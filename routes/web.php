@@ -13,12 +13,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::redirect('/', '/dashboard-general-dashboard');
 
 // Dashboard
-Route::get('/dashboard-general-dashboard', function () {
-    return view('pages.dashboard-general-dashboard', ['type_menu' => 'dashboard']);
-});
 Route::get('/dashboard-ecommerce-dashboard', function () {
     return view('pages.dashboard-ecommerce-dashboard', ['type_menu' => 'dashboard']);
 });
@@ -27,11 +23,6 @@ Route::get('/dashboard-ecommerce-dashboard', function () {
 // Layout
 Route::get('/layout-default-layout', function () {
     return view('pages.layout-default-layout', ['type_menu' => 'layout']);
-});
-
-// Blank Page
-Route::get('/blank-page', function () {
-    return view('pages.blank-page', ['type_menu' => '']);
 });
 
 // Bootstrap
@@ -149,24 +140,12 @@ Route::get('/forms-validation', function () {
     return view('pages.forms-validation', ['type_menu' => 'forms']);
 });
 
-// google maps
-// belum tersedia
-
 // modules
-Route::get('/modules-calendar', function () {
-    return view('pages.modules-calendar', ['type_menu' => 'modules']);
-});
 Route::get('/modules-chartjs', function () {
     return view('pages.modules-chartjs', ['type_menu' => 'modules']);
 });
 Route::get('/modules-datatables', function () {
     return view('pages.modules-datatables', ['type_menu' => 'modules']);
-});
-Route::get('/modules-flag', function () {
-    return view('pages.modules-flag', ['type_menu' => 'modules']);
-});
-Route::get('/modules-font-awesome', function () {
-    return view('pages.modules-font-awesome', ['type_menu' => 'modules']);
 });
 Route::get('/modules-ion-icons', function () {
     return view('pages.modules-ion-icons', ['type_menu' => 'modules']);
@@ -183,20 +162,8 @@ Route::get('/modules-sweet-alert', function () {
 Route::get('/modules-toastr', function () {
     return view('pages.modules-toastr', ['type_menu' => 'modules']);
 });
-Route::get('/modules-vector-map', function () {
-    return view('pages.modules-vector-map', ['type_menu' => 'modules']);
-});
-Route::get('/modules-weather-icon', function () {
-    return view('pages.modules-weather-icon', ['type_menu' => 'modules']);
-});
 
 // auth
-Route::get('/auth-forgot-password', function () {
-    return view('pages.auth-forgot-password', ['type_menu' => 'auth']);
-});
-Route::get('/auth-login', function () {
-    return view('pages.auth-login', ['type_menu' => 'auth']);
-});
 Route::get('/auth-login2', function () {
     return view('pages.auth-login2', ['type_menu' => 'auth']);
 });
@@ -222,9 +189,6 @@ Route::get('/error-503', function () {
 });
 
 // features
-Route::get('/features-activities', function () {
-    return view('pages.features-activities', ['type_menu' => 'features']);
-});
 Route::get('/features-post-create', function () {
     return view('pages.features-post-create', ['type_menu' => 'features']);
 });
@@ -239,23 +203,4 @@ Route::get('/features-settings', function () {
 });
 Route::get('/features-setting-detail', function () {
     return view('pages.features-setting-detail', ['type_menu' => 'features']);
-});
-Route::get('/features-tickets', function () {
-    return view('pages.features-tickets', ['type_menu' => 'features']);
-});
-
-// utilities
-Route::get('/utilities-contact', function () {
-    return view('pages.utilities-contact', ['type_menu' => 'utilities']);
-});
-Route::get('/utilities-invoice', function () {
-    return view('pages.utilities-invoice', ['type_menu' => 'utilities']);
-});
-Route::get('/utilities-subscribe', function () {
-    return view('pages.utilities-subscribe', ['type_menu' => 'utilities']);
-});
-
-// credits
-Route::get('/credits', function () {
-    return view('pages.credits', ['type_menu' => '']);
 });
