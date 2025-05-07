@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::redirect('/', '/dashboard-ecommerce-dashboard');
 
 // Dashboard
 Route::get('/dashboard-ecommerce-dashboard', function () {
