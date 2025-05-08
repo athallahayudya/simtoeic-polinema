@@ -21,7 +21,6 @@ return new class extends Migration
             $table->string('photo');
             $table->text('home_address');
             $table->text('current_address');
-            $table->boolean('is_data_complete')->default(false);
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
 
