@@ -17,7 +17,6 @@ return new class extends Migration
             $table->id('shcedule_id');
             $table->date('exam_date');
             $table->time('exam_time');
-            $table->time('test_time');
             $table->string('itc_link');
             $table->string('zoom_link');
             $table->timestamp('created_at')->useCurrent();
