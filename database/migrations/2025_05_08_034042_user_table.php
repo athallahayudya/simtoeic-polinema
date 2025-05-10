@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('user', function (Blueprint $table) {
+        Schema::create('users', function (Blueprint $table) {
             $table->id('user_id');
             $table->enum('role', ['student', 'lecturer', 'staff', 'alumni', 'admin']);
             $table->string('identity_number', 50)->unique();
@@ -33,6 +33,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('user');
+        Schema::dropIfExists('users');  // Changed from 'user' to 'users'
     }
 };

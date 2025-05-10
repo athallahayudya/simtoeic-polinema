@@ -23,7 +23,7 @@ return new class extends Migration
             $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
 
             $table->foreign('schedule_id')->references('shcedule_id')->on('exam_schedule');
-            $table->foreign('user_id')->references('user_id')->on('user');
+            $table->foreign('user_id')->references('user_id')->on('users');
         });
     }
 

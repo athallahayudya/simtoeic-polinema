@@ -16,9 +16,9 @@ return new class extends Migration
         Schema::create('faq', function (Blueprint $table) {
             $table->id('faq_id');
             $table->string('question');
+            $table->text('answer');  // Added answer column
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
-
         });
     }
 

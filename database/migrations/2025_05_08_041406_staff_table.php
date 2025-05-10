@@ -14,6 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('staff', function (Blueprint $table) {
+            $table->id('staff_id'); // Add primary key
             $table->unsignedBigInteger('user_id');
             $table->string('name', 100);
             $table->string('nip', 10)->unique();
@@ -24,7 +25,7 @@ return new class extends Migration
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
 
-            $table->foreign('user_id')->references('user_id')->on('user');
+            $table->foreign('user_id')->references('user_id')->on('users');
         });
     }
 
