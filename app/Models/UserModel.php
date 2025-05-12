@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Foundation\Auth\User as Authenticatable; //implement auth
+use App\Models\LevelModel;
 
 class UserModel extends Authenticatable
 {
@@ -36,6 +39,8 @@ class UserModel extends Authenticatable
         'password',
         'exam_status',
         'phone_number',
+        'created_at',
+        'updated_at',
     ];
 
     /**
@@ -44,6 +49,46 @@ class UserModel extends Authenticatable
      * @var array<int, string>
      */
     protected $hidden = [
-        'password',
+        'password', // Hide the password when serializing the model
     ];
+
+    protected $casts = [];
+
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isStudent()
+    {
+        return $this->role === 'student';
+    }
+
+    public function isLecturer()
+    {
+        return $this->role === 'lecturer';
+    }
+
+    public function isStaff()
+    {
+        return $this->role === 'staff';
+    }
+
+    public function isAlumni()
+    {
+        return $this->role === 'alumni';
+    }
+
+    public function hasRole($role)
+    {
+        return $this->role === $role;
+    }
+
+    // mutator to hash password
+    public function setPasswordAttribute($value) 
+    {
+        if ($value) {
+            $this->attributes['password'] = bcrypt($value);
+        }
+    } 
 }

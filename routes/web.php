@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -205,3 +206,16 @@ Route::get('/features-settings', function () {
 Route::get('/features-setting-detail', function () {
     return view('pages.features-setting-detail', ['type_menu' => 'features']);
 });
+
+
+// Authentication Routes
+Route::prefix('auth')->name('auth.')->group(function() {
+    Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [AuthController::class, 'login'])->name('process');
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+});
+
+// Admin dashboard route
+Route::get('/dashboard-ecommerce-dashboard', function () {
+    return view('pages.dashboard-ecommerce-dashboard', ['type_menu' => 'dashboard']);
+})->name('admin.dashboard'); 
