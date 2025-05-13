@@ -1,0 +1,18 @@
+body, html {
+    overflow: hidden;
+}
+
+/* Menyembunyikan scrollbar untuk browser berbasis WebKit (Chrome, Safari) */
+::-webkit-scrollbar {
+    display: none;
+}
+
+/* Menyembunyikan scrollbar untuk Firefox */
+* {
+    scrollbar-width: none;
+}
+
+/* Menyembunyikan scrollbar untuk IE dan Edge */
+* {
+    -ms-overflow-style: none;
+}
