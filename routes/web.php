@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-
+use App\Http\Controllers\MahasiswaController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -17,10 +17,13 @@ use App\Http\Controllers\AuthController;
 Route::redirect('/', '/dashboard-ecommerce-dashboard');
 
 // Dashboard
+
 Route::get('/dashboard-ecommerce-dashboard', function () {
     return view('pages.dashboard-ecommerce-dashboard', ['type_menu' => 'dashboard']);
 });
 
+Route::get('/mahasiswa/profile', [App\Http\Controllers\MahasiswaController::class, 'profile'])->name('profile');
+Route::get('/mahasiswa/dashboard', [MahasiswaController::class, 'dashboard'])->name('mahasiswa.dashboard');
 
 // Layout
 Route::get('/layout-default-layout', function () {
