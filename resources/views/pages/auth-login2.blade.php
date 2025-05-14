@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
-    <title>Login &mdash; Stisla</title>
+    <title>Login &mdash; SIMTOEIC</title>
 
     <!-- General CSS Files -->
     <link rel="stylesheet" href="{{ asset('library/bootstrap/dist/css/bootstrap.min.css') }}">
@@ -18,6 +18,9 @@
     <!-- Template CSS -->
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('css/components.css') }}">
+
+        <!-- No Scroll CSS -->
+    <link rel="stylesheet" href="{{ asset('css/no-scroll.css') }}">
 </head>
 
 <body>
@@ -26,12 +29,11 @@
             <div class="d-flex align-items-stretch flex-wrap">
                 <div class="col-lg-4 col-md-6 col-12 order-lg-1 min-vh-100 order-2 bg-white">
                     <div class="m-3 p-4">
-                        <img src="{{ asset('img/stisla-fill.svg') }}" alt="logo" width="80"
-                            class="shadow-light rounded-circle mb-5 mt-2">
-                        <h4 class="text-dark font-weight-normal">Welcome to <span class="font-weight-bold">SIMTOEIC Politeknik Negeri Malang</span>
+                        <img src="{{ asset('img/logo-polinema.png') }}" alt="logo" width="80"
+                            class="shadow-light rounded-circle mb-5 mt-2 mx-auto d-block">
+                        <h4 class="text-dark font-weight-normal">Welcome to <span class="font-weight-bold">SIMTOEIC</span> Politeknik Negeri Malang
                         </h4>
-                        <p class="text-muted">Before you get started, you must login or register if you don't already
-                            have an account.</p>
+                        <p class="text-muted">Please log in to proceed with your TOEIC registration</p>
 <form method="POST" action="{{ route('auth.process') }}" class="needs-validation" novalidate="">
     @csrf
     <div class="form-group">
@@ -82,38 +84,22 @@
         </div>
     </div>
 
-    <div class="form-group text-right">
-        <a href="auth-forgot-password.html" class="float-left mt-3">
-            Forgot Password?
-        </a>
-        <button type="submit" class="btn btn-primary btn-lg btn-icon icon-right" tabindex="5">
-            Login
-        </button>
-    </div>
+<div class="form-group d-flex justify-content-center">
+    <button type="submit" class="btn btn-primary btn-lg btn-icon icon-right w-100" tabindex="5">
+        Login
+    </button>
+</div>
 </form>
-
-                        <div class="text-small mt-5 text-center">
-                            Copyright &copy; Your Company. Made with 💙 by Stisla
-                            <div class="mt-2">
-                                <a href="#">Privacy Policy</a>
-                                <div class="bullet"></div>
-                                <a href="#">Terms of Service</a>
-                            </div>
-                        </div>
                     </div>
                 </div>
                 <div class="col-lg-8 col-12 order-lg-2 min-vh-100 background-walk-y position-relative overlay-gradient-bottom order-1"
-                    data-background="{{ asset('img/unsplash/login-bg.jpg') }}">
+                    data-background="{{ asset('img/gedung-polinema.jpg') }}">
                     <div class="absolute-bottom-left index-2">
                         <div class="text-light p-5 pb-2">
                             <div class="mb-5 pb-3">
-                                <h1 class="display-4 font-weight-bold mb-2">Good Morning</h1>
-                                <h5 class="font-weight-normal text-muted-transparent">Bali, Indonesia</h5>
+                                <h1 class="display-4 font-weight-bold mb-2">TOEIC Registration Portal</h1>
+                                <h5 class="font-weight-normal text-muted-transparent">Malang, Indonesia</h5>
                             </div>
-                            Photo by <a class="text-light bb" target="_blank"
-                                href="https://unsplash.com/photos/a8lTjWJJgLA">Justin Kauffman</a> on <a
-                                class="text-light bb" target="_blank" href="https://unsplash.com">Unsplash</a>
-                        </div>
                     </div>
                 </div>
             </div>
