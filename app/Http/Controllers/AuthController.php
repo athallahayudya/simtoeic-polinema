@@ -17,6 +17,7 @@ class AuthController extends Controller
         if (Auth::check()) {
             return redirect()->route('dashboard');
         }
+        // return view('pages.auth-login2', ['type_menu' => 'auth']);
         return view('pages.auth-login2', ['type_menu' => 'auth']);
     }
 
@@ -26,34 +27,39 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->validate([
-            'identity_number' => 'required',  // Pastikan field ini divalidasi
+            'identity_number' => 'required',
             'password' => 'required',
             'role' => 'required|in:student,lecturer,staff,alumni,admin',
         ]);
 
-        // Check if the user exists and the password is correct
+        // Check if the user exists
         $user = UserModel::where('identity_number', $credentials['identity_number'])->first();
 
-        // Check if the user has the correct role
-        if ($user && Hash::check($credentials['password'], $user->password)) {
-            // Check if the role matches
-            if ($user->role !== $credentials['role']) {
-                return back()->withErrors([
-                    'role' => 'The selected role does not match our records for this identity number.',
-                ])->withInput($request->except('password'));
-            }
-
-            // Login process
-            Auth::login($user);
-
-            // Redirect based on role
-            return $this->redirectBasedOnRole($user);
+        if (!$user) {
+            return back()->withErrors([
+                'identity_number' => 'No user found with this identity number.',
+            ])->withInput($request->except('password'));
         }
 
-        // If the user does not exist or the password is incorrect
-        return back()->withErrors([
-            'identity_number' => 'The provided credentials do not match our records.',
-        ])->withInput($request->except('password'));
+        // // Check if the password is correct
+        if (!Hash::check($credentials['password'], $user->password)) {
+            return back()->withErrors([
+                'password' => 'The password is incorrect.',
+            ])->withInput($request->except('password'));
+        }
+
+        // Check if the role matches
+        if ($user->role !== $credentials['role']) {
+            return back()->withErrors([
+                'role' => "The selected role '{$credentials['role']}' does not match the user's role '{$user->role}'.",
+            ])->withInput($request->except('password'));
+        }
+
+        // If all checks pass, log the user in
+        Auth::login($user);
+
+        // Redirect based on role
+        return $this->redirectBasedOnRole($user);
     }
 
     /**
@@ -62,7 +68,7 @@ class AuthController extends Controller
     private function redirectBasedOnRole($user)
     {
         if ($user->isAdmin()) {
-        return redirect('/dashboard-ecommerce-dashboard');
+            return redirect('/dashboard-ecommerce-dashboard');
         } elseif ($user->isLecturer()) {
             return redirect()->route('lecturer.dashboard');
         } elseif ($user->isStudent()) {
