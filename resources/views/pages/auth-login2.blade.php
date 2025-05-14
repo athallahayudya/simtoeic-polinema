@@ -18,9 +18,10 @@
     <!-- Template CSS -->
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('css/components.css') }}">
-
-    <!-- No Scroll CSS -->
     <link rel="stylesheet" href="{{ asset('css/no-scroll.css') }}">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ asset('css/login.css') }}">
 </head>
 
 <body>
@@ -59,7 +60,7 @@
                                         class="form-control @error('password') is-invalid @enderror" name="password"
                                         tabindex="2" required>
                                     <div class="input-group-append">
-                                        <button class="btn btn-light border-left-0" type="button" id="password-toggle" style="border-top-right-radius: 0.25rem; border-bottom-right-radius: 0.25rem; border-color: #e4e6fc;">
+                                        <button class="btn border-left-0 password-toggle-btn" type="button" id="password-toggle">
                                             <i class="fas fa-eye"></i>
                                         </button>
                                     </div>
@@ -135,23 +136,8 @@
     <!-- Template JS File -->
     <script src="{{ asset('js/scripts.js') }}"></script>
     <script src="{{ asset('js/custom.js') }}"></script>
-
-    <!-- Password Toggle Script -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const passwordToggle = document.getElementById('password-toggle');
-            const passwordInput = document.getElementById('password');
-
-            passwordToggle.addEventListener('click', function () {
-                // Toggle password visibility
-                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                passwordInput.setAttribute('type', type);
-
-                // Toggle icon
-                const icon = passwordToggle.querySelector('i');
-                icon.className = type === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash';
-            });
-        });
-    </script>
+    
+    <!-- Custom JS -->
+    <script src="{{ asset('js/password-toggle.js') }}"></script>
 </body>
-</html> 
+</html>=
