@@ -7,6 +7,7 @@ use App\Http\Controllers\LecturerController;
 use App\Http\Controllers\MahasiswaController;
 use App\Http\Controllers\StaffController;
 use App\Models\StudentModel;
+use App\Http\Controllers\AdminProfileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -213,6 +214,11 @@ Route::get('/features-settings', function () {
 });
 Route::get('/features-setting-detail', function () {
     return view('pages.features-setting-detail', ['type_menu' => 'features']);
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/admin/profile', [\App\Http\Controllers\AdminProfileController::class, 'show'])->name('admin.profile');
+    Route::post('/admin/profile', [\App\Http\Controllers\AdminProfileController::class, 'update'])->name('admin.profile.update');
 });
 
 
