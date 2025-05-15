@@ -1,8 +1,13 @@
 <?php
 
+use App\Http\Controllers\AlumniController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\LecturerController;
 use App\Http\Controllers\MahasiswaController;
+use App\Http\Controllers\StaffController;
+use App\Models\StudentModel;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -232,3 +237,59 @@ Route::get('/dashboard', function () {
 Route::get('/dashboard-ecommerce-dashboard', function () {
     return view('pages.dashboard-ecommerce-dashboard', ['type_menu' => 'dashboard']);
 })->name('admin.dashboard');
+
+// Admin Manage Users route
+Route::get('/manage-users', function () {
+    return view('Admin.ManageUsers.index', ['type_menu' => 'manage-users']);
+})->name('admin.manage-users');
+
+// Manage Users - Staff
+Route::group(['prefix' => 'manage-users/staff'], function () {
+    Route::get('/', function () {
+        return view('Admin.ManageUsers.staff.index', ['type_menu' => 'staff']);
+    })->name('staff.index');
+    Route::post('/list', [StaffController::class, 'list']);
+    Route::get('/{id}/show_ajax', [StaffController::class, 'show_ajax']);
+    Route::get('/{id}/edit_ajax', [StaffController::class, 'edit_ajax']);
+    Route::post('/{id}/update_ajax', [StaffController::class, 'update_ajax']);
+    Route::post('/{id}/delete_ajax', [StaffController::class, 'delete_ajax']);
+});
+
+// Manage Users - Student
+Route::group(['prefix' => 'manage-users/student'], function () {
+    Route::get('/', function () {
+        return view('Admin.ManageUsers.student.index', [
+            'type_menu' => 'student',
+            'students' => StudentModel::all()
+        ]);
+    })->name('student.index');
+    Route::post('/list', [MahasiswaController::class, 'list']);
+    Route::get('/{id}/show_ajax', [MahasiswaController::class, 'show_ajax']);
+    Route::get('/{id}/edit_ajax', [MahasiswaController::class, 'edit_ajax']);
+    Route::post('/{id}/update_ajax', [MahasiswaController::class, 'update_ajax']);
+    Route::post('/{id}/delete_ajax', [MahasiswaController::class, 'delete_ajax']);
+});
+
+// Manage Users - Alumni
+Route::group(['prefix' => 'manage-users/alumni'], function () {
+    Route::get('/', function () {
+        return view('Admin.ManageUsers.alumni.index', ['type_menu' => 'alumni']);
+    })->name('alumni.index');
+    Route::post('/list', [AlumniController::class, 'list']);
+    Route::get('/{id}/show_ajax', [AlumniController::class, 'show_ajax']);
+    Route::get('/{id}/edit_ajax', [AlumniController::class, 'edit_ajax']);
+    Route::post('/{id}/update_ajax', [AlumniController::class, 'update_ajax']);
+    Route::post('/{id}/delete_ajax', [AlumniController::class, 'delete_ajax']);
+});
+
+// Manage Users - Lecturer
+Route::group(['prefix' => 'manage-users/lecturer'], function () {
+    Route::get('/', function () {
+        return view('Admin.ManageUsers.lecturer.index', ['type_menu' => 'lecturer']);
+    })->name('lecturer.index');
+    Route::post('/list', [LecturerController::class, 'list']);
+    Route::get('/{id}/show_ajax', [LecturerController::class, 'show_ajax']);
+    Route::get('/{id}/edit_ajax', [LecturerController::class, 'edit_ajax']);
+    Route::post('/{id}/update_ajax', [LecturerController::class, 'update_ajax']);
+    Route::post('/{id}/delete_ajax', [LecturerController::class, 'delete_ajax']);
+});
