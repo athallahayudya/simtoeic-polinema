@@ -13,7 +13,7 @@ class LecturerController extends Controller
     public function list()
     {
         $lecturers = LecturerModel::select('lecturer_id', 'user_id', 'name', 'nidn', 'ktp_scan', 'photo', 'home_address', 'current_address')
-                                 ->with('user');
+                                ->with('user');
 
         return DataTables::of($lecturers)
             ->addIndexColumn()
@@ -117,5 +117,28 @@ class LecturerController extends Controller
         return view('AdminManageUsers.lecturers.show_ajax', [
             'lecturer' => $lecturer
         ]);
+    }
+
+        /**
+     * Display lecturer dashboard
+     */
+    public function dashboard()
+    {
+        $type_menu = 'dashboard';
+        // Get schedules and exam results similar to other controllers
+        $schedules = \App\Models\ExamScheduleModel::paginate(10);
+        $examResults = \App\Models\ExamResultModel::where('user_id', auth()->id())->latest()->first();
+        
+        return view('users-lecturer.lecturer-dashboard', compact('type_menu', 'schedules', 'examResults'));
+    }
+    
+    /**
+     * Display lecturer profile
+     */
+    public function profile()
+    {
+        $type_menu = 'profile';
+        $lecturer = LecturerModel::where('user_id', auth()->id())->first();
+        return view('users-lecturer.lecturer-profile', compact('type_menu', 'lecturer'));
     }
 }

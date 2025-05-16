@@ -118,4 +118,27 @@ class AlumniController extends Controller
             'alumni' => $alumni
         ]);
     }
+
+        /**
+     * Display alumni dashboard
+     */
+    public function dashboard()
+    {
+        $type_menu = 'dashboard';
+        // Get schedules and exam results similar to other controllers
+        $schedules = \App\Models\ExamScheduleModel::paginate(10);
+        $examResults = \App\Models\ExamResultModel::where('user_id', auth()->id())->latest()->first();
+        
+        return view('users-alumni.alumni-dashboard', compact('type_menu', 'schedules', 'examResults'));
+    }
+    
+    /**
+     * Display alumni profile
+     */
+    public function profile()
+    {
+        $type_menu = 'profile';
+        $alumni = AlumniModel::where('user_id', auth()->id())->first();
+        return view('users-alumni.alumni-profile', compact('type_menu', 'alumni'));
+    }
 }

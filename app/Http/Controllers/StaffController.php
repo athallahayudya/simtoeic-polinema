@@ -118,4 +118,19 @@ class StaffController extends Controller
             'staff' => $staff
         ]);
     }
+    public function dashboard()
+    {
+        $type_menu = 'dashboard';
+        // Get schedules and exam results similar to StudentController
+        $schedules = \App\Models\ExamScheduleModel::paginate(10);
+        $examResults = \App\Models\ExamResultModel::where('user_id', auth()->id())->latest()->first();
+        
+        return view('users-staff.staff-dashboard', compact('type_menu', 'schedules', 'examResults'));
+    }
+    
+    public function profile()
+    {
+        $type_menu = 'profile';
+        return view('users-staff.staff-profile', compact('type_menu'));
+    }
 }

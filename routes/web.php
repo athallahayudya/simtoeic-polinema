@@ -288,6 +288,18 @@ Route::group(['prefix' => 'manage-users/lecturer'], function () {
 Route::get('/student/profile', [StudentController::class, 'profile'])->name('profile');  
 Route::get('/student/dashboard', [StudentController::class, 'dashboard'])->name('student.dashboard'); 
 
+// Staff routes
+Route::get('/staff/profile', [StaffController::class, 'profile'])->name('staff.profile');  
+Route::get('/staff/dashboard', [StaffController::class, 'dashboard'])->name('staff.dashboard'); 
+
+// Alumni routes
+Route::get('/alumni/profile', [AlumniController::class, 'profile'])->name('alumni.profile');  
+Route::get('/alumni/dashboard', [AlumniController::class, 'dashboard'])->name('alumni.dashboard'); 
+
+// Lecturer routes
+Route::get('/lecturer/profile', [LecturerController::class, 'profile'])->name('lecturer.profile');  
+Route::get('/lecturer/dashboard', [LecturerController::class, 'dashboard'])->name('lecturer.dashboard'); 
+
 // admin routes
 Route::middleware(['auth'])->group(function () {
     Route::get('/admin/profile', [\App\Http\Controllers\AdminProfileController::class, 'show'])->name('admin.profile');
