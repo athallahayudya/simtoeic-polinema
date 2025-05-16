@@ -4,7 +4,7 @@ use App\Http\Controllers\AlumniController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\LecturerController;
-use App\Http\Controllers\MahasiswaController;
+use App\Http\Controllers\StudentController;
 use App\Http\Controllers\StaffController;
 use App\Models\StudentModel;
 use App\Http\Controllers\AdminProfileController;
@@ -20,16 +20,6 @@ use App\Http\Controllers\AdminProfileController;
 |
 */
 
-Route::redirect('/', '/dashboard-ecommerce-dashboard');
-
-// Dashboard
-
-Route::get('/dashboard-ecommerce-dashboard', function () {
-    return view('pages.dashboard-ecommerce-dashboard', ['type_menu' => 'dashboard']);
-});
-
-Route::get('/mahasiswa/profile', [App\Http\Controllers\MahasiswaController::class, 'profile'])->name('profile');
-Route::get('/mahasiswa/dashboard', [MahasiswaController::class, 'dashboard'])->name('mahasiswa.dashboard');
 
 // Layout
 Route::get('/layout-default-layout', function () {
@@ -216,12 +206,6 @@ Route::get('/features-setting-detail', function () {
     return view('pages.features-setting-detail', ['type_menu' => 'features']);
 });
 
-Route::middleware(['auth'])->group(function () {
-    Route::get('/admin/profile', [\App\Http\Controllers\AdminProfileController::class, 'show'])->name('admin.profile');
-    Route::post('/admin/profile', [\App\Http\Controllers\AdminProfileController::class, 'update'])->name('admin.profile.update');
-});
-
-
 // Redirect root URL to login page
 Route::get('/', function () {
     return redirect()->route('auth.login');
@@ -234,14 +218,14 @@ Route::prefix('auth')->name('auth.')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
 
-// Dashboard route
+// Dashboard routes
 Route::get('/dashboard', function () {
-    return view('pages.dashboard-ecommerce-dashboard', ['type_menu' => 'dashboard']);
+    return view('pages.dashboard-admin', ['type_menu' => 'dashboard']);
 })->name('dashboard')->middleware('auth');
 
 // Admin dashboard route
-Route::get('/dashboard-ecommerce-dashboard', function () {
-    return view('pages.dashboard-ecommerce-dashboard', ['type_menu' => 'dashboard']);
+Route::get('/dashboard-admin', function () {
+    return view('pages.dashboard-admin', ['type_menu' => 'dashboard']);
 })->name('admin.dashboard');
 
 // Admin Manage Users route
@@ -269,11 +253,11 @@ Route::group(['prefix' => 'manage-users/student'], function () {
             'students' => StudentModel::all()
         ]);
     })->name('student.index');
-    Route::post('/list', [MahasiswaController::class, 'list']);
-    Route::get('/{id}/show_ajax', [MahasiswaController::class, 'show_ajax']);
-    Route::get('/{id}/edit_ajax', [MahasiswaController::class, 'edit_ajax']);
-    Route::post('/{id}/update_ajax', [MahasiswaController::class, 'update_ajax']);
-    Route::post('/{id}/delete_ajax', [MahasiswaController::class, 'delete_ajax']);
+    Route::post('/list', [StudentController::class, 'list']);  // Changed from MahasiswaController
+    Route::get('/{id}/show_ajax', [StudentController::class, 'show_ajax']);  // Changed
+    Route::get('/{id}/edit_ajax', [StudentController::class, 'edit_ajax']);  // Changed
+    Route::post('/{id}/update_ajax', [StudentController::class, 'update_ajax']);  // Changed
+    Route::post('/{id}/delete_ajax', [StudentController::class, 'delete_ajax']);  // Changed
 });
 
 // Manage Users - Alumni
@@ -298,4 +282,14 @@ Route::group(['prefix' => 'manage-users/lecturer'], function () {
     Route::get('/{id}/edit_ajax', [LecturerController::class, 'edit_ajax']);
     Route::post('/{id}/update_ajax', [LecturerController::class, 'update_ajax']);
     Route::post('/{id}/delete_ajax', [LecturerController::class, 'delete_ajax']);
+});
+
+// student routes
+Route::get('/student/profile', [StudentController::class, 'profile'])->name('profile');  
+Route::get('/student/dashboard', [StudentController::class, 'dashboard'])->name('student.dashboard'); 
+
+// admin routes
+Route::middleware(['auth'])->group(function () {
+    Route::get('/admin/profile', [\App\Http\Controllers\AdminProfileController::class, 'show'])->name('admin.profile');
+    Route::post('/admin/profile', [\App\Http\Controllers\AdminProfileController::class, 'update'])->name('admin.profile.update');
 });
