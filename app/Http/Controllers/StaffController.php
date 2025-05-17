@@ -18,9 +18,9 @@ class StaffController extends Controller
         return DataTables::of($staff)
             ->addIndexColumn()
             ->addColumn('action', function ($staff) {
-                $btn = '<button onclick="modalAction(\''.url('/admin/manage-users/staff/' . $staff->staff_id . '/show_ajax').'\')" class="btn btn-info btn-sm">Detail</button> ';
-                $btn .= '<button onclick="modalAction(\''.url('/admin/manage-users/staff/' . $staff->staff_id . '/edit_ajax').'\')" class="btn btn-warning btn-sm">Edit</button> ';
-                $btn .= '<button onclick="modalAction(\''.url('/admin/manage-users/staff/' . $staff->staff_id . '/delete_ajax').'\')" class="btn btn-danger btn-sm">Hapus</button> ';
+                $btn = '<button onclick="modalAction(\''.url('/manage-users/staff/' . $staff->staff_id . '/show_ajax').'\')" class="btn btn-info btn-sm">Detail</button> ';
+                $btn .= '<button onclick="modalAction(\''.url('/manage-users/staff/' . $staff->staff_id . '/edit_ajax').'\')" class="btn btn-warning btn-sm">Edit</button> ';
+                $btn .= '<button onclick="modalAction(\''.url('/manage-users/staff/' . $staff->staff_id . '/delete_ajax').'\')" class="btn btn-danger btn-sm">Delete</button> ';
                 return $btn;
             })
             ->rawColumns(['action'])
@@ -31,17 +31,13 @@ class StaffController extends Controller
     {
         $staff = StaffModel::find($id);
 
-        return view('AdminManageUsers.staff.edit_ajax', ['staff' => $staff]);
+        return view('users-admin.manage-user.staff.edit', ['staff' => $staff]);
     }
 
     public function update_ajax(Request $request, $id)
     {
-        if ($request->ajax() || $request->wantsJson()) {
             $rules = [
-                'user_id' => 'required|exists:users,id',
                 'name' => 'required|string|max:100',
-                'nip' => 'required|string|unique:staff,nip,'.$id,
-                'ktp_scan' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
                 'photo' => 'nullable|file|mimes:jpg,jpeg,png|max:2048',
                 'home_address' => 'required|string|max:255',
                 'current_address' => 'required|string|max:255',
@@ -52,72 +48,78 @@ class StaffController extends Controller
             if ($validator->fails()) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Validasi gagal.',
+                    'message' => 'Validation failed.',
                     'msgField' => $validator->errors()
                 ]);
             }
 
             $staff = StaffModel::find($id);
             if ($staff) {
-                $data = $request->only(['user_id', 'name', 'nip', 'home_address', 'current_address']);
+                $data = $request->only([
+                    'name', 
+                    'home_address', 
+                    'current_address'
+                ]);
 
-                if ($request->hasFile('ktp_scan')) {
-                    $data['ktp_scan'] = $request->file('ktp_scan')->store('ktp_scans', 'public');
-                }
                 if ($request->hasFile('photo')) {
                     $data['photo'] = $request->file('photo')->store('photos', 'public');
                 }
 
                 $staff->update($data);
+
                 return response()->json([
                     'status' => true,
-                    'message' => 'Data staff berhasil diupdate'
+                    'message' => 'Staff data successfully updated'
                 ]);
             } else {
+
                 return response()->json([
                     'status' => false,
-                    'message' => 'Data tidak ditemukan'
+                    'message' => 'Data not found.'
                 ]);
             }
-        }
-        return redirect('/admin/manage-users/staff');
+        // }
+        return redirect('/manage-users/staff');
     }
 
     public function confirm_ajax(string $id)
     {
         $staff = StaffModel::find($id);
 
-        return view('AdminManageUsers.staff.confirm_ajax', ['staff' => $staff]);
+        return view('users-admin.manage-user.staff.delete', ['staff' => $staff]);
     }
 
-    public function delete_ajax(Request $request, $id)
+    public function delete_ajax( string $id)
     {
-        if ($request->ajax() || $request->wantsJson()) {
             $staff = StaffModel::find($id);
             if ($staff) {
                 $staff->delete();
+                return redirect('/manage-users/staff/');
+
                 return response()->json([
                     'status' => true,
-                    'message' => 'Data staff berhasil dihapus.'
+                    'message' => 'Staff data successfully deleted.'
                 ]);
             } else {
+                return redirect('/manage-users/staff/');
+
                 return response()->json([
                     'status' => false,
-                    'message' => 'Data tidak ditemukan.'
+                    'message' => 'Data not found.'
                 ]);
             }
-        }
-        return redirect('/admin/manage-users/staff');
+        return redirect('/manage-users/staff');
     }
 
     public function show_ajax(string $id)
     {
         $staff = StaffModel::find($id);
 
-        return view('AdminManageUsers.staff.show_ajax', [
+        return view('users-admin.manage-user.staff.show', [
             'staff' => $staff
         ]);
     }
+
     public function dashboard()
     {
         $type_menu = 'dashboard';
