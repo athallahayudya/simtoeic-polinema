@@ -16,7 +16,7 @@
         <div class="section-body">
             <div class="row">
                 <!-- Staff -->
-                <div class="col-lg-3 col-md-6 col-sm-6 col-12 mb-4 d-flex">
+                <div class="col-lg-3 col-md-6 col-sm-6 col-12 mb-4 d-flex" style="border-left-width: 10px; border-left-color: #6777EF; border-left-style: solid; border-radius: 10px; padding-left: 0;">
                     <a href="{{ url('/manage-users/staff/') }}" class="text-decoration-none w-100">
                         <div class="card card-statistic-1 h-100">
                             <div class="card-icon bg-primary">
@@ -26,8 +26,8 @@
                                 <div class="card-header">
                                     <h4>STAFF</h4>
                                 </div>
-                                <div class="card-body">
-                                    MANAGE STAFF
+                                <div class="card-body" style="font-size: 20px; font-weight: 800; line-height: 1.2;">
+                                    MANAGE <br> STAFF
                                 </div>
                             </div>
                         </div>
@@ -35,7 +35,7 @@
                 </div>
 
                 <!-- Student -->
-                <div class="col-lg-3 col-md-6 col-sm-6 col-12 mb-4 d-flex">
+                <div class="col-lg-3 col-md-6 col-sm-6 col-12 mb-4 d-flex" style="border-left-width: 10px; border-left-color: #6777EF; border-left-style: solid; border-radius: 10px; padding-left: 0;">
                     <a href="{{ url('/manage-users/student/') }}" class="text-decoration-none w-100">
                         <div class="card card-statistic-1 h-100">
                             <div class="card-icon bg-danger">
@@ -45,8 +45,8 @@
                                 <div class="card-header">
                                     <h4>STUDENT</h4>
                                 </div>
-                                <div class="card-body">
-                                    MANAGE STUDENT
+                                <div class="card-body" style="font-size: 20px; font-weight: 800; line-height: 1.2;">
+                                    MANAGE <br> STUDENT
                                 </div>
                             </div>
                         </div>
@@ -54,7 +54,7 @@
                 </div>
 
                 <!-- Alumni -->
-                <div class="col-lg-3 col-md-6 col-sm-6 col-12 mb-4 d-flex">
+                <div class="col-lg-3 col-md-6 col-sm-6 col-12 mb-4 d-flex" style="border-left-width: 10px; border-left-color: #6777EF; border-left-style: solid; border-radius: 10px; padding-left: 0;">
                     <a href="{{ url('/manage-users/alumni/') }}" class="text-decoration-none w-100">
                         <div class="card card-statistic-1 h-100">
                             <div class="card-icon bg-warning">
@@ -64,8 +64,8 @@
                                 <div class="card-header">
                                     <h4>ALUMNI</h4>
                                 </div>
-                                <div class="card-body">
-                                    MANAGE ALUMNI
+                                <div class="card-body" style="font-size: 20px; font-weight: 800; line-height: 1.2;">
+                                    MANAGE <br> ALUMNI
                                 </div>
                             </div>
                         </div>
@@ -73,7 +73,7 @@
                 </div>
 
                 <!-- Lecturer -->
-                <div class="col-lg-3 col-md-6 col-sm-6 col-12 mb-4 d-flex">
+                <div class="col-lg-3 col-md-6 col-sm-6 col-12 mb-4 d-flex" style="border-left-width: 10px; border-left-color: #6777EF; border-left-style: solid; border-radius: 10px; padding-left: 0;">
                     <a href="{{ url('/manage-users/lecturer/') }}" class="text-decoration-none w-100">
                         <div class="card card-statistic-1 h-100">
                             <div class="card-icon bg-success">
@@ -83,8 +83,8 @@
                                 <div class="card-header">
                                     <h4>LECTURER</h4>
                                 </div>
-                                <div class="card-body">
-                                    MANAGE LECTURER
+                                <div class="card-body" style="font-size: 20px; font-weight: 800; line-height: 1.2;">
+                                    MANAGE <br> LECTURER
                                 </div>
                             </div>
                         </div>
