@@ -230,57 +230,62 @@ Route::get('/dashboard-admin', function () {
 
 // Admin Manage Users route
 Route::get('/manage-users', function () {
-    return view('Admin.ManageUsers.index', ['type_menu' => 'manage-users']);
-})->name('admin.manage-users');
+    return view('users-admin.manage-user.index', ['type_menu' => 'manage-users']);
+})->name('manage-users');
 
 // Manage Users - Staff
 Route::group(['prefix' => 'manage-users/staff'], function () {
     Route::get('/', function () {
-        return view('Admin.ManageUsers.staff.index', ['type_menu' => 'staff']);
+        return view('users-admin.manage-user.staff.index', ['type_menu' => 'staff']);
     })->name('staff.index');
     Route::post('/list', [StaffController::class, 'list']);
     Route::get('/{id}/show_ajax', [StaffController::class, 'show_ajax']);
     Route::get('/{id}/edit_ajax', [StaffController::class, 'edit_ajax']);
-    Route::post('/{id}/update_ajax', [StaffController::class, 'update_ajax']);
+    Route::put('/{id}/update_ajax', [StaffController::class, 'update_ajax']);
+    Route::get('/{id}/delete_ajax', [StaffController::class, 'confirm_ajax']);
     Route::post('/{id}/delete_ajax', [StaffController::class, 'delete_ajax']);
 });
 
 // Manage Users - Student
 Route::group(['prefix' => 'manage-users/student'], function () {
     Route::get('/', function () {
-        return view('Admin.ManageUsers.student.index', [
+        return view('users-admin.manage-user.student.index', [
             'type_menu' => 'student',
             'students' => StudentModel::all()
         ]);
     })->name('student.index');
-    Route::post('/list', [StudentController::class, 'list']);  // Changed from MahasiswaController
-    Route::get('/{id}/show_ajax', [StudentController::class, 'show_ajax']);  // Changed
-    Route::get('/{id}/edit_ajax', [StudentController::class, 'edit_ajax']);  // Changed
-    Route::post('/{id}/update_ajax', [StudentController::class, 'update_ajax']);  // Changed
-    Route::post('/{id}/delete_ajax', [StudentController::class, 'delete_ajax']);  // Changed
+    Route::post('/list', [StudentController::class, 'list']);
+    Route::get('/{id}/show_ajax', [StudentController::class, 'show_ajax']);
+    Route::get('/{id}/edit_ajax', [StudentController::class, 'edit_ajax']);
+    Route::put('/{id}/update_ajax', [StudentController::class, 'update_ajax']);
+    Route::get('/{id}/delete_ajax', [StudentController::class, 'confirm_ajax']);
+    Route::post('/{id}/delete_ajax', [StudentController::class, 'delete_ajax']);
+
 });
 
 // Manage Users - Alumni
 Route::group(['prefix' => 'manage-users/alumni'], function () {
     Route::get('/', function () {
-        return view('Admin.ManageUsers.alumni.index', ['type_menu' => 'alumni']);
+        return view('users-admin.manage-user.alumni.index', ['type_menu' => 'alumni']);
     })->name('alumni.index');
     Route::post('/list', [AlumniController::class, 'list']);
     Route::get('/{id}/show_ajax', [AlumniController::class, 'show_ajax']);
     Route::get('/{id}/edit_ajax', [AlumniController::class, 'edit_ajax']);
-    Route::post('/{id}/update_ajax', [AlumniController::class, 'update_ajax']);
+    Route::put('/{id}/update_ajax', [AlumniController::class, 'update_ajax']);
+    Route::get('/{id}/delete_ajax', [AlumniController::class, 'confirm_ajax']);
     Route::post('/{id}/delete_ajax', [AlumniController::class, 'delete_ajax']);
 });
 
 // Manage Users - Lecturer
 Route::group(['prefix' => 'manage-users/lecturer'], function () {
     Route::get('/', function () {
-        return view('Admin.ManageUsers.lecturer.index', ['type_menu' => 'lecturer']);
+        return view('users-admin.manage-user.lecturer.index', ['type_menu' => 'lecturer']);
     })->name('lecturer.index');
     Route::post('/list', [LecturerController::class, 'list']);
     Route::get('/{id}/show_ajax', [LecturerController::class, 'show_ajax']);
     Route::get('/{id}/edit_ajax', [LecturerController::class, 'edit_ajax']);
-    Route::post('/{id}/update_ajax', [LecturerController::class, 'update_ajax']);
+    Route::put('/{id}/update_ajax', [LecturerController::class, 'update_ajax']);
+    Route::get('/{id}/delete_ajax', [LecturerController::class, 'confirm_ajax']);
     Route::post('/{id}/delete_ajax', [LecturerController::class, 'delete_ajax']);
 });
 

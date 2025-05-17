@@ -29,7 +29,7 @@ class StudentController extends Controller
     public function list(Request $request)
     {
         $students = StudentModel::select('student_id', 'user_id', 'name', 'nim', 'study_program', 'major', 'campus', 'ktp_scan', 'ktm_scan', 'photo', 'home_address', 'current_address')
-            ->with('user');
+                                ->with('user');
 
         if ($request->student_id) {
             $students->where('student_id', $request->student_id);
@@ -38,9 +38,9 @@ class StudentController extends Controller
         return DataTables::of($students)
             ->addIndexColumn()
             ->addColumn('action', function ($student) {
-                $btn = '<button onclick="modalAction(\'' . url('/admin/manage-users/students/' . $student->student_id . '/show_ajax') . '\')" class="btn btn-info btn-sm">Detail</button> ';
-                $btn .= '<button onclick="modalAction(\'' . url('/admin/manage-users/students/' . $student->student_id . '/edit_ajax') . '\')" class="btn btn-warning btn-sm">Edit</button> ';
-                $btn .= '<button onclick="modalAction(\'' . url('/admin/manage-users/students/' . $student->student_id . '/delete_ajax') . '\')" class="btn btn-danger btn-sm">Delete</button> ';
+                $btn = '<button onclick="modalAction(\''.url('/manage-users/student/' . $student->student_id . '/show_ajax').'\')" class="btn btn-info btn-sm">Detail</button> ';
+                $btn .= '<button onclick="modalAction(\''.url('/manage-users/student/' . $student->student_id . '/edit_ajax').'\')" class="btn btn-warning btn-sm">Edit</button> ';
+                $btn .= '<button onclick="modalAction(\''.url('/manage-users/student/' . $student->student_id . '/delete_ajax').'\')" class="btn btn-danger btn-sm">Delete</button> ';
                 return $btn;
             })
             ->rawColumns(['action'])
@@ -49,24 +49,16 @@ class StudentController extends Controller
 
     public function edit_ajax(string $id)
     {
-        $students = StudentModel::find($id);
+        $student = StudentModel::find($id);
 
-        return view('AdminManageUsers.students.edit_ajax', ['student' => $students]);
+        return view('users-admin.manage-user.student.edit', ['student' => $student]);
     }
 
     public function update_ajax(Request $request, $id)
     {
-        if ($request->ajax() || $request->wantsJson()) {
             $rules = [
-                'user_id' => 'required|exists:users,id',
-                'name' => 'required|string|max:100',
-                'nim' => 'required|string|max:12|unique:students,nip,' . $id,
-                'study_program' => 'required|string|max:100',
-                'major' => 'required|string|max:100',
-                'campus' => 'required|string|max:255|in:malang,psdku_kediri,psdku_lumajang',
-                'ktp_scan' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
-                'ktm_scan' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
-                'photo' => 'nullable|file|mimes:jpg,jpeg,png|max:2048',
+                'name' => 'required|string|max:100', 
+                'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
                 'home_address' => 'required|string',
                 'current_address' => 'required|string',
             ];
@@ -76,7 +68,7 @@ class StudentController extends Controller
             if ($validator->fails()) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Validation failed.',
+                    'message' => 'Validasi gagal.',
                     'msgField' => $validator->errors()
                 ]);
             }
@@ -84,22 +76,9 @@ class StudentController extends Controller
             $student = StudentModel::find($id);
             if ($student) {
                 $data = $request->only([
-                    'user_id',
-                    'name',
-                    'nim',
-                    'study_program',
-                    'major',
-                    'campus',
-                    'home_address',
-                    'current_address'
+                    'name','home_address', 'current_address'
                 ]);
 
-                if ($request->hasFile('ktp_scan')) {
-                    $data['ktp_scan'] = $request->file('ktp_scan')->store('ktp_scans', 'public');
-                }
-                if ($request->hasFile('ktm_scan')) {
-                    $data['ktm_scan'] = $request->file('ktm_scan')->store('ktm_scans', 'public');
-                }
                 if ($request->hasFile('photo')) {
                     $data['photo'] = $request->file('photo')->store('photos', 'public');
                 }
@@ -107,50 +86,51 @@ class StudentController extends Controller
                 $student->update($data);
                 return response()->json([
                     'status' => true,
-                    'message' => 'Student data successfully updated'
+                    'message' => 'Data mahasiswa berhasil diupdate'
                 ]);
             } else {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Data not found'
+                    'message' => 'Data tidak ditemukan'
                 ]);
             }
-        }
-        return redirect('/admin/manage-users/students');
+        return redirect('/manage-users/student');
     }
 
     public function confirm_ajax(string $id)
     {
         $student = StudentModel::find($id);
 
-        return view('AdminManageUsers.students.confirm_ajax', ['student' => $student]);
+        return view('users-admin.manage-user.student.delete', ['student' => $student]);
     }
 
-    public function delete_ajax(Request $request, $id)
+    public function delete_ajax( string $id)
     {
-        if ($request->ajax() || $request->wantsJson()) {
             $student = StudentModel::find($id);
             if ($student) {
                 $student->delete();
+                return redirect('/manage-users/student/');
+
                 return response()->json([
                     'status' => true,
-                    'message' => 'Student data successfully deleted.'
+                    'message' => 'Student data has been successfully deleted.'
                 ]);
             } else {
+                return redirect('/manage-users/student/');
+
                 return response()->json([
                     'status' => false,
                     'message' => 'Data not found.'
                 ]);
             }
-        }
-        return redirect('/admin/manage-users/students');
+        return redirect('/manage-users/student/');
     }
 
     public function show_ajax(string $id)
     {
-        $student = StudentModel::find($id);
+        $student = StudentModel::with('user')->find($id);
 
-        return view('AdminManageUsers.students.show_ajax', [
+        return view('users-admin.manage-user.student.show', [
             'student' => $student
         ]);
     }

@@ -18,9 +18,9 @@ class LecturerController extends Controller
         return DataTables::of($lecturers)
             ->addIndexColumn()
             ->addColumn('action', function ($lecturer) {
-                $btn = '<button onclick="modalAction(\''.url('/admin/manage-users/lecturers/' . $lecturer->lecturer_id . '/show_ajax').'\')" class="btn btn-info btn-sm">Detail</button> ';
-                $btn .= '<button onclick="modalAction(\''.url('/admin/manage-users/lecturers/' . $lecturer->lecturer_id . '/edit_ajax').'\')" class="btn btn-warning btn-sm">Edit</button> ';
-                $btn .= '<button onclick="modalAction(\''.url('/admin/manage-users/lecturers/' . $lecturer->lecturer_id . '/delete_ajax').'\')" class="btn btn-danger btn-sm">Hapus</button> ';
+                $btn = '<button onclick="modalAction(\''.url('/manage-users/lecturer/' . $lecturer->lecturer_id . '/show_ajax').'\')" class="btn btn-info btn-sm">Detail</button> ';
+                $btn .= '<button onclick="modalAction(\''.url('/manage-users/lecturer/' . $lecturer->lecturer_id . '/edit_ajax').'\')" class="btn btn-warning btn-sm">Edit</button> ';
+                $btn .= '<button onclick="modalAction(\''.url('/manage-users/lecturer/' . $lecturer->lecturer_id . '/delete_ajax').'\')" class="btn btn-danger btn-sm">Delete</button> ';
                 return $btn;
             })
             ->rawColumns(['action'])
@@ -31,17 +31,13 @@ class LecturerController extends Controller
     {
         $lecturer = LecturerModel::find($id);
 
-        return view('AdminManageUsers.lecturers.edit_ajax', ['lecturer' => $lecturer]);
+        return view('users-admin.manage-user.lecturer.edit', ['lecturer' => $lecturer]);
     }
 
     public function update_ajax(Request $request, $id)
     {
-        if ($request->ajax() || $request->wantsJson()) {
             $rules = [
-                'user_id' => 'required|exists:users,id',
                 'name' => 'required|string|max:100',
-                'nidn' => 'required|string|max:18|unique:lecturers,nidn,'.$id, 
-                'ktp_scan' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
                 'photo' => 'nullable|file|mimes:jpg,jpeg,png|max:2048',
                 'home_address' => 'required|string',
                 'current_address' => 'required|string',
@@ -52,18 +48,19 @@ class LecturerController extends Controller
             if ($validator->fails()) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Validasi gagal.',
+                    'message' => 'Valiation failed.',
                     'msgField' => $validator->errors()
                 ]);
             }
 
             $lecturer = LecturerModel::find($id);
             if ($lecturer) {
-                $data = $request->only(['user_id', 'name', 'nidn', 'home_address', 'current_address']);
+                $data = $request->only([
+                    'name', 
+                    'home_address', 
+                    'current_address'
+                ]);
 
-                if ($request->hasFile('ktp_scan')) {
-                    $data['ktp_scan'] = $request->file('ktp_scan')->store('ktp_scans', 'public');
-                }
                 if ($request->hasFile('photo')) {
                     $data['photo'] = $request->file('photo')->store('photos', 'public');
                 }
@@ -71,50 +68,51 @@ class LecturerController extends Controller
                 $lecturer->update($data);
                 return response()->json([
                     'status' => true,
-                    'message' => 'Data dosen berhasil diupdate'
+                    'message' => 'Lecturer data successfully updated'
                 ]);
             } else {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Data tidak ditemukan'
+                    'message' => 'Data not found.'
                 ]);
             }
-        }
-        return redirect('/admin/manage-users/lecturers');
+        return redirect('/manage-users/lecturer');
     }
 
     public function confirm_ajax(string $id)
     {
         $lecturer = LecturerModel::find($id);
 
-        return view('AdminManageUsers.lecturers.confirm_ajax', ['lecturer' => $lecturer]);
+        return view('users-admin.manage-user.lecturer.delete', ['lecturer' => $lecturer]);
     }
 
-    public function delete_ajax(Request $request, $id)
+    public function delete_ajax( string $id)
     {
-        if ($request->ajax() || $request->wantsJson()) {
             $lecturer = LecturerModel::find($id);
             if ($lecturer) {
                 $lecturer->delete();
+                return redirect('/manage-users/lecturer');
+
                 return response()->json([
                     'status' => true,
-                    'message' => 'Data dosen berhasil dihapus.'
+                    'message' => 'Lecturer data successfully deleted'
                 ]);
             } else {
+                return redirect('/manage-users/lecturer');
+
                 return response()->json([
                     'status' => false,
-                    'message' => 'Data tidak ditemukan.'
+                    'message' => 'Data not found.'
                 ]);
             }
-        }
-        return redirect('/admin/manage-users/lecturers');
+        return redirect('/manage-users/lecturer');
     }
 
     public function show_ajax(string $id)
     {
         $lecturer = LecturerModel::find($id);
 
-        return view('AdminManageUsers.lecturers.show_ajax', [
+        return view('users-admin.manage-user.lecturer.show', [
             'lecturer' => $lecturer
         ]);
     }

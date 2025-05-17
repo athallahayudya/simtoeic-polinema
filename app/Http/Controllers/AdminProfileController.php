@@ -26,12 +26,12 @@ class AdminProfileController extends Controller
 
         // If no admin record exists
         if (!$admin) {
-            return view('Admin.ManageUsers.admin-not-found', [
+            return view('users-admin.profile.not-found', [
                 'message' => 'Your admin profile has not been set up yet. Please contact the system administrator.'
             ]);
         }
 
-        return view('Admin.ManageUsers.profile', compact('admin'));
+        return view('users-admin.profile.profile', compact('admin'));
     }
 
     public function update(Request $request)
