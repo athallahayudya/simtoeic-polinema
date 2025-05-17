@@ -305,3 +305,4 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/profile', [\App\Http\Controllers\AdminProfileController::class, 'show'])->name('admin.profile');
     Route::post('/admin/profile', [\App\Http\Controllers\AdminProfileController::class, 'update'])->name('admin.profile.update');
 });
+
