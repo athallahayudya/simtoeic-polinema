@@ -85,10 +85,15 @@ class UserModel extends Authenticatable
     }
 
     // mutator to hash password
-    public function setPasswordAttribute($value) 
+    public function setPasswordAttribute($value)
     {
         if ($value) {
-            $this->attributes['password'] = bcrypt($value);
+            // Only hash if it's not already hashed
+            if (strlen($value) < 60 || !preg_match('/^\$2[ayb]\$.{56}$/', $value)) {
+                $this->attributes['password'] = bcrypt($value);
+            } else {
+                $this->attributes['password'] = $value; // Already hashed, store as is
+            }
         }
-    } 
+    }
 }

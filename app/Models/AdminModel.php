@@ -8,21 +8,21 @@ use Illuminate\Database\Eloquent\Model;
 class AdminModel extends Model
 {
     use HasFactory;
-    
+
     /**
      * The table associated with the model.
      *
      * @var string
      */
     protected $table = 'admin';
-    
+
     /**
      * The primary key for the model.
      *
      * @var string
      */
     protected $primaryKey = 'admin_id';
-    
+
     /**
      * The attributes that are mass assignable.
      *
@@ -37,15 +37,15 @@ class AdminModel extends Model
         'home_address',
         'current_address'
     ];
-    
+
     /**
      * Get the user that owns the admin record.
      */
     public function user()
     {
-        return $this->belongsTo(UserModel::class, 'user_id', 'user_id');
+        return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
-    
+
     /**
      * Get the admin's full path KTP scan.
      */

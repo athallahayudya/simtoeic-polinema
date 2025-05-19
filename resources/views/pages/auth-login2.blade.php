@@ -18,9 +18,10 @@
     <!-- Template CSS -->
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('css/components.css') }}">
-
-        <!-- No Scroll CSS -->
     <link rel="stylesheet" href="{{ asset('css/no-scroll.css') }}">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ asset('css/login.css') }}">
 </head>
 
 <body>
@@ -31,65 +32,81 @@
                     <div class="m-3 p-4">
                         <img src="{{ asset('img/logo-polinema.png') }}" alt="logo" width="80"
                             class="shadow-light rounded-circle mb-5 mt-2 mx-auto d-block">
-                        <h4 class="text-dark font-weight-normal">Welcome to <span class="font-weight-bold">SIMTOEIC</span> Politeknik Negeri Malang
+                        <h4 class="text-dark font-weight-normal">Welcome to <span
+                                class="font-weight-bold">SIMTOEIC</span> Politeknik Negeri Malang
                         </h4>
                         <p class="text-muted">Please log in to proceed with your TOEIC registration</p>
-<form method="POST" action="{{ route('auth.process') }}" class="needs-validation" novalidate="">
-    @csrf
-    <div class="form-group">
-        <label for="identity_number">Identity Number</label>
-        <input id="identity_number" type="text" class="form-control @error('identity_number') is-invalid @enderror" 
-            name="identity_number" value="{{ old('identity_number') }}" tabindex="1" required autofocus>
-        @error('identity_number')
-            <div class="invalid-feedback">{{ $message }}</div>
-        @else
-            <div class="invalid-feedback">Please fill in your identity number</div>
-        @enderror
-    </div>
+                        <form method="POST" action="{{ route('auth.process') }}" class="needs-validation" novalidate="">
+                            @csrf
+                            <div class="form-group">
+                                <label for="identity_number">Identity Number</label>
+                                <input id="identity_number" type="text"
+                                    class="form-control @error('identity_number') is-invalid @enderror"
+                                    name="identity_number" value="{{ old('identity_number') }}" tabindex="1" required
+                                    autofocus>
+                                @error('identity_number')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                                @else
+                                <div class="invalid-feedback">Please fill in your identity number</div>
+                                @enderror
+                            </div>
 
-    <div class="form-group">
-        <div class="d-block">
-            <label for="password" class="control-label">Password</label>
-        </div>
-        <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" 
-            name="password" tabindex="2" required>
-        @error('password')
-            <div class="invalid-feedback">{{ $message }}</div>
-        @else
-            <div class="invalid-feedback">Please fill in your password</div>
-        @enderror
-    </div>
+                            <div class="form-group">
+                                <div class="d-block">
+                                    <label for="password" class="control-label">Password</label>
+                                </div>
+                                <div class="input-group">
+                                    <input id="password" type="password"
+                                        class="form-control @error('password') is-invalid @enderror" name="password"
+                                        tabindex="2" required>
+                                    <div class="input-group-append">
+                                        <button class="btn border-left-0 password-toggle-btn" type="button" id="password-toggle">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                    @error('password')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                    @else
+                                    <div class="invalid-feedback">Please fill in your password</div>
+                                    @enderror
+                                </div>
+                            </div>
 
-    <div class="form-group">
-        <label for="role">Select Role</label>
-        <select class="form-control @error('role') is-invalid @enderror" id="role" name="role" tabindex="3" required>
-            <option value="" disabled selected>-- Select Your Role --</option>
-            <option value="student" {{ old('role') == 'student' ? 'selected' : '' }}>Student</option>
-            <option value="lecturer" {{ old('role') == 'lecturer' ? 'selected' : '' }}>Lecturer</option>
-            <option value="staff" {{ old('role') == 'staff' ? 'selected' : '' }}>Staff</option>
-            <option value="alumni" {{ old('role') == 'alumni' ? 'selected' : '' }}>Alumni</option>
-            <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
-        </select>
-        @error('role')
-            <div class="invalid-feedback">{{ $message }}</div>
-        @else
-            <div class="invalid-feedback">Please select your role</div>
-        @enderror
-    </div>
+                            <div class="form-group">
+                                <label for="role">Select Role</label>
+                                <select class="form-control @error('role') is-invalid @enderror" id="role" name="role"
+                                    tabindex="3" required>
+                                    <option value="" disabled selected>-- Select Your Role --</option>
+                                    <option value="student" {{ old('role') == 'student' ? 'selected' : '' }}>Student
+                                    </option>
+                                    <option value="lecturer" {{ old('role') == 'lecturer' ? 'selected' : '' }}>Lecturer
+                                    </option>
+                                    <option value="staff" {{ old('role') == 'staff' ? 'selected' : '' }}>Staff</option>
+                                    <option value="alumni" {{ old('role') == 'alumni' ? 'selected' : '' }}>Alumni</option>
+                                    <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
+                                </select>
+                                @error('role')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                                @else
+                                <div class="invalid-feedback">Please select your role</div>
+                                @enderror
+                            </div>
 
-    <div class="form-group">
-        <div class="custom-control custom-checkbox">
-            <input type="checkbox" name="remember" class="custom-control-input" tabindex="4" id="remember-me">
-            <label class="custom-control-label" for="remember-me">Remember Me</label>
-        </div>
-    </div>
+                            <div class="form-group">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" name="remember" class="custom-control-input" tabindex="4"
+                                        id="remember-me">
+                                    <label class="custom-control-label" for="remember-me">Remember Me</label>
+                                </div>
+                            </div>
 
-<div class="form-group d-flex justify-content-center">
-    <button type="submit" class="btn btn-primary btn-lg btn-icon icon-right w-100" tabindex="5">
-        Login
-    </button>
-</div>
-</form>
+                            <div class="form-group d-flex justify-content-center">
+                                <button type="submit" class="btn btn-primary btn-lg btn-icon icon-right w-100"
+                                    tabindex="5">
+                                    Login
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
                 <div class="col-lg-8 col-12 order-lg-2 min-vh-100 background-walk-y position-relative overlay-gradient-bottom order-1"
@@ -100,6 +117,7 @@
                                 <h1 class="display-4 font-weight-bold mb-2">TOEIC Registration Portal</h1>
                                 <h5 class="font-weight-normal text-muted-transparent">Malang, Indonesia</h5>
                             </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -115,13 +133,11 @@
     <script src="{{ asset('library/moment/min/moment.min.js') }}"></script>
     <script src="{{ asset('js/stisla.js') }}"></script>
 
-    <!-- JS Libraies -->
-
-    <!-- Page Specific JS File -->
-
     <!-- Template JS File -->
     <script src="{{ asset('js/scripts.js') }}"></script>
     <script src="{{ asset('js/custom.js') }}"></script>
+    
+    <!-- Custom JS -->
+    <script src="{{ asset('js/password-toggle.js') }}"></script>
 </body>
-
-</html>
+</html>=
