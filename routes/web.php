@@ -320,3 +320,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/profile', [\App\Http\Controllers\AdminProfileController::class, 'show'])->name('admin.profile');
     Route::post('/admin/profile', [\App\Http\Controllers\AdminProfileController::class, 'update'])->name('admin.profile.update');
 });
+
+  Route::get('/lecturer/profile', [\App\Http\Controllers\LecturerController::class, 'show'])->name('lecturer.profile');
+    Route::post('/lecturer/profile', [\App\Http\Controllers\LecturerController::class, 'update'])->name('lecturer.profile.update');
+
