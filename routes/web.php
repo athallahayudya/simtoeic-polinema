@@ -8,6 +8,7 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\StaffController;
 use App\Models\StudentModel;
 use App\Http\Controllers\AdminProfileController;
+use App\Models\UserModel;
 
 /*
 |--------------------------------------------------------------------------
@@ -289,6 +290,15 @@ Route::group(['prefix' => 'manage-users/lecturer'], function () {
     Route::post('/{id}/delete_ajax', [LecturerController::class, 'delete_ajax']);
 });
 
+// Registration - Admin
+Route::get('/registration', function(){
+    return view('users-admin.registration.index', [
+        'type_menu' => 'registration',
+        'user' => UserModel::all()
+    ]);
+})->name('registration');
+Route::post('/registration', [AuthController::class, 'register']);
+
 // student routes
 Route::get('/student/profile', [StudentController::class, 'profile'])->name('profile');  
 Route::get('/student/dashboard', [StudentController::class, 'dashboard'])->name('student.dashboard'); 
@@ -310,4 +320,3 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/profile', [\App\Http\Controllers\AdminProfileController::class, 'show'])->name('admin.profile');
     Route::post('/admin/profile', [\App\Http\Controllers\AdminProfileController::class, 'update'])->name('admin.profile.update');
 });
-
