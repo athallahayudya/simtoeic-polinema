@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
 class LecturerController extends Controller
 {
@@ -133,10 +134,60 @@ class LecturerController extends Controller
     /**
      * Display lecturer profile
      */
-    public function profile()
+    public function show()
     {
-        $type_menu = 'profile';
-        $lecturer = LecturerModel::where('user_id', auth()->id())->first();
-        return view('users-lecturer.lecturer-profile', compact('type_menu', 'lecturer'));
+        $user = Auth::guard('web')->user();
+        if (!$user) {
+            abort(403, 'Unauthorized');
+        }
+
+        if ($user->role !== 'lecturer') {
+            abort(403, 'Only lecturer users can access this page.');
+        }
+
+        $userId = $user->user_id;
+        $lecturer = LecturerModel::where('user_id', $userId)->first();
+
+        // If no record exists
+        if (!$lecturer) {
+            return view('users-lecturer.profile.not-found', [
+                'message' => 'Your lecturer profile has not been set up yet. Please contact the system administrator.'
+            ]);
+        }
+
+        return view('users-lecturer.lecturer-profile', compact('lecturer'));
     }
+
+public function update(Request $request)
+{
+    $user = Auth::guard('web')->user();
+    $lecturer = LecturerModel::where('user_id', $user->user_id)->firstOrFail();
+
+    $request->validate([
+        'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        'phone_number' => 'nullable|string|max:20',
+    ]);
+
+    // Update nomor telepon
+    $user->phone_number = $request->input('phone_number');
+    $user->save();
+
+    // Hapus foto lama jika ada dan unggah foto baru
+    if ($request->hasFile('photo')) {
+        // Hapus file lama jika ada
+        if ($lecturer->photo && Storage::disk('public')->exists($lecturer->photo)) {
+            Storage::disk('public')->delete($lecturer->photo);
+        }
+
+        // Simpan file baru
+        $path = $request->file('photo')->store('lecturer/photos', 'public');
+        $lecturer->photo = $path; // Simpan path tanpa "storage/"
+    }
+
+    $lecturer->save();
+
+    return redirect()->route('lecturer.profile')->with('success', 'Profile updated!');
+}
+
+
 }

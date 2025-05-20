@@ -18,8 +18,8 @@ return new class extends Migration
             $table->enum('role', ['student', 'lecturer', 'staff', 'alumni', 'admin']);
             $table->string('identity_number', 50)->unique();
             $table->string('password');
-            $table->enum('exam_status', ['success', 'fail', 'not_yet'])->default('not_yet');
-            $table->string('phone_number', 15);
+            $table->enum('exam_status', ['success', 'fail', 'not_yet'])->default('not_yet')->nullable();
+            $table->string('phone_number', 15)->nullable();
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
 

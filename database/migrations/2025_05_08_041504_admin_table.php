@@ -18,10 +18,10 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->string('name', 100);
             $table->string('nidn', 12)->unique();
-            $table->string('ktp_scan');
-            $table->string('photo');
-            $table->text('home_address');
-            $table->text('current_address');
+            $table->string('ktp_scan')->nullable();
+            $table->string('photo')->nullable();
+            $table->text('home_address')->nullable();
+            $table->text('current_address')->nullable();
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
 
