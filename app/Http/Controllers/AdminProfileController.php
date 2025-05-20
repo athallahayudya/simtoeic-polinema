@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\AdminModel;
 use Illuminate\Support\Facades\Storage;
+use App\Models\User;
 
 class AdminProfileController extends Controller
 {
@@ -58,7 +59,11 @@ class AdminProfileController extends Controller
         $admin->current_address = $request->input('current_address');
 
         // Update phone number di tabel user
-        $user->phone_number = $request->input('phone_number');
+        $userModel = User::find($user->user_id);
+        if ($userModel) {
+            $userModel->phone_number = $request->input('phone_number');
+            $userModel->save();
+        }
         $user->save();
 
         // Handle photo upload
