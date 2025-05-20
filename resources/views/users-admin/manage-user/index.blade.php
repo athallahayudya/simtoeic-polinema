@@ -8,9 +8,8 @@
         <div class="section-header">
             <h1>Manage Users</h1>
             <div class="section-header-breadcrumb">
-                <div class="col-12">
-                    <a href="{{ url('/auth-register') }}" class="btn btn-primary">Added Users</a>
-                </div>
+                <div class="breadcrumb-item active"><a href="{{ url('/dashboard-admin') }}">Dashboard</a></div>
+                <div class="breadcrumb-item">Manage Users</div>
             </div>
         </div>
         <div class="section-body">
@@ -20,7 +19,7 @@
                     <a href="{{ url('/manage-users/staff/') }}" class="text-decoration-none w-100">
                         <div class="card card-statistic-1 h-100">
                             <div class="card-icon bg-primary">
-                                <i class="fas fa-users"></i>
+                                <i class="fas fa-users" style="padding-right: 35px;"></i>
                             </div>
                             <div class="card-wrap">
                                 <div class="card-header">

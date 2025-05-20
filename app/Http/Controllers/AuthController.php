@@ -2,6 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AdminModel;
+use App\Models\AlumniModel;
+use App\Models\LecturerModel;
+use App\Models\StaffModel;
+use App\Models\StudentModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -94,5 +99,56 @@ class AuthController extends Controller
 
         // Change this line
         return redirect()->route('auth.login');
+    }
+
+    public function register(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:100',
+            'role' => 'required|in:student,lecturer,staff,alumni,admin',
+            'identity_number' => 'required|string|max:50',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $user = UserModel::create([
+            'role' => $request->role,
+            'identity_number' => $request->identity_number,
+            'password' => Hash::make($request->password),
+        ]);
+
+        // Save the name to the corresponding role table
+        if ($request->role === 'student') {
+            StudentModel::create([
+                'user_id' => $user->user_id,
+                'name' => $request->name,
+                'nim' => $request->identity_number,
+            ]);
+        } elseif ($request->role === 'lecturer') {
+            LecturerModel::create([
+                'user_id' => $user->user_id,
+                'name' => $request->name,
+                'nidn' => $request->identity_number, 
+            ]);
+        } elseif ($request->role === 'staff') {
+            StaffModel::create([
+                'user_id' => $user->user_id,
+                'name' => $request->name,
+                'nip' => $request->identity_number, 
+            ]);
+        } elseif ($request->role === 'alumni') {
+            AlumniModel::create([
+                'user_id' => $user->user_id,
+                'name' => $request->name,
+                'nik' => $request->identity_number,
+            ]);
+        } elseif ($request->role === 'admin') {
+            AdminModel::create([
+                'user_id' => $user->user_id,
+                'name' => $request->name,
+                'nip' => $request->identity_number, 
+            ]);
+        }
+
+        return redirect('/registration')->with('success', 'Registration successful');
     }
 }
