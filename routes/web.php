@@ -260,7 +260,6 @@ Route::group(['prefix' => 'manage-users/student'], function () {
     Route::put('/{id}/update_ajax', [StudentController::class, 'update_ajax']);
     Route::get('/{id}/delete_ajax', [StudentController::class, 'confirm_ajax']);
     Route::post('/{id}/delete_ajax', [StudentController::class, 'delete_ajax']);
-
 });
 
 // Manage Users - Alumni
@@ -290,24 +289,23 @@ Route::group(['prefix' => 'manage-users/lecturer'], function () {
 });
 
 // student routes
-Route::get('/student/profile', [StudentController::class, 'profile'])->name('profile');  
-Route::get('/student/dashboard', [StudentController::class, 'dashboard'])->name('student.dashboard'); 
+Route::get('/student/profile', [StudentController::class, 'profile'])->name('profile');
+Route::get('/student/dashboard', [StudentController::class, 'dashboard'])->name('student.dashboard');
 
 // Staff routes
-Route::get('/staff/profile', [StaffController::class, 'profile'])->name('staff.profile');  
-Route::get('/staff/dashboard', [StaffController::class, 'dashboard'])->name('staff.dashboard'); 
+Route::get('/staff/profile', [StaffController::class, 'profile'])->name('staff.profile');
+Route::get('/staff/dashboard', [StaffController::class, 'dashboard'])->name('staff.dashboard');
 
 // Alumni routes
-Route::get('/alumni/profile', [AlumniController::class, 'profile'])->name('alumni.profile');  
-Route::get('/alumni/dashboard', [AlumniController::class, 'dashboard'])->name('alumni.dashboard'); 
+Route::get('/alumni/profile', [AlumniController::class, 'profile'])->name('alumni.profile');
+Route::get('/alumni/dashboard', [AlumniController::class, 'dashboard'])->name('alumni.dashboard');
 
 // Lecturer routes
-Route::get('/lecturer/profile', [LecturerController::class, 'profile'])->name('lecturer.profile');  
-Route::get('/lecturer/dashboard', [LecturerController::class, 'dashboard'])->name('lecturer.dashboard'); 
+Route::get('/lecturer/profile', [LecturerController::class, 'profile'])->name('lecturer.profile');
+Route::get('/lecturer/dashboard', [LecturerController::class, 'dashboard'])->name('lecturer.dashboard');
 
 // admin routes
 Route::middleware(['auth'])->group(function () {
-    Route::get('/admin/profile', [\App\Http\Controllers\AdminProfileController::class, 'show'])->name('admin.profile');
-    Route::post('/admin/profile', [\App\Http\Controllers\AdminProfileController::class, 'update'])->name('admin.profile.update');
+    Route::get('/admin/profile', [AdminProfileController::class, 'show'])->name('admin.profile');
+    Route::post('/admin/profile/update', [AdminProfileController::class, 'update'])->name('admin.profile.update');
 });
-
