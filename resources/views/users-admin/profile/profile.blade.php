@@ -24,7 +24,7 @@
                 </div>
                 <div class="form-group">
                     <label>Profile Photo</label><br>
-                    <img src="{{ asset($admin->photo) }}" alt="Profile Photo" width="120" class="mb-2">
+                    <img src="{{ asset('storage/' . $lecturer->photo) }}" alt="Profile Photo">
                     <input type="file" name="photo" class="form-control-file">
                 </div>
                 <button type="submit" class="btn btn-primary">Update Profile</button>
@@ -32,4 +32,5 @@
         </div>
     </section>
 </div>
-@endsection
+
+

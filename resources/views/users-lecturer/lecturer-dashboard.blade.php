@@ -49,9 +49,9 @@
                                     <span class="text-muted ml-2" style="font-size:12px;">Thank you for completing your data.</span>
                                 </div>
                             </div>
-                            <div class="d-flex align-items-center" style="gap:6px;">
-                                <a href="{{ route('profile') }}" class="btn btn-outline-success btn-sm" style="font-size:12px; padding:2px 10px;">View Profile</a>
-                                <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="font-size:16px;">&times;</button>
+                          <div class="d-flex align-items-center" style="gap:6px;">
+                            <a href="{{ route('lecturer/profile') }}" class="btn btn-outline-success btn-sm" style="font-size:12px; padding:2px 10px; position: relative; z-index:2;">View Profile</a>
+                             <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="font-size:16px; position: relative; z-index:1;">&times;</button>
                             </div>
                         </div>
                     @endif
@@ -59,19 +59,23 @@
             </div>
 
             <!-- Announcement -->
-            <div class="row mb-2" style="margin-bottom:8px !important;">
-                <div class="col-12">
-                    <div class="card" style="margin-bottom:4px;">
-                        <div class="card-header py-2" style="padding-top:8px; padding-bottom:8px;">
-                            <strong style="font-size:15px;">Announcement</strong>
-                        </div>
-                        <div class="card-body py-2" style="padding-top:8px; padding-bottom:8px; font-size:13px;">
-                            Example: TOEIC registration announcement
-                            {{-- Replace with announcement data from the database if available --}}
-                        </div>
-                    </div>
-                </div>
+           <div class="row mb-2" style="margin-bottom:8px !important;">
+    <div class="col-12">
+        <div class="card" style="margin-bottom:4px;">
+            <div class="card-header py-2" style="padding-top:8px; padding-bottom:8px;">
+                <strong style="font-size:15px;">Announcement</strong>
             </div>
+            <div class="card-body py-2" style="padding-top:8px; padding-bottom:8px; font-size:13px;">
+                @if($announcement)
+                    <strong>{{ $announcement->title }}</strong><br>
+                    {{ $announcement->content }}
+                @else
+                    No announcement available.
+                @endif
+            </div>
+        </div>
+    </div>
+</div>
 
             <!-- Exam Schedule & Exam Score -->
             <div class="row" style="margin-bottom:0;">
