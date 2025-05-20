@@ -76,7 +76,7 @@ a:not(.btn-social-icon):not(.btn-social):not(.page-link) .fas,
 a:not(.btn-social-icon):not(.btn-social):not(.page-link) .far,
 a:not(.btn-social-icon):not(.btn-social):not(.page-link) .fal,
 a:not(.btn-social-icon):not(.btn-social):not(.page-link) .fab {
-  margin-left: 4px;
+  margin-left: 30px;
 }
 
 .bg-primary {
@@ -3529,6 +3529,13 @@ body.layout-3 .main-footer {
   text-align: center;
   margin-top: 40px;
   margin-bottom: 40px;
+}
+
+.footer-copyright {
+  clear: both;
+  width: 100%;
+  text-align: center;
+  color: #98a6ad;
 }
 
 body:not(.sidebar-mini) .sidebar-style-1 .sidebar-menu li.active a {
