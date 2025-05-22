@@ -79,6 +79,22 @@
                     </div>
                 </div>
             </div>
+<!-- Card Ujian Mandiri: Hanya muncul jika skor ≤ 70 -->
+            @if(isset($examResults) && $examResults->score <= 70)
+            <div class="row mt-3">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>Test Information</h4>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-danger">unfortunately you didnt pass the exam. please do self-exam.</p>
+                            <a href="{{ url('https://itc-indonesia.com/') }}" class="btn btn-warning">Do self</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endif
 
             <!-- Exam Schedule & Exam Score -->
             <div class="row" style="margin-bottom:0;">

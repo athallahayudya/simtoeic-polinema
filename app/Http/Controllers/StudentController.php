@@ -20,7 +20,13 @@ class StudentController extends Controller
         $type_menu = 'dashboard';
         $announcements= AnnouncementModel::where('announcement_status', 'published')->latest()->first();
         // Add $isComplete and $missingFiles if needed
-        return view('users-student.student-dashboard', compact('schedules', 'type_menu', 'examResults', 'announcements'));
+        // Cek if the score is below and same with 70
+        $examFailed = false;
+        if ($examResults && $examResults->score <= 70) {
+            $examFailed = true;
+        }
+
+        return view('users-student.student-dashboard', compact('schedules', 'type_menu', 'examResults', 'announcements', 'examFailed'));
     }
     public function profile()
     {
