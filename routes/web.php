@@ -290,7 +290,7 @@ Route::group(['prefix' => 'manage-users/lecturer'], function () {
 });
 
 // Registration - Admin
-Route::get('/registration', function(){
+Route::get('/registration', function () {
     return view('users-admin.registration.index', [
         'type_menu' => 'registration',
         'user' => UserModel::all()
@@ -320,6 +320,5 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/admin/profile/update', [AdminProfileController::class, 'update'])->name('admin.profile.update');
 });
 
-  Route::get('/lecturer/profile', [\App\Http\Controllers\LecturerController::class, 'show'])->name('lecturer.profile');
-    Route::post('/lecturer/profile', [\App\Http\Controllers\LecturerController::class, 'update'])->name('lecturer.profile.update');
-
+Route::get('/lecturer/profile', [LecturerController::class, 'show'])->name('lecturer.profile');
+Route::post('/lecturer/profile', [LecturerController::class, 'update'])->name('lecturer.profile.update');

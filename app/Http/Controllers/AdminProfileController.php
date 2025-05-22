@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\AdminModel;
 use Illuminate\Support\Facades\Storage;
-use App\Models\User;
+use App\Models\UserModel;
 
 class AdminProfileController extends Controller
 {
@@ -23,14 +23,19 @@ class AdminProfileController extends Controller
 
         $admin = AdminModel::where('user_id', $user->user_id)->first();
 
-        // Jika tidak ada record admin, buat placeholder atau kembalikan pesan
+        // If admin profile doesn't exist, create a new one with user's NIDN
         if (!$admin) {
-            return view('pages.features-profile', [
-                'message' => 'Admin profile not found. Please contact support to create your profile.',
-            ]);
+            $admin = new AdminModel();
+            $admin->user_id = $user->user_id;
+            $admin->name = $user->name ?? 'Admin';
+            $admin->nidn = $user->identity_number ?? '';
+            $admin->photo = '';
+            $admin->ktp_scan = '';
+            $admin->save();
         }
 
-        return view('pages.features-profile', compact('admin'));
+        // Pass both admin and user to the view
+        return view('users-admin.profile.profile', compact('admin', 'user'));
     }
 
     public function update(Request $request)
@@ -45,8 +50,6 @@ class AdminProfileController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'nidn' => 'required|string|max:20',
-            'home_address' => 'required|string|max:255',
-            'current_address' => 'required|string|max:255',
             'phone_number' => 'required|string|max:20',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'ktp_scan' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:2048',
@@ -55,16 +58,14 @@ class AdminProfileController extends Controller
         // Update data admin
         $admin->name = $request->input('name');
         $admin->nidn = $request->input('nidn');
-        $admin->home_address = $request->input('home_address');
-        $admin->current_address = $request->input('current_address');
 
-        // Update phone number di tabel user
-        $userModel = User::find($user->user_id);
+        // Update phone number and identity_number in users table
+        $userModel = UserModel::find($user->user_id);
         if ($userModel) {
             $userModel->phone_number = $request->input('phone_number');
+            $userModel->identity_number = $request->input('nidn');
             $userModel->save();
         }
-        $user->save();
 
         // Handle photo upload
         if ($request->hasFile('photo')) {
