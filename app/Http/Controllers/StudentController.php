@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AnnouncementModel;
 use Illuminate\Http\Request;
 use App\Models\ExamScheduleModel;
 use App\Models\ExamResultModel;
@@ -17,8 +18,9 @@ class StudentController extends Controller
         $schedules = ExamScheduleModel::paginate(10); // pagination 10 data per page
         $examResults = ExamResultModel::where('user_id', auth()->id())->latest()->first(); // only the latest score for logged in user
         $type_menu = 'dashboard';
+        $announcements= AnnouncementModel::where('announcement_status', 'published')->latest()->first();
         // Add $isComplete and $missingFiles if needed
-        return view('users-student.student-dashboard', compact('schedules', 'type_menu', 'examResults'));
+        return view('users-student.student-dashboard', compact('schedules', 'type_menu', 'examResults', 'announcements'));
     }
     public function profile()
     {

@@ -19,7 +19,7 @@
                     <a href="{{ url('/manage-users/staff/') }}" class="text-decoration-none w-100">
                         <div class="card card-statistic-1 h-100">
                             <div class="card-icon bg-primary">
-                                <i class="fas fa-users" style="padding-right: 35px;"></i>
+                                <i class="fas fa-users" style="padding-right: 60px;"></i>
                             </div>
                             <div class="card-wrap">
                                 <div class="card-header">
@@ -38,7 +38,7 @@
                     <a href="{{ url('/manage-users/student/') }}" class="text-decoration-none w-100">
                         <div class="card card-statistic-1 h-100">
                             <div class="card-icon bg-danger">
-                                <i class="fas fa-user-graduate"></i>
+                                <i class="fas fa-user-graduate" style="padding-right: 60px;"></i>
                             </div>
                             <div class="card-wrap">
                                 <div class="card-header">
@@ -57,7 +57,7 @@
                     <a href="{{ url('/manage-users/alumni/') }}" class="text-decoration-none w-100">
                         <div class="card card-statistic-1 h-100">
                             <div class="card-icon bg-warning">
-                                <i class="fas fa-user-tie"></i>
+                                <i class="fas fa-user-tie" style="padding-right: 60px;"></i>
                             </div>
                             <div class="card-wrap">
                                 <div class="card-header">
@@ -76,7 +76,7 @@
                     <a href="{{ url('/manage-users/lecturer/') }}" class="text-decoration-none w-100">
                         <div class="card card-statistic-1 h-100">
                             <div class="card-icon bg-success">
-                                <i class="fas fa-chalkboard-teacher"></i>
+                                <i class="fas fa-chalkboard-teacher" style="padding-right: 60px;"></i>
                             </div>
                             <div class="card-wrap">
                                 <div class="card-header">

@@ -63,11 +63,18 @@
                 <div class="col-12">
                     <div class="card" style="margin-bottom:4px;">
                         <div class="card-header py-2" style="padding-top:8px; padding-bottom:8px;">
-                            <strong style="font-size:15px;">Announcement</strong>
+                            <strong style="font-size:15px; font-weight:800;">Announcement</strong>
                         </div>
                         <div class="card-body py-2" style="padding-top:8px; padding-bottom:8px; font-size:13px;">
-                            Example: TOEIC registration announcement
-                            {{-- Replace with announcement data from the database if available --}}
+                            @if ($announcements)
+                            <div>
+                                <h3>{{ $announcements->title }}</h3>
+                                <p>{{ $announcements->content }}</p>
+                                <small>{{ $announcements->created_at->format('d M Y') }}</small>
+                            </div>
+                            @else
+                            <p>Tidak ada pengumuman terbaru.</p>
+                            @endif
                         </div>
                     </div>
                 </div>

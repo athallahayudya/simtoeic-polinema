@@ -3,6 +3,7 @@
 @section('title', 'Registration')
 
 @push('style')
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 @endpush
 
 @section('main')
@@ -54,5 +55,17 @@
         </section>
     </div>
 @endsection
+
 @push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        @if (session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: '{{ session('success') }}',
+                confirmButtonText: 'OK'
+            });
+        @endif
+    </script>
 @endpush
