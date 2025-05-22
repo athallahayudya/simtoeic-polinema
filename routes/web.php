@@ -8,6 +8,8 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\StaffController;
 use App\Models\StudentModel;
 use App\Http\Controllers\AdminProfileController;
+use App\Http\Controllers\AnnouncementController;
+use App\Models\AnnouncementModel;
 use App\Models\UserModel;
 
 /*
@@ -228,6 +230,24 @@ Route::get('/dashboard', function () {
 Route::get('/dashboard-admin', function () {
     return view('pages.dashboard-admin', ['type_menu' => 'dashboard']);
 })->name('admin.dashboard');
+
+// Admin Notices Announcements route
+Route::group(['prefix' => 'announcements'], function () {
+    Route::get('/', function ()  {
+        return view('users-admin.announcement.index', [
+            'type_menu' => 'announcements',
+            'announcements' => AnnouncementModel::all()
+        ]);
+    })->name('announcements.index');  
+    Route::post('/list', [AnnouncementController::class, 'list']);
+    Route::get('/create', [AnnouncementController::class, 'create']);
+    Route::post('/store', [AnnouncementController::class, 'store']);
+    Route::get('/{id}/show_ajax', [AnnouncementController::class, 'show_ajax']);
+    Route::get('/{id}/edit', [AnnouncementController::class, 'edit']);
+    Route::put('/{id}/update', [AnnouncementController::class, 'update']);
+    Route::get('/{id}/delete_ajax', [AnnouncementController::class, 'confirm_ajax']);
+    Route::post('/{id}/delete_ajax', [AnnouncementController::class, 'delete_ajax']);
+});
 
 // Admin Manage Users route
 Route::get('/manage-users', function () {
