@@ -99,21 +99,41 @@
                     </div>
                 </div>
                 <!-- Announcement -->
-                <div class="row mb-2" style="margin-bottom:8px !important;">
+                <div class="row mb-3">
                     <div class="col-12">
-                        <div class="card" style="margin-bottom:4px;">
-                            <div class="card-header py-2" style="padding-top:8px; padding-bottom:8px;">
-                                <strong style="font-size:15px; font-weight:800;">Announcement</strong>
+                        <div class="card shadow-sm border-0">
+                            <div class="card-header bg-primary text-white d-flex align-items-center">
+                                <i class="fas fa-bullhorn mr-2"></i>
+                                <strong style="font-size:16px;">Announcements</strong>
                             </div>
-                            <div class="card-body py-2" style="padding-top:8px; padding-bottom:8px; font-size:13px;">
+
+                            <div class="card-body py-3">
                                 @if ($announcements)
-                                    <div>
-                                        <h3>{{ $announcements->title }}</h3>
-                                        <p>{{ $announcements->content }}</p>
-                                        <small>{{ $announcements->created_at->format('d M Y') }}</small>
+                                    <div class="announcement-container">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h4 class="text-primary mb-0">{{ $announcements->title }}</h4>
+                                            <span
+                                                class="badge badge-primary">{{ $announcements->created_at->format('d M Y') }}</span>
+                                        </div>
+
+                                        <div class="announcement-content p-3 bg-light rounded">
+                                            <p class="mb-0">{{ $announcements->content }}</p>
+                                        </div>
+
+                                        <div class="d-flex justify-content-end mt-2">
+                                            <small class="text-muted">
+                                                <i class="fas fa-clock mr-1"></i> Posted
+                                                {{ $announcements->created_at->diffForHumans() }}
+                                            </small>
+                                        </div>
                                     </div>
                                 @else
-                                    <p>Tidak ada pengumuman terbaru.</p>
+                                    <div class="text-center py-4">
+                                        <i class="fas fa-info-circle fa-3x text-muted mb-3"></i>
+                                        <h5 class="text-muted">No Announcements</h5>
+                                        <p class="text-muted mb-0">There are no announcements at this time. Check back later!
+                                        </p>
+                                    </div>
                                 @endif
                             </div>
                         </div>
@@ -136,91 +156,79 @@
                     </div>
                 @endif
 
-                <!-- Exam Schedule & Exam Score -->
-                <div class="row" style="margin-bottom:0;">
-                    <div class="col-md-6">
-                        <div class="card" style="margin-bottom:4px;">
-                            <div class="card-header py-2" style="padding-top:8px; padding-bottom:8px;">
-                                <strong style="font-size:15px;">Exam Schedule</strong>
-                            </div>
-                            <div class="card-body py-2" style="padding-top:8px; padding-bottom:8px;">
-                                <table class="table table-striped mb-1" style="margin-bottom:4px;">
-                                    <thead>
-                                        <tr>
-                                            <th style="font-size:13px;">#</th>
-                                            <th style="font-size:13px;">Date</th>
-                                            <th style="font-size:13px;">Time</th>
-                                            <th style="font-size:13px;">Zoom Link</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($schedules as $i => $schedule)
-                                            <tr>
-                                                <td style="font-size:13px;">{{ $schedules->firstItem() + $i }}</td>
-                                                <td style="font-size:13px;">
-                                                    {{-- Example random date, replace with $schedule->exam_date if available
-                                                    --}}
-                                                    {{ $schedule->exam_date ?? \Carbon\Carbon::parse($schedule->exam_time)->format('Y-m-d') }}
-                                                </td>
-                                                <td style="font-size:13px;">
-                                                    {{-- Example time, replace with $schedule->exam_time if available --}}
-                                                    {{ \Carbon\Carbon::parse($schedule->exam_time)->format('H:i') }}
-                                                </td>
-                                                <td>
-                                                    <a href="{{ $schedule->zoom_link }}" target="_blank"
-                                                        class="btn btn-primary btn-sm"
-                                                        style="font-size:12px; padding:2px 10px;">Join Zoom</a>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                                {{ $schedules->links() }}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="card" style="margin-bottom:4px;">
-                            <div class="card-header py-2" style="padding-top:8px; padding-bottom:8px;">
-                                <strong style="font-size:15px;">Exam Score</strong>
-                            </div>
-                            <div class="card-body py-2" style="padding-top:8px; padding-bottom:8px;">
-                                <table class="table table-striped mb-1" style="margin-bottom:4px;">
-                                    <thead>
-                                        <tr>
-                                            <th style="font-size:13px;">Score</th>
-                                            <th style="font-size:13px;">Certificate</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @if($examResults)
-                                            <tr>
-                                                <td style="font-size:13px;">{{ $examResults->score }}</td>
-                                                <td>
-                                                    @if($examResults->certificate_url)
-                                                        <a href="{{ asset($examResults->certificate_url) }}" target="_blank"
-                                                            class="btn btn-info btn-sm"
-                                                            style="font-size:12px; padding:2px 10px;">Download</a>
-                                                    @else
-                                                        -
-                                                    @endif
-                                                </td>
-                                            </tr>
-                                        @else
-                                            <tr>
-                                                <td colspan="2" class="text-center" style="font-size:13px;">No exam score
-                                                    available.</td>
-                                            </tr>
-                                        @endif
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <!-- Exam Schedule -->
+<div class="col-md-6">
+    <div class="card shadow-sm border-0" style="margin-bottom:15px;">
+        <div class="card-header bg-light d-flex align-items-center justify-content-between py-3">
+            <div>
+                <i class="fas fa-calendar-alt text-primary mr-2"></i>
+                <strong style="font-size:16px;">Exam Schedule</strong>
             </div>
-        </section>
+            @if(count($schedules) > 0)
+                <span class="badge badge-primary">{{ count($schedules) }} Upcoming</span>
+            @endif
+        </div>
+        
+        <div class="card-body p-0">
+            @if(count($schedules) > 0)
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="thead-light">
+                            <tr>
+                                <th class="px-4 py-3">#</th>
+                                <th class="px-4 py-3">
+                                    <i class="far fa-calendar mr-1 text-muted"></i> Date
+                                </th>
+                                <th class="px-4 py-3">
+                                    <i class="far fa-clock mr-1 text-muted"></i> Time
+                                </th>
+                                <th class="px-4 py-3">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($schedules as $i => $schedule)
+                                @php
+                                    $examDate = $schedule->exam_date ?? \Carbon\Carbon::parse($schedule->exam_time)->format('Y-m-d');
+                                    $examTime = \Carbon\Carbon::parse($schedule->exam_time)->format('H:i');
+                                    $isToday = \Carbon\Carbon::parse($examDate)->isToday();
+                                    $isPast = \Carbon\Carbon::parse($examDate)->isPast();
+                                @endphp
+                                <tr class="{{ $isToday ? 'bg-light-success' : '' }}">
+                                    <td class="px-4 py-3">{{ $schedules->firstItem() + $i }}</td>
+                                    <td class="px-4 py-3">
+                                        <strong>{{ \Carbon\Carbon::parse($examDate)->format('d M Y') }}</strong>
+                                        @if($isToday)
+                                            <span class="badge badge-success ml-2">Today</span>
+                                        @endif
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <span class="text-primary">{{ $examTime }}</span>
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <a href="{{ $schedule->zoom_link }}" target="_blank"
+                                            class="btn btn-primary btn-sm rounded-pill px-3">
+                                            <i class="fas fa-video mr-1"></i> Join Zoom
+                                        </a>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="px-4 py-3 border-top">
+                    {{ $schedules->links() }}
+                </div>
+            @else
+                <div class="text-center py-5">
+                    <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No Exams Scheduled</h5>
+                    <p class="text-muted mb-0">There are no upcoming exams scheduled at this time.</p>
+                </div>
+            @endif
+        </div>
     </div>
+</div>
 @endsection
 
 @push('scripts')

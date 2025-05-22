@@ -15,7 +15,10 @@ class StudentController extends Controller
 {
     public function dashboard()
     {
-        $schedules = ExamScheduleModel::paginate(10); // pagination 10 data per page
+    $schedules = ExamScheduleModel::join('exam_result', 'exam_schedule.shcedule_id', '=', 'exam_result.schedule_id')
+        ->where('exam_result.user_id', auth()->id())
+        ->select('exam_schedule.*')
+        ->paginate(10);
         $examResults = ExamResultModel::where('user_id', auth()->id())->latest()->first(); // only the latest score for logged in user
         $type_menu = 'dashboard';
         $announcements = AnnouncementModel::where('announcement_status', 'published')->latest()->first();
