@@ -316,7 +316,8 @@ Route::get('/registration', function () {
         'user' => UserModel::all()
     ]);
 })->name('registration');
-Route::post('/registration', [AuthController::class, 'register']);
+Route::post('/registration', [AuthController::class, 'register'])->name('registration.store');
+Route::get('/users-data', [App\Http\Controllers\UserDataTableController::class, 'getUsers'])->name('users.data');
 
 // student routes
 Route::get('/student/profile', [StudentController::class, 'profile'])->name('profile');
