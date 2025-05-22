@@ -39,7 +39,7 @@
                             </div>
                         </div>
                     @else
-                        <div class="alert d-flex align-items-center justify-content-between" style="background:#f6fff7; border-left:3px solid #51cf66; border-radius:6px; padding:6px 12px; margin-bottom:4px;">
+                        <div class="alert d-flex align-items-center justify-content-between" style="background:#f6fff7; border-left:3px solidrgb(207, 81, 81); border-radius:6px; padding:6px 12px; margin-bottom:4px;">
                             <div class="d-flex align-items-center" style="gap:8px;">
                                 <span style="font-size:16px; color:#51cf66;">
                                     <i class="fas fa-check-circle"></i>
@@ -50,7 +50,7 @@
                                 </div>
                             </div>
                           <div class="d-flex align-items-center" style="gap:6px;">
-                            <a href="{{ route('lecturer/profile') }}" class="btn btn-outline-success btn-sm" style="font-size:12px; padding:2px 10px; position: relative; z-index:2;">View Profile</a>
+                            <a href="{{ url('/lecturer/profile') }}" class="btn btn-outline-success btn-sm" style="font-size:12px; padding:2px 10px; position: relative; z-index:2;">View Profile</a>
                              <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="font-size:16px; position: relative; z-index:1;">&times;</button>
                             </div>
                         </div>
@@ -65,14 +65,7 @@
             <div class="card-header py-2" style="padding-top:8px; padding-bottom:8px;">
                 <strong style="font-size:15px;">Announcement</strong>
             </div>
-            <div class="card-body py-2" style="padding-top:8px; padding-bottom:8px; font-size:13px;">
-                @if($announcement)
-                    <strong>{{ $announcement->title }}</strong><br>
-                    {{ $announcement->content }}
-                @else
-                    No announcement available.
-                @endif
-            </div>
+            
         </div>
     </div>
 </div>

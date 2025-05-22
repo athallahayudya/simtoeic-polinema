@@ -184,9 +184,40 @@ public function update(Request $request)
         $lecturer->photo = $path; // Simpan path tanpa "storage/"
     }
 
+    // // Update lecturer data
+    // $lecturer->name = $request->input('name');
+    // $lecturer->nidn = $request->input('nidn');
+
+    // Update phone number and identity_number in users table
+    $userModel = \App\Models\lecturerModel::find($user->lecturer_id);
+    if ($userModel) {
+        $userModel->phone_number = $request->input('phone_number');
+        $userModel->identity_number = $request->input('nidn');
+        $userModel->save();
+    }
+
+    // Handle photo upload
+    if ($request->hasFile('photo')) {
+        // Delete old photo if exists
+        if ($lecturer->photo && Storage::disk('public')->exists($lecturer->photo)) {
+            Storage::disk('public')->delete($lecturer->photo);
+        }
+        $path = $request->file('photo')->store('lecturer/photos', 'public');
+        $lecturer->photo = $path;
+    }
+
+    // Handle KTP scan upload
+    if ($request->hasFile('ktp_scan')) {
+        if ($lecturer->ktp_scan && Storage::disk('public')->exists($lecturer->ktp_scan)) {
+            Storage::disk('public')->delete($lecturer->ktp_scan);
+        }
+        $ktpPath = $request->file('ktp_scan')->store('lecturer/ktp', 'public');
+        $lecturer->ktp_scan = $ktpPath;
+    }
+
     $lecturer->save();
 
-    return redirect()->route('lecturer.profile')->with('success', 'Profile updated!');
+    return redirect()->route('lecturer.profile')->with('success', 'Profile updated successfully!');
 }
 
 
