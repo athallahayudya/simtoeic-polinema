@@ -145,7 +145,7 @@ class AuthController extends Controller
             AdminModel::create([
                 'user_id' => $user->user_id,
                 'name' => $request->name,
-                'nip' => $request->identity_number, 
+                'identity_number' => $request->identity_number, 
             ]);
         }
 
