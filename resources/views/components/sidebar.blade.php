@@ -15,9 +15,11 @@
                         <i class="fas fa-fire"></i><span>Dashboard</span>
                     </a>
                 </li>
-                
+
+
                 <!-- Management Dropdown -->
-                <li class="nav-item dropdown {{ in_array(Request::segment(1), ['registration', 'exam-results', 'users']) ? 'active' : '' }}">
+                <li
+                    class="nav-item dropdown {{ in_array(Request::segment(1), ['registration', 'exam-results', 'users']) ? 'active' : '' }}">
                     <a href="#" class="nav-link has-dropdown">
                         <i class="fas fa-cogs"></i> <span>Management</span>
                     </a>
@@ -28,8 +30,8 @@
                         <li class="{{ Request::is('exam-results*') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('exam-results') }}">Exam Results</a>
                         </li>
-                        <li class="{{ Request::is('users*') ? 'active' : '' }}">
-                            <a class="nav-link" href="{{ url('manage-users') }}">Users</a>
+                        <li class="{{ Request::is('users*') || Request::is('manage-users*') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('users') }}">Users</a>
                         </li>
                     </ul>
                 </li>
@@ -48,7 +50,7 @@
                         </li>
                     </ul>
                 </li>
-                
+
                 <!-- Profile -->
                 <li class="{{ Request::is('admin/profile') ? 'active' : '' }}">
                     <a class="nav-link" href="{{ url('admin/profile') }}">
@@ -63,9 +65,10 @@
                         <i class="fas fa-fire"></i><span>Dashboard</span>
                     </a>
                 </li>
-                
+
                 <!-- Exam Dropdown -->
-                <li class="nav-item dropdown {{ in_array(Request::segment(2), ['registration', 'schedule']) ? 'active' : '' }}">
+                <li
+                    class="nav-item dropdown {{ in_array(Request::segment(2), ['registration', 'schedule']) ? 'active' : '' }}">
                     <a href="#" class="nav-link has-dropdown">
                         <i class="fas fa-clipboard-list"></i> <span>Exam</span>
                     </a>
@@ -78,14 +81,14 @@
                         </li>
                     </ul>
                 </li>
-                
+
                 <!-- FAQs -->
                 <li class="{{ Request::is('faq*') ? 'active' : '' }}">
                     <a class="nav-link" href="{{ url('faq') }}">
                         <i class="fas fa-question-circle"></i><span>FAQs</span>
                     </a>
                 </li>
-                
+
                 <!-- Profile -->
                 <li class="{{ Request::is('*/profile') ? 'active' : '' }}">
                     <a class="nav-link" href="{{ url(Auth::user()->role . '/profile') }}">
@@ -93,11 +96,11 @@
                     </a>
                 </li>
             @endif
-            
+
             <!-- Logout (Common for all users) -->
             <li>
                 <a class="nav-link text-danger" href="{{ route('auth.logout') }}"
-                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                     <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
                 </a>
                 <form id="logout-form" action="{{ route('auth.logout') }}" method="POST" class="d-none">

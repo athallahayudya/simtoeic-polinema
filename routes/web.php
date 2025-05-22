@@ -7,6 +7,9 @@ use App\Http\Controllers\LecturerController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\StaffController;
 use App\Models\StudentModel;
+use App\Models\StaffModel;
+use App\Models\AlumniModel;
+use App\Models\LecturerModel;
 use App\Http\Controllers\AdminProfileController;
 use App\Http\Controllers\AnnouncementController;
 use App\Models\AnnouncementModel;
@@ -249,10 +252,24 @@ Route::group(['prefix' => 'announcements'], function () {
     Route::post('/{id}/delete_ajax', [AnnouncementController::class, 'delete_ajax']);
 });
 
+
 // Admin Manage Users route
-Route::get('/manage-users', function () {
-    return view('users-admin.manage-user.index', ['type_menu' => 'manage-users']);
-})->name('manage-users');
+Route::get('/users', function () {
+    // Adjust these queries based on your actual database schema
+    $staffCount = StaffModel::count(); 
+    $studentCount = StudentModel::count(); 
+    $alumniCount = AlumniModel::count(); 
+    $lecturerCount = LecturerModel::count(); 
+    
+    return view('users-admin.manage-user.index', [
+        'type_menu' => 'users',
+        'staffCount' => $staffCount,
+        'studentCount' => $studentCount,
+        'alumniCount' => $alumniCount,
+        'lecturerCount' => $lecturerCount,
+    ]);
+})->name('users');
+
 
 // Manage Users - Staff
 Route::group(['prefix' => 'manage-users/staff'], function () {
