@@ -336,9 +336,12 @@ Route::get('/registration', function () {
 Route::post('/registration', [AuthController::class, 'register'])->name('registration.store');
 Route::get('/users-data', [App\Http\Controllers\UserDataTableController::class, 'getUsers'])->name('users.data');
 
-// student routes
-Route::get('/student/profile', [StudentController::class, 'profile'])->name('profile');
-Route::get('/student/dashboard', [StudentController::class, 'dashboard'])->name('student.dashboard');
+// Student routes
+Route::group(['prefix' => 'student'], function () {
+    Route::get('/dashboard', [StudentController::class, 'dashboard'])->name('student.dashboard');
+    Route::get('/profile', [StudentController::class, 'profile'])->name('student.profile');  // The correct route name
+    Route::post('/profile/update', [StudentController::class, 'updateProfile'])->name('student.profile.update');
+});
 
 // Staff routes
 Route::get('/staff/profile', [StaffController::class, 'profile'])->name('staff.profile');

@@ -58,9 +58,15 @@
                                                 </div>
                                             @endif
 
-                                            <a href="{{ route('profile') }}" class="btn btn-warning">
-                                                <i class="fas fa-arrow-right mr-1"></i> Complete Profile Now
-                                            </a>
+<!-- For complete profile section -->
+<a href="{{ route('student.profile') }}" class="btn btn-success">
+    <i class="fas fa-user mr-1"></i> View Profile
+</a>
+
+<!-- For incomplete profile section -->
+<a href="{{ route('student.profile') }}" class="btn btn-warning">
+    <i class="fas fa-arrow-right mr-1"></i> Complete Profile Now
+</a>
                                         </div>
                                     </div>
                                 </div>
@@ -88,9 +94,9 @@
                                             <p class="mb-3">Thank you for completing your profile data. You are now ready to
                                                 register for exams!</p>
 
-                                            <a href="{{ route('profile') }}" class="btn btn-success">
-                                                <i class="fas fa-user mr-1"></i> View Profile
-                                            </a>
+<a href="{{ route('student.profile') }}" class="btn btn-success">
+    <i class="fas fa-user mr-1"></i> View Profile
+</a>
                                         </div>
                                     </div>
                                 </div>

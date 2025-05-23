@@ -28,7 +28,8 @@ class AdminProfileController extends Controller
             $admin = new AdminModel();
             $admin->user_id = $user->user_id;
             $admin->name = $user->name ?? 'Admin';
-            $admin->nidn = $user->identity_number ?? '';
+            // Limit the NIDN length to avoid database truncation error
+            $admin->nidn = $user->identity_number ? substr($user->identity_number, 0, 20) : '';
             $admin->photo = '';
             $admin->ktp_scan = '';
             $admin->save();

@@ -35,7 +35,7 @@
                         </li>
                     </ul>
                 </li>
-                
+
                 <!-- Notices Dropdown -->
                 <li class="nav-item dropdown {{ in_array(Request::segment(1), ['announcements', 'faq']) ? 'active' : '' }}">
                     <a href="#" class="nav-link has-dropdown">
@@ -90,8 +90,8 @@
                 </li>
 
                 <!-- Profile -->
-                <li class="{{ Request::is('*/profile') ? 'active' : '' }}">
-                    <a class="nav-link" href="{{ url(Auth::user()->role . '/profile') }}">
+                <li class="{{ Request::is('student/profile') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('student.profile') }}">
                         <i class="fas fa-user"></i> <span>Profile</span>
                     </a>
                 </li>

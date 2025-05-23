@@ -7,18 +7,20 @@ use Illuminate\Http\Request;
 use App\Models\ExamScheduleModel;
 use App\Models\ExamResultModel;
 use App\Models\StudentModel;
+use App\Models\UserModel;
 use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
 class StudentController extends Controller
 {
     public function dashboard()
     {
-    $schedules = ExamScheduleModel::join('exam_result', 'exam_schedule.shcedule_id', '=', 'exam_result.schedule_id')
-        ->where('exam_result.user_id', auth()->id())
-        ->select('exam_schedule.*')
-        ->paginate(10);
+        $schedules = ExamScheduleModel::join('exam_result', 'exam_schedule.shcedule_id', '=', 'exam_result.schedule_id')
+            ->where('exam_result.user_id', auth()->id())
+            ->select('exam_schedule.*')
+            ->paginate(10);
         $examResults = ExamResultModel::where('user_id', auth()->id())->latest()->first(); // only the latest score for logged in user
         $type_menu = 'dashboard';
         $announcements = AnnouncementModel::where('announcement_status', 'published')->latest()->first();
@@ -59,13 +61,16 @@ class StudentController extends Controller
             'missingFiles'
         ));
     }
-
     public function profile()
     {
-        $type_menu = 'profile'; // or fill as needed
-        return view('users-student.student-profile', compact('type_menu'));
-    }
+        // Get the currently authenticated student
+        $student = StudentModel::where('user_id', auth()->id())->first();
 
+        return view('users-student.student-profile', [
+            'type_menu' => 'profile',
+            'student' => $student
+        ]);
+    }
     public function list(Request $request)
     {
         $students = StudentModel::select('student_id', 'user_id', 'name', 'nim', 'study_program', 'major', 'campus', 'ktp_scan', 'ktm_scan', 'photo', 'home_address', 'current_address')
@@ -178,5 +183,70 @@ class StudentController extends Controller
         return view('users-admin.manage-user.student.show', [
             'student' => $student
         ]);
+    }
+
+public function updateProfile(Request $request)
+{
+    $user = Auth::guard('web')->user();
+    if (!$user || $user->role !== 'student') {
+        abort(403, 'Unauthorized or insufficient permissions.');
+    }
+
+    $student = StudentModel::where('user_id', $user->user_id)->firstOrFail();
+
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'phone_number' => 'required|string|max:20',
+        'home_address' => 'required|string',
+        'current_address' => 'required|string',
+        'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        'ktp_scan' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:2048',
+        'ktm_scan' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:2048',
+    ]);
+
+
+        // Update student data
+        $student->name = $request->input('name');
+        $student->home_address = $request->input('home_address');
+        $student->current_address = $request->input('current_address');
+
+        // Update phone number in users table
+        $userModel = UserModel::find($user->user_id);
+        if ($userModel) {
+            $userModel->phone_number = $request->input('phone_number');
+            $userModel->save();
+        }
+
+        // Handle photo upload
+        if ($request->hasFile('photo')) {
+            // Delete old photo if exists
+            if ($student->photo && Storage::disk('public')->exists(str_replace('storage/', '', $student->photo))) {
+                Storage::disk('public')->delete(str_replace('storage/', '', $student->photo));
+            }
+            $path = $request->file('photo')->store('student/photos', 'public');
+            $student->photo = 'storage/' . $path;
+        }
+
+        // Handle KTP scan upload
+        if ($request->hasFile('ktp_scan')) {
+            if ($student->ktp_scan && Storage::disk('public')->exists(str_replace('storage/', '', $student->ktp_scan))) {
+                Storage::disk('public')->delete(str_replace('storage/', '', $student->ktp_scan));
+            }
+            $ktpPath = $request->file('ktp_scan')->store('student/ktp', 'public');
+            $student->ktp_scan = 'storage/' . $ktpPath;
+        }
+
+        // Handle KTM scan upload
+        if ($request->hasFile('ktm_scan')) {
+            if ($student->ktm_scan && Storage::disk('public')->exists(str_replace('storage/', '', $student->ktm_scan))) {
+                Storage::disk('public')->delete(str_replace('storage/', '', $student->ktm_scan));
+            }
+            $ktmPath = $request->file('ktm_scan')->store('student/ktm', 'public');
+            $student->ktm_scan = 'storage/' . $ktmPath;
+        }
+
+        $student->save();
+
+        return redirect()->route('student.profile')->with('success', 'Profile updated successfully!');
     }
 }
