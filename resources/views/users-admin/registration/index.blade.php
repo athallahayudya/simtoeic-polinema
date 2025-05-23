@@ -143,7 +143,7 @@
                                             <select class="form-control validation-field" id="campus" name="campus"
                                                 data-validation="required">
                                                 <option value="">Select Campus</option>
-                                                <option value="malang-pusat">Malang Pusat</option>
+                                                <option value="malang">Malang</option>
                                                 <option value="psdku_kediri">PSDKU Kediri</option>
                                                 <option value="psdku_lumajang">PSDKU Lumajang</option>
                                                 <option value="psdku_pamekasan">PSDKU Pamekasan</option>
