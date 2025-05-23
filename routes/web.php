@@ -361,5 +361,10 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/admin/profile/update', [AdminProfileController::class, 'update'])->name('admin.profile.update');
 });
 
+// Admin Profile routes
 Route::get('/lecturer/profile', [LecturerController::class, 'show'])->name('lecturer.profile');
 Route::post('/lecturer/profile', [LecturerController::class, 'update'])->name('lecturer.profile.update');
+
+// Student Exam Registration routes
+Route::get('/student/registration', [StudentController::class, 'showRegistrationForm'])->name('student.registration.form');
+Route::post('/student/register-exam', [StudentController::class, 'registerExam'])->name('student.register.exam');

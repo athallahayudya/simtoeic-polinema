@@ -8,6 +8,7 @@ use App\Models\ExamScheduleModel;
 use App\Models\ExamResultModel;
 use App\Models\StudentModel;
 use App\Models\UserModel;
+use App\Models\ExamRegistrationModel;
 use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
@@ -21,29 +22,64 @@ class StudentController extends Controller
             ->where('exam_result.user_id', auth()->id())
             ->select('exam_schedule.*')
             ->paginate(10);
-        $examResults = ExamResultModel::where('user_id', auth()->id())->latest()->first(); // only the latest score for logged in user
+        $examResults = ExamResultModel::where('user_id', auth()->id())->latest()->first();
         $type_menu = 'dashboard';
         $announcements = AnnouncementModel::where('announcement_status', 'published')->latest()->first();
 
-        // Check if student profile is complete
+        // Enhanced profile completeness check
         $student = StudentModel::where('user_id', auth()->id())->first();
+        $user = Auth::guard('web')->user();
+
         $isComplete = true;
         $missingFiles = [];
+        $completedItems = 0;
+        $totalItems = 6; // Total required fields: photo, ktp_scan, ktm_scan, home_address, current_address, phone_number
 
-        if (!$student || !$student->photo) {
+        // Check each required field and count completed ones
+        if ($student && $student->photo) {
+            $completedItems++;
+        } else {
             $isComplete = false;
-            $missingFiles[] = 'Photo';
+            $missingFiles[] = 'Profile Photo';
         }
 
-        if (!$student || !$student->ktp_scan) {
+        if ($student && $student->ktp_scan) {
+            $completedItems++;
+        } else {
             $isComplete = false;
-            $missingFiles[] = 'ID Card (KTP)';
+            $missingFiles[] = 'ID Card (KTP) Scan';
         }
 
-        if (!$student || !$student->home_address) {
+        if ($student && $student->ktm_scan) {
+            $completedItems++;
+        } else {
+            $isComplete = false;
+            $missingFiles[] = 'Student ID Card (KTM) Scan';
+        }
+
+        if ($student && $student->home_address) {
+            $completedItems++;
+        } else {
             $isComplete = false;
             $missingFiles[] = 'Home Address';
         }
+
+        if ($student && $student->current_address) {
+            $completedItems++;
+        } else {
+            $isComplete = false;
+            $missingFiles[] = 'Current Address';
+        }
+
+        if ($user && $user->phone_number) {
+            $completedItems++;
+        } else {
+            $isComplete = false;
+            $missingFiles[] = 'Phone Number';
+        }
+
+        // Calculate accurate completion percentage
+        $completionPercentage = $totalItems > 0 ? round(($completedItems / $totalItems) * 100) : 0;
 
         // Check if the score is below or equal to 70
         $examFailed = false;
@@ -58,9 +94,13 @@ class StudentController extends Controller
             'announcements',
             'examFailed',
             'isComplete',
-            'missingFiles'
+            'missingFiles',
+            'completedItems',
+            'totalItems',
+            'completionPercentage'
         ));
     }
+
     public function profile()
     {
         // Get the currently authenticated student
@@ -74,19 +114,19 @@ class StudentController extends Controller
     public function list(Request $request)
     {
         $students = StudentModel::select('student_id', 'user_id', 'name', 'nim', 'study_program', 'major', 'campus', 'ktp_scan', 'ktm_scan', 'photo', 'home_address', 'current_address')
-            ->with('user');
+            ->with('user:user_id,exam_status');
 
         if ($request->student_id) {
             $students->where('student_id', $request->student_id);
-        };
+        }
 
         return DataTables::of($students)
             ->addIndexColumn()
-            ->addColumn('action', function ($student) {
-                $btn = '<button onclick="modalAction(\'' . url('/manage-users/student/' . $student->student_id . '/show_ajax') . '\')" class="btn btn-info btn-sm">Detail</button> ';
-                $btn .= '<button onclick="modalAction(\'' . url('/manage-users/student/' . $student->student_id . '/edit_ajax') . '\')" class="btn btn-warning btn-sm">Edit</button> ';
-                $btn .= '<button onclick="modalAction(\'' . url('/manage-users/student/' . $student->student_id . '/delete_ajax') . '\')" class="btn btn-danger btn-sm">Delete</button> ';
-                return $btn;
+            ->addColumn('action', function ($row) {
+                $actionBtn = '<a href="javascript:void(0)" onclick="modalAction(\'/manage-users/student/show/' . $row->student_id . '\')" class="btn btn-info btn-sm">View</a> ';
+                $actionBtn .= '<a href="javascript:void(0)" onclick="modalAction(\'/manage-users/student/edit/' . $row->student_id . '\')" class="edit btn btn-success btn-sm">Edit</a> ';
+                $actionBtn .= '<a href="javascript:void(0)" onclick="modalAction(\'/manage-users/student/confirm/' . $row->student_id . '\')" class="delete btn btn-danger btn-sm">Delete</a>';
+                return $actionBtn;
             })
             ->rawColumns(['action'])
             ->make(true);
@@ -185,30 +225,30 @@ class StudentController extends Controller
         ]);
     }
 
-public function updateProfile(Request $request)
-{
-    $user = Auth::guard('web')->user();
-    if (!$user || $user->role !== 'student') {
-        abort(403, 'Unauthorized or insufficient permissions.');
-    }
+    public function updateProfile(Request $request)
+    {
+        $user = Auth::guard('web')->user();
+        if (!$user || $user->role !== 'student') {
+            abort(403, 'Unauthorized or insufficient permissions.');
+        }
 
-    $student = StudentModel::where('user_id', $user->user_id)->firstOrFail();
+        $student = StudentModel::where('user_id', $user->user_id)->firstOrFail();
 
-    $request->validate([
-        'name' => 'required|string|max:255',
-        'phone_number' => 'required|string|max:20',
-        'home_address' => 'required|string',
-        'current_address' => 'required|string',
-        'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        'ktp_scan' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:2048',
-        'ktm_scan' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:2048',
-    ]);
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'phone_number' => 'required|string|min:10|max:15|regex:/^[0-9+\-\s]+$/',  // Improved validation
+            'home_address' => 'required|string',
+            'current_address' => 'required|string',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'ktp_scan' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:2048',
+            'ktm_scan' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:2048',
+        ]);
 
-
-        // Update student data
+        // Update student data (exclude major and study_program)
         $student->name = $request->input('name');
         $student->home_address = $request->input('home_address');
         $student->current_address = $request->input('current_address');
+        // Major and study_program are intentionally not updated as they should be fixed values
 
         // Update phone number in users table
         $userModel = UserModel::find($user->user_id);
@@ -248,5 +288,92 @@ public function updateProfile(Request $request)
         $student->save();
 
         return redirect()->route('student.profile')->with('success', 'Profile updated successfully!');
+    }
+
+    /**
+     * Display the exam registration form.
+     */
+    public function showRegistrationForm()
+    {
+        $user = Auth::guard('web')->user();
+        if (!$user || $user->role !== 'student') {
+            abort(403, 'Unauthorized or insufficient permissions.');
+        }
+
+        // Get student data
+        $student = StudentModel::where('user_id', $user->user_id)->first();
+
+        // Get latest exam result (score > 0 means it's a real score)
+        $examResults = ExamRegistrationModel::where('user_id', $user->user_id)
+            ->where('score', '>', 0)
+            ->latest()
+            ->first();
+
+        // Check if student is already registered for an upcoming exam
+        $isRegistered = ExamRegistrationModel::where('user_id', $user->user_id)
+            ->where('score', 0)  // 0 means "registered but not taken"
+            ->whereHas('schedule', function ($query) {
+                $query->where('exam_date', '>', now());
+            })
+            ->exists();
+
+        return view('users-student.registration', [
+            'type_menu' => 'registration',
+            'user' => $user,
+            'student' => $student,
+            'examResults' => $examResults,
+            'isRegistered' => $isRegistered
+        ]);
+    }
+
+    /**
+     * Process a new exam registration.
+     */
+    public function registerExam(Request $request)
+    {
+        $user = Auth::guard('web')->user();
+        if (!$user || $user->role !== 'student') {
+            abort(403, 'Unauthorized or insufficient permissions.');
+        }
+
+        // Check if the student is eligible for free registration
+        if ($user->exam_status !== 'not_yet') {
+            return redirect()->route('student.registration.form')
+                ->with('error', 'You are not eligible for free exam registration. Please use the paid option.');
+        }
+
+        // Check if student is already registered
+        $isAlreadyRegistered = ExamRegistrationModel::where('user_id', $user->user_id)
+            ->where('score', 0) // Use 0 as placeholder for "just registered"
+            ->whereHas('schedule', function ($query) {
+                $query->where('exam_date', '>', now());
+            })
+            ->exists();
+
+        if ($isAlreadyRegistered) {
+            return redirect()->route('student.registration.form')
+                ->with('error', 'You are already registered for an upcoming exam.');
+        }
+
+        // Get upcoming exam schedules
+        $upcomingSchedule = ExamScheduleModel::where('exam_date', '>', now())
+            ->orderBy('exam_date')
+            ->first();
+
+        if (!$upcomingSchedule) {
+            return redirect()->route('student.registration.form')
+                ->with('error', 'No upcoming exam schedules available. Please try again later.');
+        }
+
+        ExamRegistrationModel::create([
+            'user_id' => $user->user_id,
+            'schedule_id' => $upcomingSchedule->shcedule_id,
+            'score' => 0,  // Use 0 as placeholder for "not taken yet"
+            'cerfificate_url' => ''  // Include with empty value
+        ]);
+
+        // Redirect with success message
+        return redirect()->route('student.registration.form')
+            ->with('success', 'You have successfully registered for the TOEIC exam. Please check your telegram for confirmation details.');
     }
 }

@@ -32,14 +32,14 @@ class StudentModel extends Model
         'user_id',
         'name',
         'nim',
-        'study_program',
         'major',
+        'study_program',
         'campus',
+        'photo',
         'ktp_scan',
         'ktm_scan',
-        'photo',
         'home_address',
-        'current_address',
+        'current_address'
     ];
 
     /**

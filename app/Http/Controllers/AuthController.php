@@ -108,6 +108,9 @@ class AuthController extends Controller
             'role' => 'required|in:student,lecturer,staff,alumni,admin',
             'identity_number' => 'required|string|max:50',
             'password' => 'required|string|min:8|confirmed',
+            'study_program' => 'required_if:role,student|string|nullable',
+            'major' => 'required_if:role,student|string|nullable',
+            'campus' => 'required_if:role,student|string|nullable',
         ]);
 
         $user = UserModel::create([
@@ -122,18 +125,21 @@ class AuthController extends Controller
                 'user_id' => $user->user_id,
                 'name' => $request->name,
                 'nim' => $request->identity_number,
+                'study_program' => $request->study_program,
+                'major' => $request->major,          
+                'campus' => $request->campus
             ]);
         } elseif ($request->role === 'lecturer') {
             LecturerModel::create([
                 'user_id' => $user->user_id,
                 'name' => $request->name,
-                'nidn' => $request->identity_number, 
+                'nidn' => $request->identity_number,
             ]);
         } elseif ($request->role === 'staff') {
             StaffModel::create([
                 'user_id' => $user->user_id,
                 'name' => $request->name,
-                'nip' => $request->identity_number, 
+                'nip' => $request->identity_number,
             ]);
         } elseif ($request->role === 'alumni') {
             AlumniModel::create([
@@ -145,7 +151,7 @@ class AuthController extends Controller
             AdminModel::create([
                 'user_id' => $user->user_id,
                 'name' => $request->name,
-                'nidn' => $request->identity_number, 
+                'nidn' => $request->identity_number,
             ]);
         }
 
