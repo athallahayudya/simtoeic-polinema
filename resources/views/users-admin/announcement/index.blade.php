@@ -47,7 +47,7 @@
                                 <table class="table table-bordered table-striped table-hover table-sm" id="table_announcement" style="width: 100%;">
                                     <thead>
                                         <tr>
-                                            <th>No</th>
+                                            <th>ID</th>
                                             <th>Tittle</th>
                                             <th>Content</th>
                                             <th>Announcement Status</th>
@@ -91,10 +91,10 @@
             },
             columns: [
                 {
-                    data: "DT_RowIndex",
+                    data: "announcement_id",
                     className: "text-center",
                     width: "3%",
-                    orderable: false,
+                    orderable: true,
                     searchable: false
                 },
                 {
@@ -132,7 +132,8 @@
                     orderable: false,
                     searchable: false
                 }
-            ]
+            ],
+            order: [[0, 'desc']]
         });
         $('#announcement_id').on('change', function(){
             dataAnnouncement.ajax.reload();
