@@ -30,7 +30,7 @@
                         <li class="{{ Request::is('exam-results*') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('exam-results') }}">Exam Results</a>
                         </li>
-                        <li class="{{ Request::is('users*') || Request::is('manage-users*') ? 'active' : '' }}">
+                        <li class="{{ Request::is('users*') || Request::is('users*') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('users') }}">Users</a>
                         </li>
                     </ul>
