@@ -102,15 +102,15 @@
                                 <div class="row justify-content-center">
                                     <div class="col-6">
                                         <a href="{{ $student->ktp_scan ? asset($student->ktp_scan) : '#' }}" 
-                                           class="btn btn-outline-primary btn-block {{ !$student->ktp_scan ? 'disabled' : '' }}" 
-                                           {{ $student->ktp_scan ? 'target="_blank"' : '' }}>
+                                        class="btn btn-outline-primary btn-block {{ !$student->ktp_scan ? 'disabled' : '' }}" 
+                                        {{ $student->ktp_scan ? 'target="_blank"' : '' }}>
                                             <i class="fas fa-id-card mr-1"></i> KTP
                                         </a>
                                     </div>
                                     <div class="col-6">
                                         <a href="{{ $student->ktm_scan ? asset($student->ktm_scan) : '#' }}" 
-                                           class="btn btn-outline-info btn-block {{ !$student->ktm_scan ? 'disabled' : '' }}"
-                                           {{ $student->ktm_scan ? 'target="_blank"' : '' }}>
+                                        class="btn btn-outline-info btn-block {{ !$student->ktm_scan ? 'disabled' : '' }}"
+                                        {{ $student->ktm_scan ? 'target="_blank"' : '' }}>
                                             <i class="fas fa-id-badge mr-1"></i> KTM
                                         </a>
                                     </div>
