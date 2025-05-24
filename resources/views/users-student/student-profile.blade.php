@@ -19,10 +19,21 @@
             object-fit: contain;
         }
 
-        .section-title {
-            margin-top: 5px;
-            /* Reduced top margin further */
+        /* Reduce space between breadcrumb and content */
+        .section-header {
+            margin-bottom: 0 !important;
         }
+        
+        .section-body {
+            padding-top: 0 !important;
+        }
+        
+        .section-title {
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+        
+        /* End of spacing adjustment */
 
         .profile-widget-picture {
             width: 160px !important;
@@ -279,7 +290,7 @@
                                             <div class="form-group">
                                                 <label>KTP Scan (ID Card)</label>
                                                 <input type="file" name="ktp_scan" class="form-control-file"
-                                                    id="ktp-scan-input" {{ $student->ktp_scan ? 'disabled' : '' }}>
+                                                    accept="image/*" id="ktp-scan-input" {{ $student->ktp_scan ? 'disabled' : '' }}>
                                                 @if($student->ktp_scan)
                                                     <div class="warning-text">
                                                         <i class="fas fa-exclamation-triangle"></i> KTP document cannot be
@@ -295,7 +306,9 @@
                                                         carefully. It cannot be changed later.
                                                     </div>
                                                     <div class="document-preview mt-2" id="ktp-scan-container"
-                                                        style="display:none"></div>
+                                                        style="display:none">
+                                                        <img src="" alt="KTP Preview" class="img-fluid" id="ktp-scan-preview">
+                                                    </div>
                                                 @endif
                                                 @error('ktp_scan')
                                                     <div class="text-danger">{{ $message }}</div>
@@ -307,7 +320,7 @@
                                             <div class="form-group">
                                                 <label>KTM Scan (Student Card)</label>
                                                 <input type="file" name="ktm_scan" class="form-control-file"
-                                                    id="ktm-scan-input" {{ $student->ktm_scan ? 'disabled' : '' }}>
+                                                    accept="image/*" id="ktm-scan-input" {{ $student->ktm_scan ? 'disabled' : '' }}>
                                                 @if($student->ktm_scan)
                                                     <div class="warning-text">
                                                         <i class="fas fa-exclamation-triangle"></i> KTM document cannot be
@@ -323,7 +336,9 @@
                                                         carefully. It cannot be changed later.
                                                     </div>
                                                     <div class="document-preview mt-2" id="ktm-scan-container"
-                                                        style="display:none"></div>
+                                                        style="display:none">
+                                                        <img src="" alt="KTM Preview" class="img-fluid" id="ktm-scan-preview">
+                                                    </div>
                                                 @endif
                                                 @error('ktm_scan')
                                                     <div class="text-danger">{{ $message }}</div>
@@ -331,17 +346,15 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                    <div class="card-footer text-right">
+                                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                                    </div>
+                            </form>
                         </div>
-                        <div class="card-footer text-right">
-                            <button type="submit" class="btn btn-primary">Save Changes</button>
-                        </div>
-                        </form>
                     </div>
                 </div>
             </div>
-    </div>
-    </section>
+        </section>
     </div>
 @endsection
 

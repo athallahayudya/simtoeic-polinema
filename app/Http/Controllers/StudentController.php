@@ -332,7 +332,7 @@ class StudentController extends Controller
             'student' => $student,
             'examResults' => $examResults,
             'isRegistered' => $isRegistered,
-            'isProfileComplete' => $isProfileComplete  // Pass this to the view
+            'isProfileComplete' => $isProfileComplete 
         ]);
     }
 

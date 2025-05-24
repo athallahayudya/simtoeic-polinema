@@ -150,12 +150,13 @@
                             <div class="card-body">
                                 <div class="d-flex align-items-center mb-4">
                                     @if(isset($student->photo) && $student->photo)
-                                        <img src="{{ asset($student->photo) }}" alt="Profile" class="rounded-circle mr-3"
-                                            width="60">
+                                        <img src="{{ asset($student->photo) }}" alt="Profile"
+                                            style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; box-shadow: 0 2px 5px rgba(0,0,0,0.1);"
+                                            class="mr-3">
                                     @else
                                         <div class="avatar-item mr-3 bg-primary text-white"
-                                            style="width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;">
-                                            <span style="font-size:24px;">{{ substr($student->name ?? 'U', 0, 1) }}</span>
+                                            style="width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                                            <span style="font-size: 24px;">{{ substr($student->name ?? 'U', 0, 1) }}</span>
                                         </div>
                                     @endif
                                     <div>
@@ -251,40 +252,37 @@
                                         Please ensure your profile information is complete before registration.
                                     </div>
 
-<div class="text-center mt-3">
-    @php
-        $isProfileComplete = true;
-        if(!isset($student) || !$student->photo || !$student->ktp_scan || !$student->ktm_scan || 
-           !$student->home_address || !$student->current_address || !isset($user->phone_number)) {
-            $isProfileComplete = false;
-        }
-    @endphp
+                                    <div class="text-center mt-3">
+                                        <div class="text-center mt-3">
+                                            @if(isset($isRegistered) && $isRegistered)
+                                                <!-- Check for profile completeness -->
+                                                @php
+                                                    $isProfileComplete = true;
+                                                    if (!isset($student) || !$student->photo || !$student->ktp_scan || !$student->home_address) {
+                                                        $isProfileComplete = false;
+                                                    }
+                                                @endphp
 
-    @if($isProfileComplete && !$isRegistered && $user->exam_status == 'not_yet')
-        <!-- Show registration button only if profile is complete AND not registered -->
-        <form action="{{ route('student.register.exam') }}" method="POST">
-            @csrf
-            <button type="submit" class="btn btn-primary btn-lg btn-register">
-                <i class="fas fa-clipboard-list mr-2"></i> Register for Exam
-            </button>
-        </form>
-    @elseif(!$isProfileComplete)
-        <!-- Show profile completion notice -->
-        <div class="alert alert-warning">
-            <i class="fas fa-exclamation-triangle mr-2"></i> 
-            <strong>Profile Incomplete!</strong> Please complete your profile before registering for the exam.
-        </div>
-        <a href="{{ route('student.profile') }}" class="btn btn-warning btn-lg">
-            <i class="fas fa-user-edit mr-2"></i> Complete Your Profile
-        </a>
-    @elseif($isRegistered)
-        <!-- Show already registered notice -->
-        <div class="alert alert-info">
-            <i class="fas fa-info-circle mr-2"></i> 
-            <strong>Already Registered!</strong> You are already registered for an upcoming exam.
-        </div>
-    @endif
-</div>
+                                                @if($isProfileComplete)
+                                                    <!-- Show registration button only if profile is complete -->
+                                                    <form action="{{ route('student.register.exam') }}" method="POST">
+                                                        @csrf
+                                                        <button type="submit" class="btn btn-primary btn-lg btn-register">
+                                                            <i class="fas fa-clipboard-list mr-2"></i> Register for Exam
+                                                        </button>
+                                                    </form>
+                                                @else
+                                                    <!-- Show profile completion notice instead of registration button -->
+                                                    <div class="alert alert-warning">
+                                                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                                                        <strong>Profile Incomplete!</strong> Please complete your profile before
+                                                        registering for the exam.
+                                                    </div>
+                                                    <a href="{{ route('student.profile') }}" class="btn btn-warning btn-lg">
+                                                        <i class="fas fa-user-edit mr-2"></i> Complete Your Profile
+                                                    </a>
+                                                @endif
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
