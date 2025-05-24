@@ -14,6 +14,8 @@ use App\Http\Controllers\AdminProfileController;
 use App\Http\Controllers\AnnouncementController;
 use App\Models\AnnouncementModel;
 use App\Models\UserModel;
+use App\Http\Controllers\UserDataTableController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -368,3 +370,18 @@ Route::post('/lecturer/profile', [LecturerController::class, 'update'])->name('l
 // Student Exam Registration routes
 Route::get('/student/registration', [StudentController::class, 'showRegistrationForm'])->name('student.registration.form');
 Route::post('/student/register-exam', [StudentController::class, 'registerExam'])->name('student.register.exam');
+
+Route::get('/registration', function () {
+    return view('users-admin.registration.index', [
+        'type_menu' => 'registration',
+        'user' => UserModel::all()
+    ]);
+})->name('registration');
+Route::post('/registration', [AuthController::class, 'register'])->name('registration.store');
+Route::get('/users-data', [App\Http\Controllers\UserDataTableController::class, 'getUsers'])->name('users.data');
+
+// Tambahkan route AJAX user
+Route::get('/registration/{id}/show', [UserDataTableController::class, 'showUser']);
+Route::get('/registration/{id}/edit', [UserDataTableController::class, 'editUser']);
+Route::post('/registration/{id}/update', [UserDataTableController::class, 'updateUser']);
+Route::delete('/registration/{id}/delete', [UserDataTableController::class, 'deleteUser']);
