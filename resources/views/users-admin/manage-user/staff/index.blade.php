@@ -8,7 +8,7 @@
         <div class="section-header">
             <h1>Staff List</h1>
             <div class="section-header-breadcrumb">
-                <div class="breadcrumb-item active"><a href="{{ url('/manage-users') }}">Manage Users</a></div>
+                <div class="breadcrumb-item active"><a href="{{ url('/users') }}">Users</a></div>
                 <div class="breadcrumb-item">Staff</div>
             </div>
         </div>
@@ -30,8 +30,8 @@
                                 <table class="table table-bordered table-striped table-hover table-sm" id="table_staff">
                                     <thead>
                                         <tr>
-                                            <th>No</th>
-                                            <th>Role</th>
+                                            <th>ID</th>
+                                            <th>Exam Status</th>
                                             <th>Name</th>
                                             <th>NIP</th>
                                             <th>Scan KTP</th>
@@ -76,13 +76,13 @@
             },
             columns: [
                 {
-                    data: "DT_RowIndex",
+                    data: "staff_id",
                     className: "text-center",
-                    orderable: false,
+                    orderable: true,
                     searchable: false
                 },
                 {
-                    data: "user.role",
+                    data: "user.exam_status",
                     className: "",
                     orderable: true,
                     searchable: true
@@ -135,7 +135,8 @@
                     orderable: false,
                     searchable: false
                 }
-            ]
+            ],
+            order: [[0, 'desc']]
         });
     });
 </script>

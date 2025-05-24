@@ -8,7 +8,7 @@
         <div class="section-header">
             <h1>Lecturer List</h1>
             <div class="section-header-breadcrumb">
-                <div class="breadcrumb-item active"><a href="{{ url('/manage-users') }}">Manage Users</a></div>
+                <div class="breadcrumb-item active"><a href="{{ url('/users') }}">Users</a></div>
                 <div class="breadcrumb-item">Lecturer</div>
             </div>
         </div>
@@ -30,7 +30,7 @@
                                 <table class="table table-bordered table-striped table-hover table-sm" id="table_lecturer">
                                     <thead>
                                         <tr>
-                                            <th>No</th>
+                                            <th>ID</th>
                                             <th>Exam Status</th>
                                             <th>Name</th>
                                             <th>NIDN</th>
@@ -76,9 +76,9 @@
             },
             columns: [
                 {
-                    data: "DT_RowIndex",
+                    data: "lecturer_id",
                     className: "text-center",
-                    orderable: false,
+                    orderable: true,
                     searchable: false
                 },
                 {
@@ -137,7 +137,8 @@
                     orderable: false,
                     searchable: false
                 }
-            ]
+            ],
+            order: [[0, 'desc']]
         });
     });
 </script>

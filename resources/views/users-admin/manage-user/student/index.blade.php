@@ -8,7 +8,7 @@
             <div class="section-header">
                 <h1>Student List</h1>
                 <div class="section-header-breadcrumb">
-                    <div class="breadcrumb-item active"><a href="{{ url('/manage-users') }}">Manage Users</a></div>
+                    <div class="breadcrumb-item active"><a href="{{ url('/users') }}">Users</a></div>
                     <div class="breadcrumb-item">Students</div>
                 </div>
             </div>
@@ -48,7 +48,7 @@
                                         id="table_student">
                                         <thead>
                                             <tr>
-                                                <th>No</th>
+                                                <th>ID</th>
                                                 <th>Exam Status</th>
                                                 <th>Name</th>
                                                 <th>NIM</th>
@@ -99,9 +99,9 @@
                 },
                 columns: [
                     {
-                        data: "DT_RowIndex",
+                        data: "student_id",
                         className: "text-center",
-                        orderable: false,
+                        orderable: true,
                         searchable: false
                     },
                     {
@@ -197,7 +197,8 @@
                         orderable: false,
                         searchable: false
                     }
-                ]
+                ],
+                order: [[0, 'desc']]
             });
             $('#student_id').on('change', function () {
                 dataStudent.ajax.reload();
