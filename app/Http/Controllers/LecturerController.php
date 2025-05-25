@@ -121,15 +121,25 @@ class LecturerController extends Controller
         /**
      * Display lecturer dashboard
      */
-    public function dashboard()
-    {
-        $type_menu = 'dashboard';
-        // Get schedules and exam results similar to other controllers
-        $schedules = \App\Models\ExamScheduleModel::paginate(10);
-        $examResults = \App\Models\ExamResultModel::where('user_id', auth()->id())->latest()->first();
-        
-        return view('users-lecturer.lecturer-dashboard', compact('type_menu', 'schedules', 'examResults'));
-    }
+   public function dashboard()
+{
+    $type_menu = 'dashboard';
+    // Get schedules and exam results similar to other controllers
+    $schedules = \App\Models\ExamScheduleModel::paginate(10);
+    $examResults = \App\Models\ExamResultModel::where('user_id', auth()->id())->latest()->first();
+
+    // ambil skor dari 4 tabel user: student, staff, lecturer, alumni
+    $examScores = \App\Models\ExamResultModel::with([
+        'user' => function ($query) {
+            $query->with(['student', 'staff', 'lecturer', 'alumni']);
+        }
+    ])->get();
+    
+    // Ambil announcement terbaru dari AnnouncementModel
+    $announcements = \App\Models\AnnouncementModel::latest()->first();
+    
+    return view('users-lecturer.lecturer-dashboard', compact('type_menu', 'schedules', 'examResults', 'examScores', 'announcements'));
+}
     
     /**
      * Display lecturer profile
