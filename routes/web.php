@@ -12,6 +12,7 @@ use App\Models\AlumniModel;
 use App\Models\LecturerModel;
 use App\Http\Controllers\AdminProfileController;
 use App\Http\Controllers\AnnouncementController;
+use App\Http\Controllers\ExamResultController;
 use App\Models\AnnouncementModel;
 use App\Models\UserModel;
 
@@ -236,12 +237,12 @@ Route::get('/dashboard-admin', function () {
 
 // Admin Notices Announcements route
 Route::group(['prefix' => 'announcements'], function () {
-    Route::get('/', function ()  {
+    Route::get('/', function () {
         return view('users-admin.announcement.index', [
             'type_menu' => 'announcements',
             'announcements' => AnnouncementModel::all()
         ]);
-    })->name('announcements.index');  
+    })->name('announcements.index');
     Route::post('/list', [AnnouncementController::class, 'list']);
     Route::get('/create', [AnnouncementController::class, 'create']);
     Route::post('/store', [AnnouncementController::class, 'store']);
@@ -256,11 +257,11 @@ Route::group(['prefix' => 'announcements'], function () {
 // Admin Manage Users route
 Route::get('/users', function () {
     // Adjust these queries based on your actual database schema
-    $staffCount = StaffModel::count(); 
-    $studentCount = StudentModel::count(); 
-    $alumniCount = AlumniModel::count(); 
-    $lecturerCount = LecturerModel::count(); 
-    
+    $staffCount = StaffModel::count();
+    $studentCount = StudentModel::count();
+    $alumniCount = AlumniModel::count();
+    $lecturerCount = LecturerModel::count();
+
     return view('users-admin.manage-user.index', [
         'type_menu' => 'users',
         'staffCount' => $staffCount,
@@ -368,3 +369,14 @@ Route::post('/lecturer/profile', [LecturerController::class, 'update'])->name('l
 // Student Exam Registration routes
 Route::get('/student/registration', [StudentController::class, 'showRegistrationForm'])->name('student.registration.form');
 Route::post('/student/register-exam', [StudentController::class, 'registerExam'])->name('student.register.exam');
+
+
+// Admin Exam Results Routes
+Route::middleware(['auth'])->group(function () {
+    Route::get('/exam-results', [ExamResultController::class, 'index'])->name('exam-results.index');
+    Route::get('/exam-results/data', [ExamResultController::class, 'getResults'])->name('exam-results.data');
+    Route::post('/exam-results/import', [ExamResultController::class, 'import'])->name('exam-results.import.store');
+    Route::get('/exam-results/{id}', [ExamResultController::class, 'show'])->name('exam-results.show');
+    Route::put('/exam-results/{id}', [ExamResultController::class, 'update'])->name('exam-results.update');
+    Route::delete('/exam-results/{id}', [ExamResultController::class, 'destroy'])->name('exam-results.destroy');
+});
