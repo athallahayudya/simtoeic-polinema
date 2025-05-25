@@ -1,12 +1,17 @@
 <?php
 
+
 namespace App\Http\Controllers;
 
 use App\Models\AlumniModel; 
+use App\Models\ExamScheduleModel;
+use App\Models\ExamResultModel;
+use App\Models\AnnouncementModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
 class AlumniController extends Controller
 {
@@ -36,43 +41,42 @@ class AlumniController extends Controller
 
     public function update_ajax(Request $request, $id)
     {
-            $rules = [
-                'name' => 'required|string|max:100',
-                'photo' => 'nullable|file|mimes:jpg,jpeg,png|max:2048',
-                'home_address' => 'required|string',
-                'current_address' => 'required|string',
-            ];
+        $rules = [
+            'name'          => 'required|string|max:100',
+            'photo'         => 'nullable|file|mimes:jpg,jpeg,png|max:2048',
+            'home_address'  => 'required|string',
+            'current_address'=> 'required|string',
+        ];
 
-            $validator = Validator::make($request->all(), $rules);
+        $validator = Validator::make($request->all(), $rules);
 
-            if ($validator->fails()) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Validation failed.',
-                    'msgField' => $validator->errors()
-                ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Validation failed.',
+                'msgField'=> $validator->errors()
+            ]);
+        }
+
+        $alumni = AlumniModel::find($id);
+        if ($alumni) {
+            $data = $request->only('name', 'home_address', 'current_address');
+
+            if ($request->hasFile('photo')) {
+                $data['photo'] = $request->file('photo')->store('photos', 'public');
             }
 
-            $alumni = AlumniModel::find($id);
-            if ($alumni) {
-                $data = $request->only('name', 'home_address', 'current_address');
-
-                if ($request->hasFile('photo')) {
-                    $data['photo'] = $request->file('photo')->store('photos', 'public');
-                }
-
-                $alumni->update($data);
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Alumni data successfully updated'
-                ]);
-            } else {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Data not found.'
-                ]);
-            }
-        return redirect('/manage-users/alumni');
+            $alumni->update($data);
+            return response()->json([
+                'status'  => true,
+                'message' => 'Alumni data successfully updated'
+            ]);
+        } else {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Data not found.'
+            ]);
+        }
     }
 
     public function confirm_ajax(string $id)
@@ -82,26 +86,15 @@ class AlumniController extends Controller
         return view('users-admin.manage-user.alumni.delete', ['alumni' => $alumni]);
     }
 
-    public function delete_ajax( string $id)
+    public function delete_ajax(string $id)
     {
         $alumni = AlumniModel::find($id);
-            if ($alumni) {
-                $alumni->delete();
-                return redirect('/manage-users/alumni');
-
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Alumni data successfully deleted'
-                ]);
-            } else {
-                return redirect('/manage-users/alumni');
-
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Data not found.'
-                ]);
-            }
-        return redirect('/manage-users/alumni');
+        if ($alumni) {
+            $alumni->delete();
+            return redirect('/manage-users/alumni');
+        } else {
+            return redirect('/manage-users/alumni');
+        }
     }
 
     public function show_ajax(string $id)
@@ -113,26 +106,86 @@ class AlumniController extends Controller
         ]);
     }
 
-        /**
+    /**
      * Display alumni dashboard
+     * (Disamakan dengan LecturerController)
      */
     public function dashboard()
     {
         $type_menu = 'dashboard';
         // Get schedules and exam results similar to other controllers
-        $schedules = \App\Models\ExamScheduleModel::paginate(10);
-        $examResults = \App\Models\ExamResultModel::where('user_id', auth()->id())->latest()->first();
+        $schedules = ExamScheduleModel::paginate(10);
+        $examResults = ExamResultModel::where('user_id', auth()->id())->latest()->first();
         
-        return view('users-alumni.alumni-dashboard', compact('type_menu', 'schedules', 'examResults'));
+        // Ambil exam scores beserta relasi (student, staff, lecturer, alumni)
+        $examScores = ExamResultModel::with([
+            'user' => function ($query) {
+                $query->with(['student', 'staff', 'lecturer', 'alumni']);
+            }
+        ])->get();
+        
+        // Ambil announcement terbaru
+        $announcements = AnnouncementModel::latest()->first();
+        
+        return view('users-alumni.alumni-dashboard', compact('type_menu', 'schedules', 'examResults', 'examScores', 'announcements'));
     }
-    
+
     /**
-     * Display alumni profile
+     * Display alumni profile (Disamakan dengan LecturerController)
      */
     public function profile()
     {
-        $type_menu = 'profile';
-        $alumni = AlumniModel::where('user_id', auth()->id())->first();
-        return view('users-alumni.alumni-profile', compact('type_menu', 'alumni'));
+        $user = Auth::guard('web')->user();
+        if (!$user) {
+            abort(403, 'Unauthorized');
+        }
+
+        if ($user->role !== 'alumni') {
+            abort(403, 'Only alumni users can access this page.');
+        }
+
+        $userId = $user->user_id;
+        $alumni = AlumniModel::where('user_id', $userId)->first();
+
+        // Jika tidak ada record alumni, tampilkan pesan not found
+        if (!$alumni) {
+            return view('users-alumni.profile.not-found', [
+                'message' => 'Your alumni profile has not been set up yet. Please contact the system administrator.'
+            ]);
+        }
+
+        return view('users-alumni.alumni-profile', compact('alumni'));
+    }
+
+    /**
+     * Update alumni profile (Disamakan dengan LecturerController)
+     */
+    public function update(Request $request)
+    {
+        $user = Auth::guard('web')->user();
+        $alumni = AlumniModel::where('user_id', $user->user_id)->firstOrFail();
+
+        $request->validate([
+            'photo'       => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'phone_number'=> 'nullable|string|max:20',
+        ]);
+
+        // Update nomor telepon di tabel users
+        $user->phone_number = $request->input('phone_number');
+        $user->save();
+
+        // Upload foto jika ada, hapus foto lama jika tersedia
+        if ($request->hasFile('photo')) {
+            if ($alumni->photo && Storage::disk('public')->exists($alumni->photo)) {
+                Storage::disk('public')->delete($alumni->photo);
+            }
+            $path = $request->file('photo')->store('alumni/photos', 'public');
+            $alumni->photo = $path;
+        }
+
+        // Simpan perubahan data alumni
+        $alumni->save();
+
+        return redirect()->route('alumni.profile')->with('success', 'Profile updated successfully!');
     }
 }

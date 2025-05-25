@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Foundation\Auth\User as Authenticatable; //implement auth
-use App\Models\LevelModel;
+use App\Models\StudentModel;
 
 class UserModel extends Authenticatable
 {
@@ -96,4 +96,23 @@ class UserModel extends Authenticatable
             }
         }
     }
+
+    
+    public function student()
+    {
+        return $this->hasOne(StudentModel::class, 'user_id', 'user_id');
+    }
+     public function staff()
+    {
+        return $this->hasOne(StaffModel::class, 'user_id', 'user_id');
+    }
+     public function lecturer()
+    {
+        return $this->hasOne(LecturerModel::class, 'user_id', 'user_id');
+    }
+     public function Alumni()
+    {
+        return $this->hasOne(AlumniModel::class, 'user_id', 'user_id');
+    }
 }
+
