@@ -13,9 +13,9 @@ class AnnouncementController extends Controller
     {
         $announcements = AnnouncementModel::select('announcement_id', 'title', 'content', 'announcement_status', 'announcement_date');
 
-        if ($request->announcement_id) {
-            $announcements->where('announcement_id', $request->announcement_id);
-        };
+        if ($request->announcement_status) {
+            $announcements->where('announcement_status', $request->announcement_status);
+        }
 
         return DataTables::of($announcements)
             ->addIndexColumn()

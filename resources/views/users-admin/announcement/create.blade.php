@@ -56,8 +56,10 @@
                         </div>
 
                         <div class="form-group">
+                            <a href="{{ url('announcements') }}" class="btn btn-secondary">Cancel</a>   
                             <button type="submit" class="btn btn-primary">Publish</button>
                         </div>
+                        
                     </form>
                 </div>
             </div>

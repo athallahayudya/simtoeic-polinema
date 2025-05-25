@@ -31,13 +31,12 @@
                                     <div class="d-flex justify-content-between align-items-end">
                                         <div class="form-group mb-0">
                                             <label class="control-label">Filter:</label>
-                                            <select class="form-control" id="announcement_id" name="announcement_id" required>
-                                                <option value="">- Semua</option>
-                                                @foreach ($announcements as $item)
-                                                    <option value="{{ $item->announcement_id }}">{{ $item->announcement_status }}</option>
-                                                @endforeach
-                                            </select>
-                                            <small class="form-text text-muted">Announcement Status</small>
+                                                <select class="form-control" id="announcement_status" name="announcement_status">
+                                                    <option value="">- Semua</option>
+                                                    <option value="published">Published</option>
+                                                    <option value="draft">Draft</option>
+                                                </select>
+                                                <small class="form-text text-muted">Announcement Status</small>
                                         </div>
                                         <a href="{{ url('announcements/create') }}" class="btn btn-success">Add Announcement</a>
                                     </div>
@@ -86,7 +85,7 @@
                 dataType: "json",
                 data: function (d) {
                     d._token = $('meta[name="csrf-token"]').attr('content');
-                    d.announcement_id = $('#announcement_id').val();
+                    d.announcement_status = $('#announcement_status').val();
                 }
             },
             columns: [
@@ -135,7 +134,7 @@
             ],
             order: [[0, 'desc']]
         });
-        $('#announcement_id').on('change', function(){
+        $('#announcement_status').on('change', function(){
             dataAnnouncement.ajax.reload();
         });
     });
