@@ -389,11 +389,11 @@
                     icon: 'error',
                     title: 'Account Creation Failed',
                     html: `
-                                                <div class="text-left">
-                                                    <p>Please fix the following issues:</p>
-                                                    <ul class="text-danger">${errorListHtml}</ul>
-                                                </div>
-                                            `,
+                                                        <div class="text-left">
+                                                            <p>Please fix the following issues:</p>
+                                                            <ul class="text-danger">${errorListHtml}</ul>
+                                                        </div>
+                                                    `,
                     confirmButtonText: 'Fix Issues',
                     confirmButtonColor: '#3085d6'
                 });
@@ -555,7 +555,17 @@
                     { data: 'exam_status', name: 'exam_status' },
                     { data: 'actions', name: 'actions', orderable: false, searchable: false }
                 ],
-                order: [[0, 'desc']]
+                order: [[0, 'desc']],
+                // Add search functionality parameters
+                searching: true,
+                language: {
+                    search: "Search:",
+                    searchPlaceholder: "Name, ID or Role..."
+                },
+                // Improve responsive behavior
+                responsive: true,
+                // Increase entries per page options
+                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]]
             });
 
             // Handle delete user action
@@ -599,6 +609,98 @@
                     }
                 });
             });
+        });
+
+        // Handle view user action
+        $(document).on('click', '.view-btn', function () {
+            const userId = $(this).data('id');
+
+            // Show loading state
+            Swal.fire({
+                title: 'Loading user details',
+                text: 'Please wait...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // Fetch user details
+            $.ajax({
+                url: `/registration/${userId}/details`,
+                type: 'GET',
+                success: function (response) {
+                    Swal.close();
+
+                    // Generate user details HTML
+                    let detailsHtml = `
+                    <div class="user-details text-left">
+                        <div class="mb-3">
+                            <h6 class="font-weight-bold">Personal Information</h6>
+                            <div class="row">
+                                <div class="col-5 text-muted">Name:</div>
+                                <div class="col-7">${response.user.name}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-5 text-muted">Role:</div>
+                                <div class="col-7">${response.user.role}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-5 text-muted">Identity Number:</div>
+                                <div class="col-7">${response.user.identity_number}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-5 text-muted">Exam Status:</div>
+                                <div class="col-7">${response.user.exam_status}</div>
+                            </div>
+                        </div>`;
+
+                    // Add student-specific information if available
+                    if (response.student) {
+                        detailsHtml += `
+                        <div class="mb-3">
+                            <h6 class="font-weight-bold">Student Information</h6>
+                            <div class="row">
+                                <div class="col-5 text-muted">Major:</div>
+                                <div class="col-7">${response.student.major || 'Not available'}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-5 text-muted">Study Program:</div>
+                                <div class="col-7">${response.student.study_program || 'Not available'}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-5 text-muted">Campus:</div>
+                                <div class="col-7">${response.student.campus || 'Not available'}</div>
+                            </div>
+                        </div>`;
+                    }
+
+                    detailsHtml += `</div>`;
+
+                    Swal.fire({
+                        title: 'User Details',
+                        html: detailsHtml,
+                        width: '600px',
+                        confirmButtonText: 'Close',
+                        confirmButtonColor: '#3085d6'
+                    });
+                },
+                error: function (xhr) {
+                    Swal.fire(
+                        'Error!',
+                        'Unable to load user details.',
+                        'error'
+                    );
+                }
+            });
+        });
+
+        // Handle edit user action
+        $(document).on('click', '.edit-btn', function () {
+            const userId = $(this).data('id');
+
+            // Redirect to edit page
+            window.location.href = `/registration/${userId}/edit`;
         });
 
         // SweetAlert notifications for server-side responses
