@@ -111,24 +111,34 @@ class StudentController extends Controller
             'student' => $student
         ]);
     }
+
     public function list(Request $request)
     {
         $students = StudentModel::select('student_id', 'user_id', 'name', 'nim', 'study_program', 'major', 'campus', 'ktp_scan', 'ktm_scan', 'photo', 'home_address', 'current_address')
             ->with('user:user_id,exam_status');
 
-        if ($request->student_id) {
-            $students->where('student_id', $request->student_id);
+        if ($request->campus) {
+            $students->where('campus', $request->campus);
         }
 
         return DataTables::of($students)
             ->addIndexColumn()
-            ->addColumn('action', function ($row) {
-                $actionBtn = '<a href="javascript:void(0)" onclick="modalAction(\'/manage-users/student/show/' . $row->student_id . '\')" class="btn btn-info btn-sm">View</a> ';
-                $actionBtn .= '<a href="javascript:void(0)" onclick="modalAction(\'/manage-users/student/edit/' . $row->student_id . '\')" class="edit btn btn-success btn-sm">Edit</a> ';
-                $actionBtn .= '<a href="javascript:void(0)" onclick="modalAction(\'/manage-users/student/confirm/' . $row->student_id . '\')" class="delete btn btn-danger btn-sm">Delete</a>';
-                return $actionBtn;
+            ->editColumn('ktp_scan', function ($student) {
+                return $student->ktp_scan ? asset($student->ktp_scan) : '-';
             })
-            ->rawColumns(['action'])
+            ->editColumn('ktm_scan', function ($student) {
+                return $student->ktm_scan ? asset($student->ktm_scan) : '-';
+            })
+            ->editColumn('photo', function ($student) {
+                return $student->photo ? asset($student->photo) : '-';
+            })
+            ->addColumn('action', function ($student) {
+                $btn = '<button onclick="modalAction(\'' . url('/manage-users/student/' . $student->student_id . '/show_ajax') . '\')" class="btn btn-info btn-sm">Detail</button> ';
+                $btn .= '<button onclick="modalAction(\'' . url('/manage-users/student/' . $student->student_id . '/edit_ajax') . '\')" class="btn btn-warning btn-sm">Edit</button> ';
+                $btn .= '<button onclick="modalAction(\'' . url('/manage-users/student/' . $student->student_id . '/delete_ajax') . '\')" class="btn btn-danger btn-sm">Delete</button> ';
+                return $btn;
+            })
+            ->rawColumns(['action', 'ktp_scan', 'ktm_scan', 'photo'])
             ->make(true);
     }
 
@@ -167,7 +177,11 @@ class StudentController extends Controller
             ]);
 
             if ($request->hasFile('photo')) {
-                $data['photo'] = $request->file('photo')->store('photos', 'public');
+                if ($student->photo && Storage::disk('public')->exists(str_replace('storage/', '', $student->photo))) {
+                    Storage::disk('public')->delete(str_replace('storage/', '', $student->photo));
+                }
+                $path = $request->file('photo')->store('student/photos', 'public');
+                $student->photo = 'storage/' . $path;
             }
 
             $student->update($data);
@@ -196,23 +210,18 @@ class StudentController extends Controller
         if ($student) {
             $student->delete();
 
-            // Choose one response type - JSON for AJAX
+            return redirect('/manage-users/student/');
             return response()->json([
                 'status' => true,
                 'message' => 'Student data has been successfully deleted.'
             ]);
 
-            // Alternative if using regular form submission:
-            // return redirect('/manage-users/student/');
         } else {
-            // Choose one response type - JSON for AJAX
             return response()->json([
                 'status' => false,
                 'message' => 'Data not found.'
             ]);
 
-            // Alternative if using regular form submission:
-            // return redirect('/manage-users/student/')->with('error', 'Data not found');
         }
     }
 
@@ -303,15 +312,6 @@ class StudentController extends Controller
         // Get student data
         $student = StudentModel::where('user_id', $user->user_id)->first();
 
-        // Check profile completeness
-        $isProfileComplete = true;
-        if (
-            !$student || !$student->photo || !$student->ktp_scan || !$student->ktm_scan ||
-            !$student->home_address || !$student->current_address || !$user->phone_number
-        ) {
-            $isProfileComplete = false;
-        }
-
         // Get latest exam result (score > 0 means it's a real score)
         $examResults = ExamRegistrationModel::where('user_id', $user->user_id)
             ->where('score', '>', 0)
@@ -331,8 +331,7 @@ class StudentController extends Controller
             'user' => $user,
             'student' => $student,
             'examResults' => $examResults,
-            'isRegistered' => $isRegistered,
-            'isProfileComplete' => $isProfileComplete 
+            'isRegistered' => $isRegistered
         ]);
     }
 

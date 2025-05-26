@@ -18,13 +18,19 @@ class LecturerController extends Controller
 
         return DataTables::of($lecturers)
             ->addIndexColumn()
+            ->editColumn('ktp_scan', function ($lecturers) {
+                return $lecturers->ktp_scan ? asset($lecturers->ktp_scan) : '-';
+            })
+            ->editColumn('photo', function ($lecturers) {
+                return $lecturers->photo ? asset($lecturers->photo) : '-';
+            })
             ->addColumn('action', function ($lecturer) {
                 $btn = '<button onclick="modalAction(\''.url('/manage-users/lecturer/' . $lecturer->lecturer_id . '/show_ajax').'\')" class="btn btn-info btn-sm">Detail</button> ';
                 $btn .= '<button onclick="modalAction(\''.url('/manage-users/lecturer/' . $lecturer->lecturer_id . '/edit_ajax').'\')" class="btn btn-warning btn-sm">Edit</button> ';
                 $btn .= '<button onclick="modalAction(\''.url('/manage-users/lecturer/' . $lecturer->lecturer_id . '/delete_ajax').'\')" class="btn btn-danger btn-sm">Delete</button> ';
                 return $btn;
             })
-            ->rawColumns(['action'])
+            ->rawColumns(['action', 'ktp_scan', 'photo'])
             ->make(true);
     }
 
@@ -62,9 +68,13 @@ class LecturerController extends Controller
                     'current_address'
                 ]);
 
-                if ($request->hasFile('photo')) {
-                    $data['photo'] = $request->file('photo')->store('photos', 'public');
+            if ($request->hasFile('photo')) {
+                if ($lecturer->photo && Storage::disk('public')->exists(str_replace('storage/', '', $lecturer->photo))) {
+                    Storage::disk('public')->delete(str_replace('storage/', '', $lecturer->photo));
                 }
+                $path = $request->file('photo')->store('lecturer/photos', 'public');
+                $lecturer->photo = 'storage/' . $path;
+            }
 
                 $lecturer->update($data);
                 return response()->json([

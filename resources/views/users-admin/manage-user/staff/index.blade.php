@@ -104,8 +104,8 @@
                     className: "",
                     orderable: false,
                     searchable: false,
-                    render: function(data, type, row) {
-                        return data ? '<a href="' + data + '" target="_blank">KTP</a>' : '-';
+                    render: function (data, type, row) {
+                            return data && data !== '-' ? '<a href="' + data + '" target="_blank">KTP</a>' : '-';
                     }
                 },
                 {
@@ -113,8 +113,8 @@
                     className: "",
                     orderable: false,
                     searchable: false,
-                    render: function(data, type, row) {
-                        return data ? '<img src="' + data + '" alt="Foto" width="50" height="50">' : '-';
+                    render: function (data, type, row) {
+                            return data && data !== '-' ? '<a href="' + data + '" target="_blank">Photo</a>' : '-';
                     }
                 },
                 {
