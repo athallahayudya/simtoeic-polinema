@@ -312,6 +312,15 @@ class StudentController extends Controller
         // Get student data
         $student = StudentModel::where('user_id', $user->user_id)->first();
 
+        // Check profile completeness
+        $isProfileComplete = true;
+        if (
+            !$student || !$student->photo || !$student->ktp_scan || !$student->ktm_scan ||
+            !$student->home_address || !$student->current_address || !$user->phone_number
+        ) {
+            $isProfileComplete = false;
+        }
+
         // Get latest exam result (score > 0 means it's a real score)
         $examResults = ExamRegistrationModel::where('user_id', $user->user_id)
             ->where('score', '>', 0)
@@ -331,6 +340,7 @@ class StudentController extends Controller
             'user' => $user,
             'student' => $student,
             'examResults' => $examResults,
+            'isProfileComplete' => $isProfileComplete,
             'isRegistered' => $isRegistered
         ]);
     }
