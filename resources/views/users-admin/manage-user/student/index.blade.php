@@ -31,14 +31,14 @@
                                         <div class="form-group row">
                                             <label class="col-1 control-label col-form-label">Filter:</label>
                                             <div class="col-3">
-                                                <select class="form-control" id="student_id" name="student_id" required>
+                                                <select class="form-control" id="campus" name="campus" required>
                                                     <option value="">- Semua</option>
-                                                    @foreach ($students as $item)
-                                                        <option value="{{ $item->student_id }}">{{ $item->study_program }}
-                                                        </option>
-                                                    @endforeach
+                                                    <option value="malang">Politeknik Negeri Malang</option>
+                                                    <option value="psdku_kediri">PSDKU Kediri</option>
+                                                    <option value="psdku_lumajang">PSDKU Lumajang</option>
+                                                    <option value="psdku_pamekasan">PSDKU Pamekasan</option>
                                                 </select>
-                                                <small class="form-text text-muted">Study Program</small>
+                                                <small class="form-text text-muted">Campus</small>
                                             </div>
                                         </div>
                                     </div>
@@ -94,7 +94,7 @@
                     dataType: "json",
                     data: function (d) {
                         d._token = $('meta[name="csrf-token"]').attr('content');
-                        d.student_id = $('#student_id').val();
+                        d.campus = $('#campus').val();
                     }
                 },
                 columns: [
@@ -156,7 +156,7 @@
                         orderable: false,
                         searchable: false,
                         render: function (data, type, row) {
-                            return data ? '<a href="' + data + '" target="_blank">KTP</a>' : '-';
+                                return data && data !== '-' ? '<a href="' + data + '" target="_blank">KTP</a>' : '-';
                         }
                     },
                     {
@@ -165,7 +165,7 @@
                         orderable: false,
                         searchable: false,
                         render: function (data, type, row) {
-                            return data ? '<a href="' + data + '" target="_blank">KTM</a>' : '-';
+                                return data && data !== '-' ? '<a href="' + data + '" target="_blank">KTM</a>' : '-';
                         }
                     },
                     {
@@ -175,7 +175,7 @@
                         orderable: false,
                         searchable: false,
                         render: function (data, type, row) {
-                            return data ? '<img src="' + data + '" alt="Photo" width="50" height="50">' : '-';
+                                return data && data !== '-' ? '<a href="' + data + '" target="_blank">Photo</a>' : '-';
                         }
                     },
                     {
@@ -200,7 +200,7 @@
                 ],
                 order: [[0, 'desc']]
             });
-            $('#student_id').on('change', function () {
+            $('#campus').on('change', function () {
                 dataStudent.ajax.reload();
             });
         });

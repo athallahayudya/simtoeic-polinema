@@ -22,13 +22,19 @@ class StaffController extends Controller
 
         return DataTables::of($staff)
             ->addIndexColumn()
+            ->editColumn('ktp_scan', function ($staff) {
+                return $staff->ktp_scan ? asset($staff->ktp_scan) : '-';
+            })
+            ->editColumn('photo', function ($staff) {
+                return $staff->photo ? asset($staff->photo) : '-';
+            })
             ->addColumn('action', function ($staff) {
                 $btn = '<button onclick="modalAction(\''.url('/manage-users/staff/' . $staff->staff_id . '/show_ajax').'\')" class="btn btn-info btn-sm">Detail</button> ';
                 $btn .= '<button onclick="modalAction(\''.url('/manage-users/staff/' . $staff->staff_id . '/edit_ajax').'\')" class="btn btn-warning btn-sm">Edit</button> ';
                 $btn .= '<button onclick="modalAction(\''.url('/manage-users/staff/' . $staff->staff_id . '/delete_ajax').'\')" class="btn btn-danger btn-sm">Delete</button> ';
                 return $btn;
             })
-            ->rawColumns(['action'])
+            ->rawColumns(['action', 'ktp_scan', 'photo'])
             ->make(true);
     }
 
@@ -62,7 +68,11 @@ class StaffController extends Controller
             $data = $request->only(['name','home_address','current_address']);
 
             if ($request->hasFile('photo')) {
-                $data['photo'] = $request->file('photo')->store('photos', 'public');
+                if ($staff->photo && Storage::disk('public')->exists(str_replace('storage/', '', $staff->photo))) {
+                    Storage::disk('public')->delete(str_replace('storage/', '', $staff->photo));
+                }
+                $path = $request->file('photo')->store('staff/photos', 'public');
+                $staff->photo = 'storage/' . $path;
             }
 
             $staff->update($data);
