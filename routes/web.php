@@ -15,6 +15,8 @@ use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\ExamResultController;
 use App\Models\AnnouncementModel;
 use App\Models\UserModel;
+use App\Http\Controllers\UserDataTableController;
+use App\Http\Controllers\FaqController;
 
 /*
 |--------------------------------------------------------------------------
@@ -370,7 +372,6 @@ Route::post('/lecturer/profile', [LecturerController::class, 'update'])->name('l
 Route::get('/student/registration', [StudentController::class, 'showRegistrationForm'])->name('student.registration.form');
 Route::post('/student/register-exam', [StudentController::class, 'registerExam'])->name('student.register.exam');
 
-
 // Admin Exam Results Routes
 Route::middleware(['auth'])->group(function () {
     Route::get('/exam-results', [ExamResultController::class, 'index'])->name('exam-results.index');
@@ -380,3 +381,11 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/exam-results/{id}', [ExamResultController::class, 'update'])->name('exam-results.update');
     Route::delete('/exam-results/{id}', [ExamResultController::class, 'destroy'])->name('exam-results.destroy');
 });
+// Tambahkan route AJAX user
+Route::get('/registration/{id}/show', [UserDataTableController::class, 'showUser']);
+Route::get('/registration/{id}/edit', [UserDataTableController::class, 'editUser']);
+Route::post('/registration/{id}/update', [UserDataTableController::class, 'updateUser']);
+Route::delete('/registration/{id}/delete', [UserDataTableController::class, 'deleteUser']);
+
+// FAQ routes
+Route::get('/faq', [FaqController::class, 'index']);
