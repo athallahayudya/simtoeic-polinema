@@ -7,6 +7,7 @@ use App\Models\AlumniModel;
 use App\Models\ExamScheduleModel;
 use App\Models\ExamResultModel;
 use App\Models\AnnouncementModel;
+use App\Models\UserModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
@@ -141,56 +142,67 @@ class AlumniController extends Controller
     }
 
     /**
-     * Display alumni profile (Disamakan dengan LecturerController)
+     * Display alumni profile
      */
     public function profile()
     {
-        $user = Auth::guard('web')->user();
-        if (!$user) {
-            abort(403, 'Unauthorized');
-        }
+        $alumni = AlumniModel::where('user_id', auth()->id())->first();
 
-        if ($user->role !== 'alumni') {
-            abort(403, 'Only alumni users can access this page.');
-        }
-
-        $userId = $user->user_id;
-        $alumni = AlumniModel::where('user_id', $userId)->first();
-
-        // Jika tidak ada record alumni, tampilkan pesan not found
-        if (!$alumni) {
-            return view('users-alumni.profile.not-found', [
-                'message' => 'Your alumni profile has not been set up yet. Please contact the system administrator.'
-            ]);
-        }
-
-        return view('users-alumni.alumni-profile', compact('alumni'));
+        return view('users-alumni.alumni-profile', [
+            'type_menu' => 'profile',
+            'alumni' => $alumni
+        ]);
     }
 
     /**
-     * Update alumni profile (Disamakan dengan LecturerController)
+     * Update alumni profile 
      */
-    public function update(Request $request)
+    public function updateProfile(Request $request)
     {
         $user = Auth::guard('web')->user();
+        if (!$user || $user->role !== 'alumni') {
+            abort(403, 'Unauthorized or insufficient permissions.');
+        }
+
         $alumni = AlumniModel::where('user_id', $user->user_id)->firstOrFail();
 
         $request->validate([
-            'photo'       => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'phone_number'=> 'nullable|string|max:20',
+            'name' => 'required|string|max:255',
+            'phone_number' => 'required|string|min:10|max:15|regex:/^[0-9+\-\s]+$/',  // Improved validation
+            'home_address' => 'required|string',
+            'current_address' => 'required|string',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'ktp_scan' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:2048',
         ]);
 
-        // Update nomor telepon di tabel users
-        $user->phone_number = $request->input('phone_number');
-        $user->save();
+        $alumni->name = $request->input('name');
+        $alumni->home_address = $request->input('home_address');
+        $alumni->current_address = $request->input('current_address');
 
-        // Upload foto jika ada, hapus foto lama jika tersedia
+        // Update phone number
+        $userModel = UserModel::find($user->user_id);
+        if ($userModel) {
+            $userModel->phone_number = $request->input('phone_number');
+            $userModel->save();
+        }
+
+        // Handle photo upload  
         if ($request->hasFile('photo')) {
-            if ($alumni->photo && Storage::disk('public')->exists($alumni->photo)) {
-                Storage::disk('public')->delete($alumni->photo);
+            // Delete old photo if exists
+            if ($alumni->photo && Storage::disk('public')->exists(str_replace('storage/', '', $alumni->photo))) {
+                Storage::disk('public')->delete(str_replace('storage/', '', $alumni->photo));
             }
             $path = $request->file('photo')->store('alumni/photos', 'public');
-            $alumni->photo = $path;
+            $alumni->photo = 'storage/' . $path;
+        }
+
+        // Handle KTP scan upload
+        if ($request->hasFile('ktp_scan')) {
+            if ($alumni->ktp_scan && Storage::disk('public')->exists(str_replace('storage/', '', $alumni->ktp_scan))) {
+                Storage::disk('public')->delete(str_replace('storage/', '', $alumni->ktp_scan));
+            }
+            $ktpPath = $request->file('ktp_scan')->store('alumni/ktp', 'public');
+            $alumni->ktp_scan = 'storage/' . $ktpPath;
         }
 
         // Simpan perubahan data alumni
