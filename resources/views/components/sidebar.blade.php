@@ -90,8 +90,8 @@
                 </li>
 
                 <!-- Profile -->
-                <li class="{{ Request::is('student/profile') ? 'active' : '' }}">
-                    <a class="nav-link" href="{{ route('student.profile') }}">
+                <li class="{{ Request::is('*/profile') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ url(Auth::user()->role . '/profile') }}">
                         <i class="fas fa-user"></i> <span>Profile</span>
                     </a>
                 </li>
