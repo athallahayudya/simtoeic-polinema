@@ -187,12 +187,12 @@ class StudentController extends Controller
             $student->update($data);
             return response()->json([
                 'status' => true,
-                'message' => 'Data mahasiswa berhasil diupdate'
+                'message' => 'Student data has been successfully updated.'
             ]);
         } else {
             return response()->json([
                 'status' => false,
-                'message' => 'Data tidak ditemukan'
+                'message' => 'Data not found.'
             ]);
         }
     }
@@ -210,12 +210,10 @@ class StudentController extends Controller
         if ($student) {
             $student->delete();
 
-            return redirect('/manage-users/student/');
             return response()->json([
                 'status' => true,
                 'message' => 'Student data has been successfully deleted.'
             ]);
-
         } else {
             return response()->json([
                 'status' => false,
@@ -223,6 +221,7 @@ class StudentController extends Controller
             ]);
 
         }
+        return redirect('/manage-users/student/');
     }
 
     public function show_ajax(string $id)

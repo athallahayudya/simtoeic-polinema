@@ -46,15 +46,12 @@ class AnnouncementController extends Controller
         $announcements = AnnouncementModel::find($id);
         if ($announcements) {
             $announcements->delete();
-            return redirect('announcements/');
 
             return response()->json([
                 'status' => true,
                 'message' => 'Announcements data has been successfully deleted.'
             ]);
         } else {
-            return redirect('announcements/');
-
             return response()->json([
                 'status' => false,
                 'message' => 'Data not found.'

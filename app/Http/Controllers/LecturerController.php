@@ -99,23 +99,20 @@ class LecturerController extends Controller
 
     public function delete_ajax( string $id)
     {
-            $lecturer = LecturerModel::find($id);
-            if ($lecturer) {
-                $lecturer->delete();
-                return redirect('/manage-users/lecturer');
+        $lecturer = LecturerModel::find($id);
+        if ($lecturer) {
+            $lecturer->delete();
 
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Lecturer data successfully deleted'
-                ]);
-            } else {
-                return redirect('/manage-users/lecturer');
-
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Data not found.'
-                ]);
-            }
+            return response()->json([
+                'status' => true,
+                'message' => 'Lecturer data successfully deleted'
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'Data not found.'
+            ]);
+        }
         return redirect('/manage-users/lecturer');
     }
 
