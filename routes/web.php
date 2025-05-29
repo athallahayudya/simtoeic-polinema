@@ -351,8 +351,11 @@ Route::get('/staff/profile', [StaffController::class, 'profile'])->name('staff.p
 Route::get('/staff/dashboard', [StaffController::class, 'dashboard'])->name('staff.dashboard');
 
 // Alumni routes
-Route::get('/alumni/profile', [AlumniController::class, 'profile'])->name('alumni.profile');
-Route::get('/alumni/dashboard', [AlumniController::class, 'dashboard'])->name('alumni.dashboard');
+Route::group(['prefix' => 'alumni'], function (){
+    Route::get('/dashboard', [AlumniController::class, 'dashboard'])->name('alumni.dashboard');
+    Route::get('/profile', [AlumniController::class, 'profile'])->name('alumni.profile');
+    Route::post('/profile/update', [AlumniController::class, 'updateProfile'])->name('alumni.profle.update');
+});
 
 // Lecturer routes
 Route::get('/lecturer/profile', [LecturerController::class, 'profile'])->name('lecturer.profile');
