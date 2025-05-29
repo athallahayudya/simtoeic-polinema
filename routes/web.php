@@ -387,5 +387,10 @@ Route::get('/registration/{id}/edit', [UserDataTableController::class, 'editUser
 Route::post('/registration/{id}/update', [UserDataTableController::class, 'updateUser']);
 Route::delete('/registration/{id}/delete', [UserDataTableController::class, 'deleteUser']);
 
-// FAQ routes
-Route::get('/faq', [FaqController::class, 'index']);
+// // FAQ routes
+// Route::get('/faq', [FaqController::class, 'index']);
+
+// Admin dashboard route
+Route::get('/dashboard-admin', [App\Http\Controllers\AdminDashboardController::class, 'index'])
+    ->name('admin.dashboard')
+    ->middleware('auth');

@@ -11,7 +11,7 @@
                 <!-- ADMIN SIDEBAR MENU -->
                 <!-- Dashboard -->
                 <li class="{{ Request::is('dashboard-admin') ? 'active' : '' }}">
-                    <a class="nav-link" href="{{ url('dashboard-admin') }}">
+                    <a class="nav-link" href="{{ route('admin.dashboard') }}">
                         <i class="fas fa-fire"></i><span>Dashboard</span>
                     </a>
                 </li>
