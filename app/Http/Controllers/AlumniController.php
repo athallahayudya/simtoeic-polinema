@@ -102,10 +102,18 @@ class AlumniController extends Controller
         $alumni = AlumniModel::find($id);
         if ($alumni) {
             $alumni->delete();
-            return redirect('/manage-users/alumni');
+            
+            return response()->json([
+                'status' => true,
+                'message' => 'Alumni data has been successfully deleted.'
+            ]);
         } else {
-            return redirect('/manage-users/alumni');
+            return response()->json([
+                'status' => false,
+                'message' => 'Alumni data not found.'
+            ]);
         }
+        return redirect('/manage-users/alumni');
     }
 
     public function show_ajax(string $id)

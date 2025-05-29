@@ -72,50 +72,47 @@
         </div>
     </form>
     <script>
-    $(document).ready(function() {
-        $("#form-delete").validate({
-            rules: {},
-            submitHandler: function(form) {
+        $(document).ready(function() {
+            $('#form-delete').on('submit', function(e) {
+                e.preventDefault();
                 $.ajax({
-                    url: form.action,
-                    type: form.method,
-                    data: $(form).serialize(),
+                    url: $(this).attr('action'),
+                    type: 'POST', 
+                    data: $(this).serialize(),
                     success: function(response) {
-                        if (response.status) {
-                            $('#myModal').modal('hide');
+                        if (response.status === true) {
+                            $('#modal-master').modal('hide'); 
                             Swal.fire({
                                 icon: 'success',
-                                title: 'Berhasil',
-                                text: response.message
+                                title: 'Success!',
+                                text: response.message,
+                                timer: 2000,
+                                showConfirmButton: false
+                            }).then(() => {
+                                if (typeof dataStaff !== 'undefined' && dataStaff.ajax.reload) {
+                                    dataStaff.ajax.reload(); 
+                                } else {
+                                    location.reload(); 
+                                }
                             });
-                            dataStaff.ajax.reload();
                         } else {
-                            $('.error-text').text('');
-                            $.each(response.msgField, function(prefix, val) {
-                                $('#error-' + prefix).text(val[0]);
-                            });
                             Swal.fire({
                                 icon: 'error',
-                                title: 'Terjadi Kesalahan',
+                                title: 'Error',
                                 text: response.message
                             });
                         }
+                    },
+                    error: function(xhr) {
+                        console.log(xhr.responseJSON);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'An error occurred while processing your request.'
+                        });
                     }
                 });
-                return false;
-            },
-            errorElement: 'span',
-            errorPlacement: function(error, element) {
-                error.addClass('invalid-feedback');
-                element.closest('.form-group').append(error);
-            },
-            highlight: function(element, errorClass, validClass) {
-                $(element).addClass('is-invalid');
-            },
-            unhighlight: function(element, errorClass, validClass) {
-                $(element).removeClass('is-invalid');
-            }
+            });
         });
-    });
     </script>
 @endempty

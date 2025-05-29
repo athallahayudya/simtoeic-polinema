@@ -100,10 +100,18 @@ class StaffController extends Controller
         $staff = StaffModel::find($id);
         if ($staff) {
             $staff->delete();
-            return redirect('/manage-users/staff/');
+           
+            return response()->json([
+                'status' => true,
+                'message' => 'Staff data has been successfully deleted.'
+            ]);
         } else {
-            return redirect('/manage-users/staff/');
+            return response()->json([
+                'status' => false,
+                'message' => 'Data not found.'
+            ]);
         }
+        return redirect('/manage-users/staff/');
     }
 
     public function show_ajax(string $id)

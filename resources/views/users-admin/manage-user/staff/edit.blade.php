@@ -69,20 +69,33 @@
                     contentType: false,
                     processData: false,
                     success: function(response) {
-                        if (response.status == true) {
-                            $('#myModal').modal('hide');
-                            location.reload();
+                        if (response.status === true) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success!',
+                                text: response.message,
+                                timer: 2000,
+                                showConfirmButton: false
+                            }).then(() => {
+                                $('#modal-master').modal('hide'); 
+                                location.reload(); 
+                            });
                         } else {
-                            $.each(response.errors, function(key, value) {
-                                $('#error-' + key).text(value);
+                            $.each(response.msgField, function(key, value) {
+                                $('#error-' + key).text(value[0]); 
                             });
                         }
                     },
                     error: function(xhr) {
-                        console.log(xhr);
+                        console.log(xhr.responseJSON);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: 'An error occurred while processing your request.',
+                        });
                     }
                 });
             });
-        });
+        }); 
     </script>
 @endempty
