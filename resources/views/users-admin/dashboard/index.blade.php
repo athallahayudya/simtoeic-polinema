@@ -336,11 +336,11 @@
                         </div>
                     </div>
                 
-                <!-- Campus Distribution and Announcements Row -->
-                <div class="row  ml-2">
-                    <!-- Campus Distribution -->
-                    <div class="col-lg-4 mb-4">
-                        <div class="card card-dashboard h-100">
+                    <!-- Campus Distribution and Announcements Row -->
+                    <div class="row ml-1">
+                        <!-- Campus Distribution -->
+                        <div class="col-lg-5 mb-4">
+                            <div class="card card-dashboard h-100">
                             <div class="card-header">
                                 <h4 class="mb-0"><i class="fas fa-university mr-2 text-primary"></i> Campus Distribution</h4>
                                 <small class="text-muted">Student distribution</small>
@@ -373,7 +373,7 @@
                     </div>
                     
                     <!-- Announcements -->
-                    <div class="col-lg-8 mb-4">
+                    <div class="col-lg-7 mb-4">
                         <div class="card card-dashboard h-100">
                             <div class="card-header d-flex justify-content-between align-items-center">
                                 <div>
