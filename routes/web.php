@@ -330,13 +330,15 @@ Route::group(['prefix' => 'manage-users/lecturer'], function () {
 });
 
 // Registration - Admin
-Route::get('/registration', function () {
-    return view('users-admin.registration.index', [
-        'type_menu' => 'registration',
-        'user' => UserModel::all()
-    ]);
-})->name('registration');
-Route::post('/registration', [AuthController::class, 'register'])->name('registration.store');
+Route::get('/registration', [App\Http\Controllers\UserDataTableController::class, 'index'])->name('registration.index');
+
+// Make sure you have these existing AJAX routes
+Route::get('/users/data', [App\Http\Controllers\UserDataTableController::class, 'getUsers'])->name('users.data');
+Route::get('/registration/{id}/show', [App\Http\Controllers\UserDataTableController::class, 'showUser']);
+Route::get('/registration/{id}/edit', [App\Http\Controllers\UserDataTableController::class, 'editUser']);
+Route::post('/registration/{id}/update', [App\Http\Controllers\UserDataTableController::class, 'updateUser']);
+Route::delete('/registration/{id}/delete', [App\Http\Controllers\UserDataTableController::class, 'deleteUser']);
+
 Route::get('/users-data', [App\Http\Controllers\UserDataTableController::class, 'getUsers'])->name('users.data');
 
 // Student routes
