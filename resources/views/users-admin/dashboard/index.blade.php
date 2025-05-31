@@ -4,206 +4,244 @@
 
 @push('style')
     <!-- CSS Libraries -->
-    <link rel="stylesheet" href="{{ asset('library/jqvmap/dist/jqvmap.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('library/summernote/dist/summernote-bs4.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('library/owl.carousel/dist/assets/owl.carousel.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('library/owl.carousel/dist/assets/owl.theme.default.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('library/flag-icon-css/css/flag-icon.min.css') }}">
     <link rel="stylesheet" href="{{ asset('library/chart.js/dist/Chart.min.css') }}">
+    <style>
+
+        
+        .stat-card .card-body {
+            display: flex;
+            align-items: center;
+            padding: 1.5rem;
+        }
+        .stat-card {
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            overflow: hidden;
+            height: 100%;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-icon-container {
+            width: 70px;
+            display: flex;
+            justify-content: center;
+            margin-right: 15px;
+            margin-left: 10px;
+        }
+        
+        .stat-icon {
+            height: 60px;
+            width: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            font-size: 24px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-content {
+            flex: 1;
+        }
+        
+        .stat-icon::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+            z-index: 1;
+        }
+        
+        .stat-icon i {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .bg-primary {
+            background: linear-gradient(135deg, #6777ef 0%, #4a5fe4 100%) !important;
+        }
+        
+        .bg-success {
+            background: linear-gradient(135deg, #47c363 0%, #2bb14a 100%) !important;
+        }
+        
+        .bg-info {
+            background: linear-gradient(135deg, #3abaf4 0%, #1a9cdc 100%) !important;
+        }
+        
+        .bg-warning {
+            background: linear-gradient(135deg, #ffa426 0%, #f78c00 100%) !important;
+        }
+        
+        .card-dashboard {
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s;
+            border: none;
+        }
+        
+        .card-dashboard:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-dashboard .card-header {
+            background-color: #fff;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 20px 25px;
+        }
+        
+        .announcement-item {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            background-color: #f8f9fa;
+            transition: all 0.2s ease;
+            border-left: 4px solid #6777ef;
+        }
+        
+        .announcement-item:hover {
+            background-color: #eef0f8;
+        }
+        
+        .score-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        
+        .campus-item {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            background-color: #f8f9fa;
+            transition: all 0.2s ease;
+        }
+        
+        .campus-item:hover {
+            background-color: #eef0f8;
+        }
+        
+        .table-results th {
+            font-weight: 600;
+            color: #6c757d;
+        }
+        
+        .table-results {
+            border-radius: 8px;
+            overflow: hidden;
+        }
+    </style>
 @endpush
 
 @section('main')
     <div class="main-content">
         <section class="section">
             <div class="section-header">
-                <h1>Admin Dashboard</h1>
+                <h1></i> Admin Dashboard</h1>
                 <div class="section-header-breadcrumb">
                     <div class="breadcrumb-item active"><a href="#">Dashboard</a></div>
                 </div>
             </div>
 
-            <div class="section-body">
-                <!-- Statistics Cards -->
-                <div class="row">
-                    <div class="col-lg-3 col-md-6 col-sm-6 col-12">
-                        <div class="card card-statistic-1">
-                            <div class="card-icon bg-primary">
-                                <i class="far fa-user"></i>
-                            </div>
-                            <div class="card-wrap">
-                                <div class="card-header">
-                                    <h4>Total Users</h4>
-                                </div>
-                                <div class="card-body">
-                                    {{ number_format($totalUsers ?? 0) }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6 col-sm-6 col-12">
-                        <div class="card card-statistic-1">
-                            <div class="card-icon bg-success">
-                                <i class="fas fa-user-graduate"></i>
-                            </div>
-                            <div class="card-wrap">
-                                <div class="card-header">
-                                    <h4>Students</h4>
-                                </div>
-                                <div class="card-body">
-                                    {{ number_format($totalStudents ?? 0) }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6 col-sm-6 col-12">
-                        <div class="card card-statistic-1">
-                            <div class="card-icon bg-warning">
-                                <i class="fas fa-chalkboard-teacher"></i>
-                            </div>
-                            <div class="card-wrap">
-                                <div class="card-header">
-                                    <h4>Lecturers</h4>
-                                </div>
-                                <div class="card-body">
-                                    {{ number_format($totalLecturers ?? 0) }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6 col-sm-6 col-12">
-                        <div class="card card-statistic-1">
-                            <div class="card-icon bg-info">
-                                <i class="fas fa-clipboard-list"></i>
-                            </div>
-                            <div class="card-wrap">
-                                <div class="card-header">
-                                    <h4>Exam Results</h4>
-                                </div>
-                                <div class="card-body">
-                                    {{ number_format($totalExamResults ?? 0) }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+       <!-- Main Statistics Cards -->
+<div class="row mb-4">
+    <!-- Total Users Card -->
+    <div class="col-lg-3 col-md-6 col-sm-6 col-12 mb-4">
+        <a href="{{ route('users') }}" class="text-decoration-none">
+            <div class="card stat-card h-100">
+                <div class="card-header bg-primary text-white p-3 d-flex align-items-center justify-content-center">
+                    <h6 class="mb-0 text-center">Total Users</h6>
                 </div>
-
-                <!-- Secondary Statistics -->
-                <div class="row">
-                    <div class="col-lg-3 col-md-6 col-sm-6 col-12">
-                        <div class="card card-statistic-1">
-                            <div class="card-icon bg-secondary">
-                                <i class="fas fa-users-cog"></i>
-                            </div>
-                            <div class="card-wrap">
-                                <div class="card-header">
-                                    <h4>Staff</h4>
-                                </div>
-                                <div class="card-body">
-                                    {{ number_format($totalStaff ?? 0) }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6 col-sm-6 col-12">
-                        <div class="card card-statistic-1">
-                            <div class="card-icon bg-dark">
-                                <i class="fas fa-user-tie"></i>
-                            </div>
-                            <div class="card-wrap">
-                                <div class="card-header">
-                                    <h4>Alumni</h4>
-                                </div>
-                                <div class="card-body">
-                                    {{ number_format($totalAlumni ?? 0) }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6 col-sm-6 col-12">
-                        <div class="card card-statistic-1">
-                            <div class="card-icon bg-danger">
-                                <i class="fas fa-calendar-alt"></i>
-                            </div>
-                            <div class="card-wrap">
-                                <div class="card-header">
-                                    <h4>Schedules</h4>
-                                </div>
-                                <div class="card-body">
-                                    {{ number_format($totalExamSchedules ?? 0) }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6 col-sm-6 col-12">
-                        <div class="card card-statistic-1">
-                            <div class="card-icon bg-warning">
-                                <i class="fas fa-chart-line"></i>
-                            </div>
-                            <div class="card-wrap">
-                                <div class="card-header">
-                                    <h4>Avg Score</h4>
-                                </div>
-                                <div class="card-body">
-                                    {{ number_format($averageScore ?? 0, 1) }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="card-body p-4 d-flex align-items-center justify-content-center">
+                    <h2 class="font-weight-bold text-center mb-0">{{ number_format($totalUsers ?? 0) }}</h2>
                 </div>
-
-                <!-- Charts Row -->
-                <div class="row">
-                    <div class="col-lg-8">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4>User Registration Trend</h4>
-                            </div>
-                            <div class="card-body">
-                                <canvas id="userRegistrationChart" height="100"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4>Score Distribution</h4>
-                            </div>
-                            <div class="card-body">
-                                <canvas id="scoreDistributionChart" height="150"></canvas>
-                            </div>
-                        </div>
-                    </div>
+            </div>
+        </a>
+    </div>
+    
+    <!-- Users Taken TOEIC Card -->
+    <div class="col-lg-3 col-md-6 col-sm-6 col-12 mb-4">
+        <a href="{{ route('exam-results.index') }}" class="text-decoration-none">
+            <div class="card stat-card h-100">
+                <div class="card-header bg-success text-white p-3 d-flex align-items-center justify-content-center">
+                    <h6 class="mb-0 text-center">Taken TOEIC</h6>
                 </div>
-
-                <!-- Recent Activities and Campus Distribution -->
+                <div class="card-body p-4 d-flex align-items-center justify-content-center">
+                    <h2 class="font-weight-bold text-center mb-0">{{ number_format($totalExamParticipants ?? 0) }}</h2>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <!-- Users Not Taken TOEIC Card -->
+    <div class="col-lg-3 col-md-6 col-sm-6 col-12 mb-4">
+        <a href="{{ route('users') }}" class="text-decoration-none">
+            <div class="card stat-card h-100">
+                <div class="card-header bg-info text-white p-3 d-flex align-items-center justify-content-center">
+                    <h6 class="mb-0 text-center">Not Taken TOEIC</h6>
+                </div>
+                <div class="card-body p-4 d-flex align-items-center justify-content-center">
+                    <h2 class="font-weight-bold text-center mb-0">{{ number_format(($totalUsers ?? 0) - ($totalExamParticipants ?? 0)) }}</h2>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <!-- Average Score Card -->
+    <div class="col-lg-3 col-md-6 col-sm-6 col-12 mb-4">
+        <div class="card stat-card h-100">
+            <div class="card-header bg-warning text-white p-3 d-flex align-items-center justify-content-center">
+                <h6 class="mb-0 text-center">Average Score</h6>
+            </div>
+            <div class="card-body p-4 d-flex align-items-center justify-content-center">
+                <h2 class="font-weight-bold text-center mb-0">{{ number_format($averageScore ?? 0, 1) }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+                <!-- Charts and Results Row -->
                 <div class="row">
-                    <div class="col-lg-8">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4>Recent Exam Results</h4>
+                    <!-- Recent Exam Results -->
+                    <div class="col-lg-8 mb-4">
+                        <div class="card card-dashboard h-100">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h4 class="mb-0"><i class="fas fa-list-alt mr-2 text-primary"></i> Recent Exam Results</h4>
+                                    <small class="text-muted">Latest TOEIC exam performances</small>
+                                </div>
                                 @if(Route::has('exam-results.index'))
-                                <div class="card-header-action">
-                                    <a href="{{ route('exam-results.index') }}" class="btn btn-primary">View All</a>
-                                </div>
+                                <a href="{{ route('exam-results.index') }}" class="btn btn-primary btn-sm">
+                                    View All <i class="fas fa-arrow-right ml-1"></i>
+                                </a>
                                 @endif
                             </div>
-                            <div class="card-body p-0">
+                            <div class="card-body px-0 py-0">
                                 <div class="table-responsive">
-                                    <table class="table-striped table">
+                                    <table class="table table-striped table-results mb-0">
                                         <thead>
                                             <tr>
-                                                <th>User</th>
-                                                <th>Role</th>
-                                                <th>Score</th>
-                                                <th>Status</th>
-                                                <th>Date</th>
+                                                <th class="px-4 py-3">User</th>
+                                                <th class="py-3">Role</th>
+                                                <th class="py-3">Score</th>
+                                                <th class="py-3">Status</th>
+                                                <th class="py-3">Date</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @if(isset($recentExamResults) && $recentExamResults->count() > 0)
                                                 @foreach($recentExamResults as $result)
                                                     <tr>
-                                                        <td>
+                                                        <td class="px-4 py-3">
                                                             @if(isset($result->user))
                                                                 @if(isset($result->user->student) && $result->user->student)
                                                                     {{ $result->user->student->name ?? 'N/A' }}
@@ -220,7 +258,7 @@
                                                                 Unknown User
                                                             @endif
                                                         </td>
-                                                        <td>
+                                                        <td class="py-3">
                                                             @if(isset($result->user) && isset($result->user->role))
                                                                 <span class="badge badge-{{ $result->user->role == 'student' ? 'primary' : ($result->user->role == 'lecturer' ? 'success' : 'secondary') }}">
                                                                     {{ ucfirst($result->user->role) }}
@@ -229,12 +267,12 @@
                                                                 <span class="badge badge-secondary">Unknown</span>
                                                             @endif
                                                         </td>
-                                                        <td>
-                                                            <span class="badge badge-{{ ($result->score ?? 0) >= 80 ? 'success' : (($result->score ?? 0) >= 60 ? 'warning' : 'danger') }}">
+                                                        <td class="py-3">
+                                                            <span class="score-badge {{ ($result->score ?? 0) >= 80 ? 'bg-success text-white' : (($result->score ?? 0) >= 60 ? 'bg-warning text-white' : 'bg-danger text-white') }}">
                                                                 {{ $result->score ?? 0 }}
                                                             </span>
                                                         </td>
-                                                        <td>
+                                                        <td class="py-3">
                                                             @if(($result->score ?? 0) >= 80)
                                                                 <span class="badge badge-success">Excellent</span>
                                                             @elseif(($result->score ?? 0) >= 60)
@@ -243,12 +281,15 @@
                                                                 <span class="badge badge-danger">Needs Improvement</span>
                                                             @endif
                                                         </td>
-                                                        <td>{{ isset($result->created_at) ? $result->created_at->format('M d, Y') : 'N/A' }}</td>
+                                                        <td class="py-3">{{ isset($result->created_at) ? $result->created_at->format('M d, Y') : 'N/A' }}</td>
                                                     </tr>
                                                 @endforeach
                                             @else
                                                 <tr>
-                                                    <td colspan="5" class="text-center">No exam results found</td>
+                                                    <td colspan="5" class="text-center py-4">
+                                                        <i class="fas fa-clipboard fa-2x text-muted mb-2"></i>
+                                                        <p class="mb-0 text-muted">No exam results found</p>
+                                                    </td>
                                                 </tr>
                                             @endif
                                         </tbody>
@@ -257,58 +298,125 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4">
-                        <div class="card">
+                    
+                    <!-- Score Distribution Chart -->
+                    <div class="col-lg-4 mb-4">
+                        <div class="card card-dashboard h-100">
                             <div class="card-header">
-                                <h4>Campus Distribution</h4>
+                                <h4 class="mb-0"><i class="fas fa-chart-pie mr-2 text-primary"></i> Exam Qualification</h4>
+                                <small class="text-muted">TOEIC score threshold (500)</small>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container" style="position: relative; height:250px;">
+                                    <canvas id="scoreDistributionChart"></canvas>
+                                </div>
+                                <div class="score-legend mt-4">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <div class="d-flex align-items-center">
+                                                <span class="badge bg-success text-white mr-2" style="width: 16px; height: 16px;">&nbsp;</span>
+                                                <div>
+                                                    <div class="font-weight-bold">Score ≥ 500</div>
+                                                    <small class="text-muted">Free Exam Qualification</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="d-flex align-items-center">
+                                                <span class="badge bg-danger text-white mr-2" style="width: 16px; height: 16px;">&nbsp;</span>
+                                                <div>
+                                                    <div class="font-weight-bold">Score < 500</div>
+                                                    <small class="text-muted">Paid Exam Required</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                
+                <!-- Campus Distribution and Announcements Row -->
+                <div class="row  ml-2">
+                    <!-- Campus Distribution -->
+                    <div class="col-lg-4 mb-4">
+                        <div class="card card-dashboard h-100">
+                            <div class="card-header">
+                                <h4 class="mb-0"><i class="fas fa-university mr-2 text-primary"></i> Campus Distribution</h4>
+                                <small class="text-muted">Student distribution</small>
                             </div>
                             <div class="card-body">
                                 @if(isset($campusDistribution) && $campusDistribution->count() > 0)
                                     @foreach($campusDistribution as $campus)
-                                        <div class="mb-3">
-                                            <div class="d-flex justify-content-between mb-1">
-                                                <span class="text-muted">
+                                        <div class="campus-item">
+                                            <div class="d-flex justify-content-between mb-2">
+                                                <span>
+                                                    <i class="fas fa-map-marker-alt text-primary mr-1"></i>
                                                     {{ ucfirst(str_replace('_', ' ', $campus->campus ?? 'Unknown')) }}
                                                 </span>
-                                                <span class="font-weight-bold">{{ $campus->total ?? 0 }}</span>
+                                                <span class="badge badge-primary">{{ $campus->total ?? 0 }}</span>
                                             </div>
-                                            <div class="progress" style="height: 8px;">
+                                            <div class="progress" style="height: 8px; border-radius: 4px;">
                                                 <div class="progress-bar bg-primary" 
                                                      style="width: {{ ($totalStudents ?? 1) > 0 ? (($campus->total ?? 0) / ($totalStudents ?? 1)) * 100 : 0 }}%"></div>
                                             </div>
                                         </div>
                                     @endforeach
                                 @else
-                                    <p class="text-muted text-center">No campus data available</p>
+                                    <div class="text-center py-5">
+                                        <i class="fas fa-university fa-3x text-muted mb-3"></i>
+                                        <p class="text-muted">No campus data available</p>
+                                    </div>
                                 @endif
                             </div>
                         </div>
-
-                        <!-- Recent Announcements -->
-                        <div class="card">
-                            <div class="card-header">
-                                <h4>Recent Announcements</h4>
-                                @if(Route::has('announcements.index'))
-                                <div class="card-header-action">
-                                    <a href="{{ route('announcements.index') }}" class="btn btn-primary btn-sm">View All</a>
+                    </div>
+                    
+                    <!-- Announcements -->
+                    <div class="col-lg-8 mb-4">
+                        <div class="card card-dashboard h-100">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h4 class="mb-0"><i class="fas fa-bullhorn mr-2 text-primary"></i> Announcements</h4>
+                                    <small class="text-muted">Latest system announcements</small>
                                 </div>
+                                @if(Route::has('announcements.index'))
+                                <a href="{{ route('announcements.index') }}" class="btn btn-primary btn-sm">
+                                    All Announcements <i class="fas fa-arrow-right ml-1"></i>
+                                </a>
                                 @endif
                             </div>
                             <div class="card-body">
                                 @if(isset($recentAnnouncements) && $recentAnnouncements->count() > 0)
                                     @foreach($recentAnnouncements as $announcement)
-                                        <div class="mb-3 pb-2 border-bottom">
-                                            <h6 class="mb-1">{{ Str::limit($announcement->title ?? 'No Title', 30) }}</h6>
+                                        <div class="announcement-item">
+                                            <div class="d-flex justify-content-between mb-2">
+                                                <h6 class="mb-0 font-weight-bold">{{ Str::limit($announcement->title ?? 'No Title', 50) }}</h6>
+                                                <span class="badge badge-light">
+                                                    {{ isset($announcement->created_at) ? $announcement->created_at->format('M d') : '' }}
+                                                </span>
+                                            </div>
                                             <p class="text-muted small mb-1">
-                                                {{ Str::limit(strip_tags($announcement->content ?? ''), 50) }}
+                                                {{ Str::limit(strip_tags($announcement->content ?? ''), 100) }}
                                             </p>
-                                            <small class="text-muted">
-                                                {{ isset($announcement->created_at) ? $announcement->created_at->diffForHumans() : 'Unknown date' }}
-                                            </small>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <small class="text-muted">
+                                                    <i class="fas fa-clock mr-1"></i>
+                                                    {{ isset($announcement->created_at) ? $announcement->created_at->diffForHumans() : 'Unknown date' }}
+                                                </small>
+                                                @if(Route::has('announcements.show'))
+                                                <a href="{{ route('announcements.show', $announcement->id) }}" class="btn btn-sm btn-light">
+                                                    Read more
+                                                </a>
+                                                @endif
+                                            </div>
                                         </div>
                                     @endforeach
                                 @else
-                                    <p class="text-muted text-center">No announcements found</p>
+                                    <div class="text-center py-5">
+                                        <i class="fas fa-bullhorn fa-3x text-muted mb-3"></i>
+                                        <p class="text-muted">No announcements found</p>
+                                    </div>
                                 @endif
                             </div>
                         </div>
@@ -322,67 +430,82 @@
 @push('scripts')
     <!-- JS Libraries -->
     <script src="{{ asset('library/chart.js/dist/Chart.min.js') }}"></script>
-    <script src="{{ asset('library/jquery-sparkline/jquery.sparkline.min.js') }}"></script>
 
     <script>
-        // User Registration Chart
-        var ctx = document.getElementById('userRegistrationChart').getContext('2d');
-        var userRegistrationData = @json($userRegistrationData ?? collect());
-        var userRegistrationChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: userRegistrationData.length > 0 ? 
-                    userRegistrationData.map(function(item) {
-                        return new Date(2024, item.month - 1).toLocaleDateString('en', { month: 'short' });
-                    }) : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                datasets: [{
-                    label: 'New Users',
-                    data: userRegistrationData.length > 0 ? 
-                        userRegistrationData.map(function(item) { return item.count; }) : [0, 0, 0, 0, 0, 0],
-                    borderColor: '#6777ef',
-                    backgroundColor: 'rgba(103, 119, 239, 0.1)',
-                    borderWidth: 3,
-                    fill: true,
-                    tension: 0.4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-
-        // Score Distribution Chart
+        // Score Distribution Chart - Exam Qualification
         var ctx2 = document.getElementById('scoreDistributionChart').getContext('2d');
+        
+        // Calculate counts for scores above and below 500
         var scoreDistributionData = @json($scoreDistribution ?? collect());
+        var aboveThreshold = 0;
+        var belowThreshold = 0;
+        
+        // If we have actual score data, calculate the distribution
+        if(scoreDistributionData.length > 0) {
+            // Try to use the raw exam results if available
+            var examResults = @json($allExamResults ?? collect());
+            
+            if(examResults.length > 0) {
+                // Count directly from raw scores
+                examResults.forEach(function(result) {
+                    if(result.score >= 500) {
+                        aboveThreshold++;
+                    } else {
+                        belowThreshold++;
+                    }
+                });
+            } else {
+                // Estimate from the existing score distribution data
+                // This is just an approximation since we don't have the raw scores
+                scoreDistributionData.forEach(function(item) {
+                    // Parse the grade to get the score range
+                    var gradeText = item.grade || "";
+                    var count = item.count || 0;
+                    
+                    if(gradeText.includes("Excellent") || gradeText.includes("Good") || 
+                       (gradeText.includes("Average") && !gradeText.includes("Below"))) {
+                        // These are likely above 500
+                        aboveThreshold += count;
+                    } else {
+                        // These are likely below 500
+                        belowThreshold += count;
+                    }
+                });
+            }
+        }
+        
         var scoreDistributionChart = new Chart(ctx2, {
             type: 'doughnut',
             data: {
-                labels: scoreDistributionData.length > 0 ? 
-                    scoreDistributionData.map(function(item) { return item.grade; }) : 
-                    ['Excellent (90-100)', 'Good (80-89)', 'Average (70-79)', 'Below Average (60-69)', 'Poor (0-59)'],
+                labels: ['Score ≥ 500 (Free Exam)', 'Score < 500 (Paid Exam)'],
                 datasets: [{
-                    data: scoreDistributionData.length > 0 ? 
-                        scoreDistributionData.map(function(item) { return item.count; }) : [0, 0, 0, 0, 0],
+                    data: [aboveThreshold, belowThreshold],
                     backgroundColor: [
-                        '#28a745',
-                        '#17a2b8',
-                        '#ffc107',
-                        '#fd7e14',
-                        '#dc3545'
-                    ]
+                        '#28a745', // Green for qualifying scores (≥ 500)
+                        '#dc3545'  // Red for non-qualifying scores (< 500)
+                    ],
+                    borderWidth: 0
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                cutoutPercentage: 70,
                 legend: {
-                    position: 'bottom'
+                    display: false
+                },
+                tooltips: {
+                    callbacks: {
+                        label: function(tooltipItem, data) {
+                            var dataset = data.datasets[tooltipItem.datasetIndex];
+                            var total = dataset.data.reduce(function(previousValue, currentValue) {
+                                return previousValue + currentValue;
+                            }, 0);
+                            var currentValue = dataset.data[tooltipItem.index];
+                            var percentage = Math.floor(((currentValue/total) * 100)+0.5);        
+                            return data.labels[tooltipItem.index] + ': ' + currentValue + ' (' + percentage + '%)';
+                        }
+                    }
                 }
             }
         });

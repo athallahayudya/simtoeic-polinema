@@ -1,4 +1,5 @@
 <div class="navbar-bg"></div>
+<div class="navbar-bg"></div>
 <nav class="navbar navbar-expand-lg main-navbar">
     <form class="form-inline mr-auto">
         <ul class="navbar-nav mr-3">
@@ -15,7 +16,24 @@
         <li class="dropdown"><a href="#" data-toggle="dropdown"
                 class="nav-link dropdown-toggle nav-link-lg nav-link-user">
                 <img alt="image" src="{{ asset('img/avatar/avatar-1.png') }}" class="rounded-circle mr-1">
-                <div class="d-sm-none d-lg-inline-block">Hi, Ujang Maman</div>
+                <div class="d-sm-none d-lg-inline-block">
+                    Hi, 
+                    @if(Auth::check())
+                        @if(Auth::user()->role === 'student' && Auth::user()->student)
+                            {{ Auth::user()->student->name }}
+                        @elseif(Auth::user()->role === 'lecturer' && Auth::user()->lecturer)
+                            {{ Auth::user()->lecturer->name }}
+                        @elseif(Auth::user()->role === 'staff' && Auth::user()->staff)
+                            {{ Auth::user()->staff->name }}
+                        @elseif(Auth::user()->role === 'alumni' && Auth::user()->alumni)
+                            {{ Auth::user()->alumni->name }}
+                        @else
+                            {{ Auth::user()->name ?? Auth::user()->identity_number }}
+                        @endif
+                    @else
+                        Guest
+                    @endif
+                </div>
             </a>
             <div class="dropdown-menu dropdown-menu-right">
                 <div class="dropdown-title">Logged in 5 min ago</div>

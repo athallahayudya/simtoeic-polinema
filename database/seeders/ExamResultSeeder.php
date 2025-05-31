@@ -39,8 +39,8 @@ class ExamResultSeeder extends Seeder
             // Assign to a random schedule
             $scheduleId = $scheduleIds[array_rand($scheduleIds)];
             
-            // Generate a passing score (70-100)
-            $score = rand(70, 100);
+            // Generate a qualifying score (≥ 500) for free exam
+            $score = rand(500, 990);
             
             ExamResultModel::firstOrCreate(
                 [
@@ -63,8 +63,8 @@ class ExamResultSeeder extends Seeder
             // Assign to a random schedule
             $scheduleId = $scheduleIds[array_rand($scheduleIds)];
             
-            // Generate a failing score (0-69)
-            $score = rand(0, 69);
+            // Generate a non-qualifying score (< 500) for paid exam
+            $score = rand(10, 499);
             
             ExamResultModel::firstOrCreate(
                 [
@@ -90,7 +90,7 @@ class ExamResultSeeder extends Seeder
      */
     private function createSpecificExamples($scheduleIds)
     {
-        // Example 1: A student with a perfect score
+        // Example 1: A student with a perfect TOEIC score
         $perfectStudent = UserModel::where('role', 'student')
                                 ->where('exam_status', 'success')
                                 ->first();
@@ -102,13 +102,13 @@ class ExamResultSeeder extends Seeder
                     'schedule_id' => $scheduleIds[0] // Using the first schedule
                 ],
                 [
-                    'score' => 100,
+                    'score' => 990, // Perfect TOEIC score
                     'cerfificate_url' => "storage/certificates/distinction_{$perfectStudent->identity_number}.pdf"
                 ]
             );
         }
 
-        // Example 2: A student with a borderline pass
+        // Example 2: A student with a borderline qualifying score
         $borderlineStudent = UserModel::where('role', 'student')
                                   ->where('exam_status', 'success')
                                   ->skip(1)
@@ -121,13 +121,13 @@ class ExamResultSeeder extends Seeder
                     'schedule_id' => $scheduleIds[count($scheduleIds) > 1 ? 1 : 0] // Using the second schedule if available
                 ],
                 [
-                    'score' => 70,
+                    'score' => 500, // Exactly at the threshold
                     'cerfificate_url' => "storage/certificates/{$borderlineStudent->identity_number}.pdf"
                 ]
             );
         }
 
-        // Example 3: A student with a borderline fail
+        // Example 3: A student with a borderline non-qualifying score
         $borderlineFailStudent = UserModel::where('role', 'student')
                                       ->where('exam_status', 'fail')
                                       ->first();
@@ -139,7 +139,7 @@ class ExamResultSeeder extends Seeder
                     'schedule_id' => $scheduleIds[count($scheduleIds) > 2 ? 2 : 0] // Using the third schedule if available
                 ],
                 [
-                    'score' => 69,
+                    'score' => 499, // Just below the threshold
                     'cerfificate_url' => "" // No certificate for failed exams
                 ]
             );
