@@ -97,22 +97,21 @@ class UserModel extends Authenticatable
         }
     }
 
-    
+
     public function student()
     {
         return $this->hasOne(StudentModel::class, 'user_id', 'user_id');
     }
-     public function staff()
+    public function staff()
     {
         return $this->hasOne(StaffModel::class, 'user_id', 'user_id');
     }
-     public function lecturer()
+    public function lecturer()
     {
         return $this->hasOne(LecturerModel::class, 'user_id', 'user_id');
     }
-     public function Alumni()
+    public function alumni()
     {
         return $this->hasOne(AlumniModel::class, 'user_id', 'user_id');
     }
 }
-

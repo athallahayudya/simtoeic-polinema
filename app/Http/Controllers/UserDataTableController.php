@@ -34,56 +34,77 @@ class UserDataTableController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
     public function getUsers(Request $request)
-    {
-        try {
-            $users = UserModel::select(['user_id', 'role', 'identity_number', 'exam_status', 'phone_number', 'created_at']);
+{
+    try {
+        // Join with profile tables to enable searching by name
+        $users = UserModel::select(['users.user_id', 'users.role', 'users.identity_number', 'users.exam_status', 'users.phone_number', 'users.created_at'])
+            ->leftJoin('student', 'users.user_id', '=', 'student.user_id')
+            ->leftJoin('lecturer', 'users.user_id', '=', 'lecturer.user_id')
+            ->leftJoin('staff', 'users.user_id', '=', 'staff.user_id')
+            ->leftJoin('alumni', 'users.user_id', '=', 'alumni.user_id');
 
-            return DataTables::of($users)
-                ->addColumn('name', function ($user) {
-                    switch ($user->role) {
-                        case 'student':
-                            $profile = StudentModel::where('user_id', $user->user_id)->first();
-                            return $profile ? $profile->name : 'N/A';
-                        case 'lecturer':
-                            $profile = LecturerModel::where('user_id', $user->user_id)->first();
-                            return $profile ? $profile->name : 'N/A';
-                        case 'staff':
-                            $profile = StaffModel::where('user_id', $user->user_id)->first();
-                            return $profile ? $profile->name : 'N/A';
-                        case 'alumni':
-                            $profile = AlumniModel::where('user_id', $user->user_id)->first();
-                            return $profile ? $profile->name : 'N/A';
-                        case 'admin':
-                            return 'Admin';
-                        default:
-                            return 'N/A';
-                    }
-                })
-                ->editColumn('role', function ($user) {
-                    return ucfirst($user->role);
-                })
-                ->editColumn('exam_status', function ($user) {
-                    $statusMap = [
-                        'not_yet' => '<span class="badge badge-warning">Not Yet</span>',
-                        'success' => '<span class="badge badge-success">Success</span>',
-                        'fail' => '<span class="badge badge-danger">Failed</span>'
-                    ];
-                    return $statusMap[$user->exam_status] ?? '<span class="badge badge-secondary">Unknown</span>';
-                })
-                ->addColumn('actions', function ($user) {
-                    // Changed to use modalAction approach like staff management page
-                    $btn = '<button onclick="modalAction(\'' . url('/registration/' . $user->user_id . '/show_ajax') . '\')" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></button> ';
-                    $btn .= '<button onclick="modalAction(\'' . url('/registration/' . $user->user_id . '/edit_ajax') . '\')" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></button> ';
-                    $btn .= '<button onclick="modalAction(\'' . url('/registration/' . $user->user_id . '/delete_ajax') . '\')" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>';
-                    return $btn;
-                })
-                ->rawColumns(['exam_status', 'actions'])
-                ->make(true);
-        } catch (\Exception $e) {
-            Log::error('DataTables error: ' . $e->getMessage());
-            return response()->json(['error' => 'Failed to load user data'], 500);
-        }
+        return DataTables::of($users)
+            ->addColumn('name', function ($user) {
+                switch ($user->role) {
+                    case 'student':
+                        $profile = StudentModel::where('user_id', $user->user_id)->first();
+                        return $profile ? $profile->name : 'N/A';
+                    case 'lecturer':
+                        $profile = LecturerModel::where('user_id', $user->user_id)->first();
+                        return $profile ? $profile->name : 'N/A';
+                    case 'staff':
+                        $profile = StaffModel::where('user_id', $user->user_id)->first();
+                        return $profile ? $profile->name : 'N/A';
+                    case 'alumni':
+                        $profile = AlumniModel::where('user_id', $user->user_id)->first();
+                        return $profile ? $profile->name : 'N/A';
+                    case 'admin':
+                        return 'Admin';
+                    default:
+                        return 'N/A';
+                }
+            })
+            ->filterColumn('name', function($query, $keyword) {
+                $query->where(function($q) use ($keyword) {
+                    $q->whereHas('student', function($q) use ($keyword) {
+                        $q->where('name', 'like', "%{$keyword}%");
+                    })
+                    ->orWhereHas('lecturer', function($q) use ($keyword) {
+                        $q->where('name', 'like', "%{$keyword}%");
+                    })
+                    ->orWhereHas('staff', function($q) use ($keyword) {
+                        $q->where('name', 'like', "%{$keyword}%");
+                    })
+                    ->orWhereHas('alumni', function($q) use ($keyword) {
+                        $q->where('name', 'like', "%{$keyword}%");
+                    });
+                });
+            })
+            ->editColumn('role', function ($user) {
+                return ucfirst($user->role);
+            })
+            ->editColumn('exam_status', function ($user) {
+                $statusMap = [
+                    'not_yet' => '<span class="badge badge-warning">Not Yet</span>',
+                    'success' => '<span class="badge badge-success">Success</span>',
+                    'fail' => '<span class="badge badge-danger">Failed</span>'
+                ];
+                return $statusMap[$user->exam_status] ?? '<span class="badge badge-secondary">Unknown</span>';
+            })
+            ->addColumn('actions', function ($user) {
+                // Changed to use modalAction approach like staff management page
+                $btn = '<button onclick="modalAction(\'' . url('/registration/' . $user->user_id . '/show_ajax') . '\')" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></button> ';
+                $btn .= '<button onclick="modalAction(\'' . url('/registration/' . $user->user_id . '/edit_ajax') . '\')" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></button> ';
+                $btn .= '<button onclick="modalAction(\'' . url('/registration/' . $user->user_id . '/delete_ajax') . '\')" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>';
+                return $btn;
+            })
+            ->rawColumns(['exam_status', 'actions'])
+            ->make(true);
+    } catch (\Exception $e) {
+        Log::error('DataTables error: ' . $e->getMessage());
+        return response()->json(['error' => 'Failed to load user data'], 500);
     }
+}
 
     // Changed approach to match staff management page
     public function show_ajax($id)

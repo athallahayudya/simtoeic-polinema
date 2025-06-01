@@ -392,7 +392,7 @@
             // Initialize validation on page load
             initializeValidation();
 
-            // Initialize DataTable
+            // Initialize DataTable with custom search field
             var dataTable = $('#usersTable').DataTable({
                 processing: true,
                 serverSide: true,
@@ -401,14 +401,26 @@
                     { data: 'user_id', name: 'user_id' },
                     { data: 'role', name: 'role' },
                     { data: 'identity_number', name: 'identity_number' },
-                    { data: 'name', name: 'name' },
+                    { data: 'name', name: 'name', searchable: true },
                     { data: 'exam_status', name: 'exam_status' },
                     { data: 'actions', name: 'actions', orderable: false, searchable: false }
                 ],
                 order: [[0, 'desc']],
                 searching: true,
                 responsive: true,
-                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]]
+                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                // Remove the default search box
+                dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"<"float-right"f>>>' +
+                    '<"row"<"col-sm-12"tr>>' +
+                    '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+                language: {
+                    search: "Search by name: _INPUT_",
+                    searchPlaceholder: "Enter name..."
+                }
+            });
+            // Add custom search if needed
+            $('#searchInput').on('keyup', function () {
+                dataTable.search($(this).val()).draw();
             });
 
             // Define study programs for each major
