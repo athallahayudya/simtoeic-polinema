@@ -330,16 +330,19 @@ Route::group(['prefix' => 'manage-users/lecturer'], function () {
 });
 
 // Registration - Admin
-Route::get('/registration', [App\Http\Controllers\UserDataTableController::class, 'index'])->name('registration.index');
-
-// Make sure you have these existing AJAX routes
-Route::get('/users/data', [App\Http\Controllers\UserDataTableController::class, 'getUsers'])->name('users.data');
-Route::get('/registration/{id}/show', [App\Http\Controllers\UserDataTableController::class, 'showUser']);
-Route::get('/registration/{id}/edit', [App\Http\Controllers\UserDataTableController::class, 'editUser']);
-Route::post('/registration/{id}/update', [App\Http\Controllers\UserDataTableController::class, 'updateUser']);
-Route::delete('/registration/{id}/delete', [App\Http\Controllers\UserDataTableController::class, 'deleteUser']);
-
-Route::get('/users-data', [App\Http\Controllers\UserDataTableController::class, 'getUsers'])->name('users.data');
+Route::prefix('registration')->group(function () {
+    Route::get('/', [App\Http\Controllers\UserDataTableController::class, 'index'])->name('registration.index');
+    Route::get('/users-data', [App\Http\Controllers\UserDataTableController::class, 'getUsers'])->name('users.data');
+    
+    // AJAX modal routes
+    Route::get('/{id}/show_ajax', [App\Http\Controllers\UserDataTableController::class, 'show_ajax']);
+    Route::get('/{id}/edit_ajax', [App\Http\Controllers\UserDataTableController::class, 'edit_ajax']);
+    Route::get('/{id}/delete_ajax', [App\Http\Controllers\UserDataTableController::class, 'confirm_ajax']);
+    
+    // AJAX action routes - make sure these are POST routes
+    Route::post('/{id}/update_ajax', [App\Http\Controllers\UserDataTableController::class, 'update_ajax']);
+    Route::post('/{id}/delete_ajax', [App\Http\Controllers\UserDataTableController::class, 'delete_ajax']);
+});
 
 // Student routes
 Route::group(['prefix' => 'student'], function () {
@@ -386,14 +389,6 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/exam-results/{id}', [ExamResultController::class, 'update'])->name('exam-results.update');
     Route::delete('/exam-results/{id}', [ExamResultController::class, 'destroy'])->name('exam-results.destroy');
 });
-// Tambahkan route AJAX user
-Route::get('/registration/{id}/show', [UserDataTableController::class, 'showUser']);
-Route::get('/registration/{id}/edit', [UserDataTableController::class, 'editUser']);
-Route::post('/registration/{id}/update', [UserDataTableController::class, 'updateUser']);
-Route::delete('/registration/{id}/delete', [UserDataTableController::class, 'deleteUser']);
-
-// // FAQ routes
-// Route::get('/faq', [FaqController::class, 'index']);
 
 // Admin dashboard route
 Route::get('/dashboard-admin', [App\Http\Controllers\AdminDashboardController::class, 'index'])
