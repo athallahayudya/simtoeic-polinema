@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ExamRegistrationModel;
 use App\Models\LecturerModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -237,5 +238,46 @@ public function update(Request $request)
     return redirect()->route('lecturer.profile')->with('success', 'Profile updated successfully!');
 }
 
+    public function showRegistrationForm()
+    {
+        $user = Auth::guard('web')->user();
+        if (!$user || $user->role !== 'lecturer') {
+            abort(403, 'Unauthorized or insufficient permissions.');
+        }
 
+        // Get lecturer data      
+        $lecturer = lecturerModel::where('user_id', $user->user_id)->first();
+
+        // Check profile completeness
+        $isProfileComplete = true;
+        if (
+            !$lecturer || !$lecturer->photo || !$lecturer->ktp_scan  || !$lecturer->home_address
+            || !$lecturer->current_address || !$user->phone_number
+        ) {
+            $isProfileComplete = false;
+        }
+
+        // Get latest exam result (score > 0 means it's a real score)
+        $examResults = ExamRegistrationModel::where('user_id', $user->user_id)
+            ->where('score', '>', 0)
+            ->latest()
+            ->first();
+
+        // Check if lecturer is already registered for an upcoming exam
+        $isRegistered = ExamRegistrationModel::where('user_id', $user->user_id)
+            ->where('score', 0)  // 0 means "registered but not taken"
+            ->whereHas('schedule', function ($query) {
+                $query->where('exam_date', '>', now());
+            })
+            ->exists();
+
+        return view('users-lecturer.lecturer-registration', [
+            'type_menu' => 'registration',
+            'user' => $user,
+            'lecturer' => $lecturer,
+            'examResults' => $examResults,
+            'isProfileComplete' => $isProfileComplete,
+            'isRegistered' => $isRegistered
+        ]);
+    }
 }
