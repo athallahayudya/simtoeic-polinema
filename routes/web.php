@@ -343,6 +343,7 @@ Route::prefix('registration')->group(function () {
     Route::post('/{id}/update_ajax', [App\Http\Controllers\UserDataTableController::class, 'update_ajax']);
     Route::post('/{id}/delete_ajax', [App\Http\Controllers\UserDataTableController::class, 'delete_ajax']);
 });
+Route::post('/registration', [App\Http\Controllers\UserDataTableController::class, 'store'])->name('registration.store');
 
 // Student routes
 Route::group(['prefix' => 'student'], function () {

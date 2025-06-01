@@ -118,98 +118,98 @@ class UserDataTableController extends Controller
     }
 
     public function update_ajax(Request $request, $id)
-{
-    // First validate the basic required fields
-    $validator = Validator::make($request->all(), [
-        'identity_number' => 'required',
-        'role' => 'required',
-        'password' => 'nullable|min:8'
-    ]);
-
-    if ($validator->fails()) {
-        return response()->json([
-            'status' => false,
-            'message' => 'Validation failed',
-            'msgField' => $validator->errors()
+    {
+        // First validate the basic required fields
+        $validator = Validator::make($request->all(), [
+            'identity_number' => 'required',
+            'role' => 'required',
+            'password' => 'nullable|min:8'
         ]);
-    }
 
-    try {
-        $user = UserModel::findOrFail($id);
-
-        // Check if the identity number is already used by another user
-        $existingUser = UserModel::where('identity_number', $request->identity_number)
-            ->where('user_id', '!=', $id)
-            ->first();
-
-        if ($existingUser) {
+        if ($validator->fails()) {
             return response()->json([
                 'status' => false,
-                'message' => 'Identity number already in use by another user',
-                'msgField' => [
-                    'identity_number' => ['This identity number is already registered']
-                ]
+                'message' => 'Validation failed',
+                'msgField' => $validator->errors()
             ]);
         }
 
-        // Create data array with validated fields
-        $data = [
-            'identity_number' => $request->identity_number,
-            'role' => $request->role
-        ];
+        try {
+            $user = UserModel::findOrFail($id);
 
-        // Only update password if provided
-        if ($request->filled('password')) {
-            // Additional password validation for client-side validation consistency
-            if (strlen($request->password) < 8 || !preg_match('/[A-Za-z]/', $request->password) || !preg_match('/[0-9]/', $request->password)) {
+            // Check if the identity number is already used by another user
+            $existingUser = UserModel::where('identity_number', $request->identity_number)
+                ->where('user_id', '!=', $id)
+                ->first();
+
+            if ($existingUser) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Password validation failed',
+                    'message' => 'Identity number already in use by another user',
                     'msgField' => [
-                        'password' => ['Password must be at least 8 characters with letters and numbers']
+                        'identity_number' => ['This identity number is already registered']
                     ]
                 ]);
             }
-            
-            $data['password'] = Hash::make($request->password);
-        }
 
-        // Update the user
-        $user->update($data);
+            // Create data array with validated fields
+            $data = [
+                'identity_number' => $request->identity_number,
+                'role' => $request->role
+            ];
 
-        // Return success response
-        return response()->json([
-            'status' => true,
-            'message' => 'User updated successfully'
-        ]);
-    } catch (\Exception $e) {
-        // Log the error for debugging
-        Log::error('Update user error: ' . $e->getMessage());
+            // Only update password if provided
+            if ($request->filled('password')) {
+                // Additional password validation for client-side validation consistency
+                if (strlen($request->password) < 8 || !preg_match('/[A-Za-z]/', $request->password) || !preg_match('/[0-9]/', $request->password)) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Password validation failed',
+                        'msgField' => [
+                            'password' => ['Password must be at least 8 characters with letters and numbers']
+                        ]
+                    ]);
+                }
 
-        // Return failure response with more user-friendly message
-        $errorMessage = 'Failed to update user';
+                $data['password'] = Hash::make($request->password);
+            }
 
-        // If it's a duplicate key error, provide a specific message
-        if (
-            strpos($e->getMessage(), 'Duplicate entry') !== false &&
-            strpos($e->getMessage(), 'users_identity_number_unique') !== false
-        ) {
-            $errorMessage = 'This identity number is already being used by another user';
+            // Update the user
+            $user->update($data);
+
+            // Return success response
+            return response()->json([
+                'status' => true,
+                'message' => 'User updated successfully'
+            ]);
+        } catch (\Exception $e) {
+            // Log the error for debugging
+            Log::error('Update user error: ' . $e->getMessage());
+
+            // Return failure response with more user-friendly message
+            $errorMessage = 'Failed to update user';
+
+            // If it's a duplicate key error, provide a specific message
+            if (
+                strpos($e->getMessage(), 'Duplicate entry') !== false &&
+                strpos($e->getMessage(), 'users_identity_number_unique') !== false
+            ) {
+                $errorMessage = 'This identity number is already being used by another user';
+                return response()->json([
+                    'status' => false,
+                    'message' => $errorMessage,
+                    'msgField' => [
+                        'identity_number' => ['This identity number is already registered']
+                    ]
+                ]);
+            }
+
             return response()->json([
                 'status' => false,
-                'message' => $errorMessage,
-                'msgField' => [
-                    'identity_number' => ['This identity number is already registered']
-                ]
+                'message' => $errorMessage
             ]);
         }
-
-        return response()->json([
-            'status' => false,
-            'message' => $errorMessage
-        ]);
     }
-}
 
     public function confirm_ajax($id)
     {
@@ -375,6 +375,95 @@ class UserDataTableController extends Controller
                 'success' => false,
                 'message' => 'Failed to delete user'
             ], 500);
+        }
+    }
+
+    public function store(Request $request)
+    {
+        $rules = [
+            'name' => 'required|min:3',
+            'identity_number' => 'required|unique:users,identity_number|min:5',
+            'role' => 'required|in:student,lecturer,staff,alumni,admin',
+            'password' => ['required', 'min:8', 'regex:/[A-Za-z]/', 'regex:/[0-9]/'],
+            'password_confirmation' => 'required|same:password'
+        ];
+
+        // Add student-specific validation rules if role is student
+        if ($request->input('role') === 'student') {
+            $rules['major'] = 'required';
+            $rules['study_program'] = 'required';
+            $rules['campus'] = 'required';
+        }
+
+        $validator = Validator::make($request->all(), $rules, [
+            'password.regex' => 'Password must include at least one letter and one number',
+            'password_confirmation.same' => 'Password confirmation must match password'
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        try {
+            // Create the user
+            $user = UserModel::create([
+                'identity_number' => $request->identity_number,
+                'role' => $request->role,
+                'password' => Hash::make($request->password),
+                'exam_status' => 'not_yet'
+            ]);
+
+            // Create appropriate profile based on role
+            if ($request->role === 'student') {
+                // Include all required fields for StudentModel
+                StudentModel::create([
+                    'user_id' => $user->user_id,
+                    'name' => $request->name,
+                    'nim' => $request->identity_number, // Using identity_number as NIM for students
+                    'major' => $request->major,
+                    'study_program' => $request->study_program,
+                    'campus' => $request->campus,
+                    'batch' => date('Y'),   // Add current year as batch
+                    'status' => 'active',   // Add default status
+                    'phone_number' => $request->phone_number ?? null,
+                    'email' => $request->email ?? null
+                ]);
+            } elseif ($request->role === 'lecturer') {
+                LecturerModel::create([
+                    'user_id' => $user->user_id,
+                    'name' => $request->name,
+                    'nidn' => $request->identity_number, // Using identity_number as NIDN for lecturers
+                    'phone_number' => $request->phone_number ?? null,
+                    'email' => $request->email ?? null
+                ]);
+            } elseif ($request->role === 'staff') {
+                StaffModel::create([
+                    'user_id' => $user->user_id,
+                    'name' => $request->name,
+                    'nip' => $request->identity_number, // Using identity_number as NIP for staff
+                    'phone_number' => $request->phone_number ?? null,
+                    'email' => $request->email ?? null
+                ]);
+            } elseif ($request->role === 'alumni') {
+                AlumniModel::create([
+                    'user_id' => $user->user_id,
+                    'name' => $request->name,
+                    'nik' => $request->identity_number, // Using identity_number as NIK for alumni
+                    'phone_number' => $request->phone_number ?? null,
+                    'email' => $request->email ?? null
+                ]);
+            }
+
+            return redirect()->route('registration.index')
+                ->with('success', 'User created successfully');
+        } catch (\Exception $e) {
+            Log::error('Create user error: ' . $e->getMessage());
+
+            return redirect()->back()
+                ->with('error', 'Failed to create user: ' . $e->getMessage())
+                ->withInput();
         }
     }
 }

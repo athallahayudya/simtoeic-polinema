@@ -26,7 +26,7 @@
             color: #6777ef;
             margin-bottom: 15px;
         }
-        
+
         /* Custom validation styles */
         .validation-field.is-valid {
             border-color: #28a745;
@@ -94,7 +94,7 @@
                             </div>
                         @endif
 
-                        <form method="POST" action="{{ url('/registration') }}">
+                        <form method="POST" action="{{ route('registration.store') }}">
                             @csrf
                             <div class="form-group">
                                 <label for="name">Full Name</label>
@@ -236,24 +236,163 @@
             </div>
         </section>
     </div>
-    
+
     <!-- Modal for displaying user details, editing, and deletion -->
-    <div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" aria-hidden="true"></div>
+    <div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" data-backdrop="static"
+        data-keyboard="false" aria-hidden="true"></div>
 @endsection
 
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
     <script>
-        // Function to load modal content - similar to staff management
+        // Function to load modal content
         function modalAction(url = '') {
-            $('#myModal').load(url, function() {
-                $('#myModal').modal('show'); 
+            $('#myModal').load(url, function () {
+                $('#myModal').modal('show');
+                // Initialize validation on modal forms after they're loaded
+                initializeValidation();
             });
         }
 
-        $(document).ready(function() {
-            // Initialize the DataTable
+        // Simplified validation functions
+        function validateName(value) {
+            return value.length >= 3;
+        }
+
+        function validateIdentity(value) {
+            return value.length >= 5;
+        }
+
+        function validatePassword(value) {
+            return value.length >= 8 && /[A-Za-z]/.test(value) && /[0-9]/.test(value);
+        }
+
+        function validateRequired(value) {
+            return value !== "" && value !== null;
+        }
+
+        // Apply validation to a specific field
+        function validateField(field) {
+            const value = field.val();
+            const validationType = field.data('validation');
+            let isValid = false;
+
+            // Don't validate empty fields immediately (except on form submit)
+            if (value === "" && !field.hasClass('form-submitted')) {
+                field.removeClass('is-valid is-invalid');
+                return true;
+            }
+
+            switch (validationType) {
+                case 'name':
+                    isValid = validateName(value);
+                    break;
+                case 'identity':
+                    isValid = validateIdentity(value);
+                    break;
+                case 'password':
+                    isValid = validatePassword(value);
+                    break;
+                case 'password-match':
+                    isValid = value === $('#password').val();
+                    break;
+                case 'required':
+                    isValid = validateRequired(value);
+                    break;
+                default:
+                    isValid = true;
+            }
+
+            // Apply visual feedback
+            if (isValid) {
+                field.removeClass('is-invalid').addClass('is-valid');
+                const feedbackId = field.attr('id') + '-validation';
+                const feedbackElement = $('#' + feedbackId);
+
+                if (feedbackElement.length) {
+                    feedbackElement.removeClass('text-danger text-muted').addClass('text-success');
+                    const icon = feedbackElement.find('i');
+                    if (icon.length) {
+                        icon.removeClass('fa-info-circle fa-times-circle').addClass('fa-check-circle');
+                    }
+                }
+            } else {
+                field.removeClass('is-valid').addClass('is-invalid');
+                const feedbackId = field.attr('id') + '-validation';
+                const feedbackElement = $('#' + feedbackId);
+
+                if (feedbackElement.length) {
+                    feedbackElement.removeClass('text-success text-muted').addClass('text-danger');
+                    const icon = feedbackElement.find('i');
+                    if (icon.length) {
+                        icon.removeClass('fa-info-circle fa-check-circle').addClass('fa-times-circle');
+                    }
+                }
+            }
+
+            return isValid;
+        }
+
+        // Initialize validation for all fields in the form
+        function initializeValidation() {
+            // Add event listeners for real-time validation
+            $('.validation-field').off('input change').on('input change', function () {
+                validateField($(this));
+            });
+
+            // Special case for password + confirmation
+            $('#password').off('input change').on('input change', function () {
+                validateField($(this));
+                // Re-validate confirmation if it's not empty
+                if ($('#password_confirmation').val() !== '') {
+                    validateField($('#password_confirmation'));
+                }
+            });
+
+            // Clear validation styling when a form is reset
+            $('form').off('reset').on('reset', function () {
+                $(this).find('.validation-field').removeClass('is-valid is-invalid');
+                $(this).find('.validation-message')
+                    .removeClass('text-success text-danger')
+                    .addClass('text-muted');
+                $(this).find('.validation-message i')
+                    .removeClass('fa-check-circle fa-times-circle')
+                    .addClass('fa-info-circle');
+            });
+
+            // Validate all fields on form submission
+            $('form').off('submit').on('submit', function (e) {
+                const form = $(this);
+
+                // Mark all fields as submitted for validation
+                form.find('.validation-field').addClass('form-submitted');
+
+                // Validate all fields
+                let isValid = true;
+                form.find('.validation-field').each(function () {
+                    if (!validateField($(this))) {
+                        isValid = false;
+                    }
+                });
+
+                if (!isValid) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Validation Error',
+                        text: 'Please check all fields and try again.'
+                    });
+                    return false;
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            // Initialize validation on page load
+            initializeValidation();
+
+            // Initialize DataTable
             var dataTable = $('#usersTable').DataTable({
                 processing: true,
                 serverSide: true,
@@ -283,27 +422,68 @@
                     'D-IV Jaringan Telekomunikasi Digital',
                     'D-IV Teknik Elektronika (PSDKU Kediri)'
                 ],
-                // Keep other study programs as they are
+                'Teknik Sipil': [
+                    'D-III Teknik Sipil',
+                    'D-IV Teknik Sipil'
+                ],
+                'Teknik Mesin': [
+                    'D-III Teknik Mesin',
+                    'D-IV Teknik Mesin'
+                ],
+                'Teknik Kimia': [
+                    'D-III Teknik Kimia',
+                    'D-IV Teknik Kimia'
+                ],
+                'Akuntansi': [
+                    'D-III Akuntansi',
+                    'D-IV Akuntansi Manajemen'
+                ],
+                'Administrasi Niaga': [
+                    'D-III Administrasi Bisnis',
+                    'D-IV Manajemen Pemasaran'
+                ],
+                'Teknologi Informasi': [
+                    'D-III Teknologi Informasi',
+                    'D-IV Teknik Informatika'
+                ]
             };
 
             // Toggle form visibility
-            $('#addUserBtn').on('click', function() {
+            $('#addUserBtn').on('click', function () {
                 $('#registrationForm').show();
                 $(this).hide();
+
+                // Reset form when showing
+                $('form')[0].reset();
+                $('.validation-field').removeClass('is-valid is-invalid form-submitted');
+                $('.validation-message')
+                    .removeClass('text-success text-danger')
+                    .addClass('text-muted');
+                $('.validation-message i')
+                    .removeClass('fa-check-circle fa-times-circle')
+                    .addClass('fa-info-circle');
             });
 
             // Cancel button
-            $('#cancelBtn').on('click', function() {
+            $('#cancelBtn').on('click', function () {
                 $('#registrationForm').hide();
                 $('#addUserBtn').show();
                 // Clear form inputs
                 $('form')[0].reset();
+                // Clear validation classes
+                $('.validation-field').removeClass('is-valid is-invalid form-submitted');
+                $('.validation-message')
+                    .removeClass('text-success text-danger')
+                    .addClass('text-muted');
+                $('.validation-message i')
+                    .removeClass('fa-check-circle fa-times-circle')
+                    .addClass('fa-info-circle');
                 // Hide student fields
                 $('#studentFields').hide();
             });
 
             // Show/hide student fields based on role selection
-            $('#role').on('change', function() {
+            $('#role').on('change', function () {
                 const studentFields = $('#studentFields');
                 const majorField = $('#major');
                 const studyProgramField = $('#study_program');
@@ -330,11 +510,16 @@
                     majorField.removeAttr('required');
                     studyProgramField.removeAttr('required');
                     campusField.removeAttr('required');
+
+                    // Clear validation states for hidden fields
+                    majorField.removeClass('is-valid is-invalid');
+                    studyProgramField.removeClass('is-valid is-invalid');
+                    campusField.removeClass('is-valid is-invalid');
                 }
             });
 
             // Populate study program dropdown based on selected major
-            $('#major').on('change', function() {
+            $('#major').on('change', function () {
                 const studyProgramSelect = $('#study_program');
                 const selectedMajor = $(this).val();
 
@@ -347,21 +532,51 @@
                         studyProgramSelect.append(`<option value="${program}">${program}</option>`);
                     });
                 }
+
+                // Revalidate the field if it was already validated
+                if ($(this).hasClass('is-valid') || $(this).hasClass('is-invalid')) {
+                    validateField($(this));
+                }
             });
-            
+
             // Event handler for form submissions in modal
-            $(document).on('submit', '#form-edit, #form-delete', function(e) {
+            $(document).on('submit', '#form-edit, #form-delete', function (e) {
                 e.preventDefault();
+
+                // For edit forms, validate fields before submission
+                if ($(this).attr('id') === 'form-edit') {
+                    let isValid = true;
+
+                    // Mark all fields as submitted for validation
+                    $(this).find('.validation-field').addClass('form-submitted');
+
+                    // Validate all fields
+                    $(this).find('.validation-field').each(function () {
+                        if (!validateField($(this))) {
+                            isValid = false;
+                        }
+                    });
+
+                    if (!isValid) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Validation Error',
+                            text: 'Please check all fields and try again.'
+                        });
+                        return false;
+                    }
+                }
+
                 $.ajax({
                     url: $(this).attr('action'),
                     type: 'POST',
                     data: new FormData(this),
                     contentType: false,
                     processData: false,
-                    success: function(response) {
+                    success: function (response) {
                         if (response.status === true) {
                             $('#myModal').modal('hide');
-                            
+
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Success!',
@@ -374,8 +589,23 @@
                             });
                         } else {
                             if (response.msgField) {
-                                $.each(response.msgField, function(key, value) {
-                                    $('#error-' + key).text(value[0]);
+                                // Apply error classes to fields with errors
+                                $.each(response.msgField, function (key, value) {
+                                    const errorField = $('#' + key);
+                                    errorField.removeClass('is-valid').addClass('is-invalid');
+
+                                    // Update validation message if it exists
+                                    const feedbackId = key + '-validation';
+                                    const feedbackElement = $('#' + feedbackId);
+
+                                    if (feedbackElement.length) {
+                                        feedbackElement.removeClass('text-success text-muted').addClass('text-danger');
+                                        feedbackElement.html(`<i class="fas fa-times-circle mr-1"></i> ${value[0]}`);
+                                    } else {
+                                        // If no validation message container exists, create error message element
+                                        const errorMsg = $(`<div id="error-${key}" class="text-danger mt-1"><i class="fas fa-times-circle mr-1"></i> ${value[0]}</div>`);
+                                        errorField.after(errorMsg);
+                                    }
                                 });
                             } else {
                                 Swal.fire({
@@ -386,7 +616,7 @@
                             }
                         }
                     },
-                    error: function(xhr) {
+                    error: function (xhr) {
                         console.error('AJAX Error:', xhr.responseText);
                         Swal.fire({
                             icon: 'error',
