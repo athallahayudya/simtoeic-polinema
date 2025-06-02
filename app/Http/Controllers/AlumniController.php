@@ -3,10 +3,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\AlumniModel; 
+use App\Models\AlumniModel;
 use App\Models\ExamScheduleModel;
 use App\Models\ExamResultModel;
 use App\Models\AnnouncementModel;
+use App\Models\ExamRegistrationModel;
 use App\Models\UserModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -19,7 +20,7 @@ class AlumniController extends Controller
     public function list()
     {
         $alumni = AlumniModel::select('alumni_id', 'user_id', 'name', 'nik', 'ktp_scan', 'photo', 'home_address', 'current_address')
-                             ->with('user');
+            ->with('user');
 
         return DataTables::of($alumni)
             ->addIndexColumn()
@@ -30,9 +31,9 @@ class AlumniController extends Controller
                 return $alumni->photo ? asset($alumni->photo) : '-';
             })
             ->addColumn('action', function ($alumni) {
-                $btn = '<button onclick="modalAction(\''.url('/manage-users/alumni/' . $alumni->alumni_id . '/show_ajax').'\')" class="btn btn-info btn-sm">Detail</button> ';
-                $btn .= '<button onclick="modalAction(\''.url('/manage-users/alumni/' . $alumni->alumni_id . '/edit_ajax').'\')" class="btn btn-warning btn-sm">Edit</button> ';
-                $btn .= '<button onclick="modalAction(\''.url('/manage-users/alumni/' . $alumni->alumni_id . '/delete_ajax').'\')" class="btn btn-danger btn-sm">Delete</button> ';
+                $btn = '<button onclick="modalAction(\'' . url('/manage-users/alumni/' . $alumni->alumni_id . '/show_ajax') . '\')" class="btn btn-info btn-sm">Detail</button> ';
+                $btn .= '<button onclick="modalAction(\'' . url('/manage-users/alumni/' . $alumni->alumni_id . '/edit_ajax') . '\')" class="btn btn-warning btn-sm">Edit</button> ';
+                $btn .= '<button onclick="modalAction(\'' . url('/manage-users/alumni/' . $alumni->alumni_id . '/delete_ajax') . '\')" class="btn btn-danger btn-sm">Delete</button> ';
                 return $btn;
             })
             ->rawColumns(['action', 'ktp_scan', 'photo'])
@@ -52,7 +53,7 @@ class AlumniController extends Controller
             'name'          => 'required|string|max:100',
             'photo'         => 'nullable|file|mimes:jpg,jpeg,png|max:2048',
             'home_address'  => 'required|string',
-            'current_address'=> 'required|string',
+            'current_address' => 'required|string',
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -61,7 +62,7 @@ class AlumniController extends Controller
             return response()->json([
                 'status'  => false,
                 'message' => 'Validation failed.',
-                'msgField'=> $validator->errors()
+                'msgField' => $validator->errors()
             ]);
         }
 
@@ -102,7 +103,7 @@ class AlumniController extends Controller
         $alumni = AlumniModel::find($id);
         if ($alumni) {
             $alumni->delete();
-            
+
             return response()->json([
                 'status' => true,
                 'message' => 'Alumni data has been successfully deleted.'
@@ -135,17 +136,17 @@ class AlumniController extends Controller
         // Get schedules and exam results similar to other controllers
         $schedules = ExamScheduleModel::paginate(10);
         $examResults = ExamResultModel::where('user_id', auth()->id())->latest()->first();
-        
+
         // Ambil exam scores beserta relasi (student, staff, lecturer, alumni)
         $examScores = ExamResultModel::with([
             'user' => function ($query) {
                 $query->with(['student', 'staff', 'lecturer', 'alumni']);
             }
         ])->get();
-        
+
         // Ambil announcement terbaru
         $announcements = AnnouncementModel::latest()->first();
-        
+
         return view('users-alumni.alumni-dashboard', compact('type_menu', 'schedules', 'examResults', 'examScores', 'announcements'));
     }
 
@@ -217,5 +218,48 @@ class AlumniController extends Controller
         $alumni->save();
 
         return redirect()->route('alumni.profile')->with('success', 'Profile updated successfully!');
+    }
+
+    public function showRegistrationForm()
+    {
+        $user = Auth::guard('web')->user();
+        if (!$user || $user->role !== 'alumni') {
+            abort(403, 'Unauthorized or insufficient permissions.');
+        }
+
+        // Get alumni data      
+        $alumni = AlumniModel::where('user_id', $user->user_id)->first();
+
+        // Check profile completeness
+        $isProfileComplete = true;
+        if (
+            !$alumni || !$alumni->photo || !$alumni->ktp_scan  || !$alumni->home_address
+            || !$alumni->current_address || !$user->phone_number
+        ) {
+            $isProfileComplete = false;
+        }
+
+        // Get latest exam result (score > 0 means it's a real score)
+        $examResults = ExamRegistrationModel::where('user_id', $user->user_id)
+            ->where('score', '>', 0)
+            ->latest()
+            ->first();
+
+        // Check if alumni is already registered for an upcoming exam
+        $isRegistered = ExamRegistrationModel::where('user_id', $user->user_id)
+            ->where('score', 0)  // 0 means "registered but not taken"
+            ->whereHas('schedule', function ($query) {
+                $query->where('exam_date', '>', now());
+            })
+            ->exists();
+
+        return view('users-alumni.alumni-registration', [
+            'type_menu' => 'registration',
+            'user' => $user,
+            'alumni' => $alumni,
+            'examResults' => $examResults,
+            'isProfileComplete' => $isProfileComplete,
+            'isRegistered' => $isRegistered
+        ]);
     }
 }

@@ -353,19 +353,26 @@ Route::group(['prefix' => 'student'], function () {
 });
 
 // Staff routes
-Route::get('/staff/profile', [StaffController::class, 'profile'])->name('staff.profile');
-Route::get('/staff/dashboard', [StaffController::class, 'dashboard'])->name('staff.dashboard');
+Route::group(['prefix' => 'staff'], function (){
+    Route::get('/profile', [StaffController::class, 'profile'])->name('staff.profile');
+    Route::get('/dashboard', [StaffController::class, 'dashboard'])->name('staff.dashboard');
+    Route::get('/registration', [StaffController::class, 'showRegistrationForm'])->name('staff.registration.form');
+});
 
 // Alumni routes
 Route::group(['prefix' => 'alumni'], function (){
     Route::get('/dashboard', [AlumniController::class, 'dashboard'])->name('alumni.dashboard');
     Route::get('/profile', [AlumniController::class, 'profile'])->name('alumni.profile');
     Route::post('/profile/update', [AlumniController::class, 'updateProfile'])->name('alumni.profle.update');
+    Route::get('/registration', [AlumniController::class, 'showRegistrationForm'])->name('alumni.registration.form');
 });
 
 // Lecturer routes
-Route::get('/lecturer/profile', [LecturerController::class, 'profile'])->name('lecturer.profile');
-Route::get('/lecturer/dashboard', [LecturerController::class, 'dashboard'])->name('lecturer.dashboard');
+Route::group(['prefix' => 'lecturer'], function (){
+    Route::get('/dashboard', [LecturerController::class, 'dashboard'])->name('lecturer.dashboard');
+    Route::get('/profile', [LecturerController::class, 'profile'])->name('lecturer.profile');
+    Route::get('/registration', [LecturerController::class, 'showRegistrationForm'])->name('lecturer.registration.form');
+});
 
 // admin routes
 Route::middleware(['auth'])->group(function () {
