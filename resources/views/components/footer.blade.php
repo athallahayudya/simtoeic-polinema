@@ -1,11 +1,13 @@
 <footer class="main-footer">
     <div class="container">
         <div class="footer-left">
-            <!-- Logo and Description -->
-            <div class="footer-section">
-                <h3 class="footer-logo">SIMTOEIC-POLINEMA</h3>
-                <p class="footer-text">
-                    No. 9 Soekarno Hatta St., Jatimulyo, Lowokwaru District, Malang City, East Java 65141
+            <!-- Logo + Alamat -->
+            <div class="footer-section" style="margin-bottom: 10px;">
+                <img src="{{ asset('img/simtoeic0.png') }}" alt="SIMTOEIC Logo" style="height: 90px; margin-bottom: 10px;">
+                <p class="footer-text" style="margin-top: 10px;">
+                    POLITEKNIK NEGERI MALANG<br>
+                    No. 9 Soekarno Hatta St., Jatimulyo, Lowokwaru District, Malang City, East Java 65141<br>
+                    (0341) 404424
                 </p>
             </div>
         </div>

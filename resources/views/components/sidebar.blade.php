@@ -1,10 +1,14 @@
 <div class="main-sidebar sidebar-style-2">
     <aside id="sidebar-wrapper">
         <div class="sidebar-brand">
-            <a href="{{ url('dashboard-admin') }}">SIMTOEIC</a>
+            <a href="{{ url('dashboard-admin') }}">
+                <img src="{{ asset('img/simtoeic0.png') }}" alt="logo" style="height: 40px; margin: bottom 3px;">
+            </a>
         </div>
         <div class="sidebar-brand sidebar-brand-sm">
-            <a href="{{ url('dashboard-admin') }}">StP</a>
+            <a href="{{ url('dashboard-admin') }}">
+                <img src="{{ asset('img/simtoeic-1.png') }}" alt="logo" style="height: 50px; vertical-align:bottom;">
+            </a>
         </div>
         <ul class="sidebar-menu">
             @if(Auth::check() && Auth::user()->isAdmin())
@@ -45,8 +49,8 @@
                         <li class="{{ Request::is('announcements*') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('announcements') }}">Announcements</a>
                         </li>
-                        <li class="{{ Request::is('faq*') ? 'active' : '' }}">
-                            <a class="nav-link" href="{{ url('faq') }}">FAQ</a>
+                        <li class="{{ Request::is('faqs*') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ url('faqs') }}">FAQ</a>
                         </li>
                     </ul>
                 </li>

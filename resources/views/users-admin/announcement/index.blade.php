@@ -10,7 +10,7 @@
             <div class="section-header-breadcrumb">
                 <div class="breadcrumb-item active"><a href="{{ url('/dashboard-admin') }}">Dashboard</a></div>
                 <div class="breadcrumb-item">Announcement</div>
-            </div>
+            </div> 
         </div>
         <div class="section-body">
             <div class="row">
