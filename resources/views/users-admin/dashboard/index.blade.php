@@ -153,64 +153,65 @@
                 </div>
             </div>
 
-       <!-- Main Statistics Cards -->
-<div class="row mb-4">
-    <!-- Total Users Card -->
-    <div class="col-lg-3 col-md-6 col-sm-6 col-12 mb-4">
-        <a href="{{ route('users') }}" class="text-decoration-none">
-            <div class="card stat-card h-100">
-                <div class="card-header bg-primary text-white p-3 d-flex align-items-center justify-content-center">
-                    <h6 class="mb-0 text-center">Total Users</h6>
+            <!-- Main Statistics Cards -->
+            <div class="row mb-4">
+                <!-- Total Users Card -->
+                <div class="col-lg-3 col-md-6 col-sm-6 col-12 mb-4">
+                    <a href="{{ route('users') }}" class="text-decoration-none">
+                        <div class="card stat-card h-100">
+                            <div class="card-header bg-primary text-white p-3 d-flex align-items-center justify-content-center">
+                                <h6 class="mb-0 text-center">Total Users</h6>
+                            </div>
+                            <div class="card-body p-4 d-flex align-items-center justify-content-center">
+                                <h2 class="font-weight-bold text-center mb-0">{{ number_format($totalUsers ?? 0) }}</h2>
+                            </div>
+                        </div>
+                    </a>
                 </div>
-                <div class="card-body p-4 d-flex align-items-center justify-content-center">
-                    <h2 class="font-weight-bold text-center mb-0">{{ number_format($totalUsers ?? 0) }}</h2>
+                
+                <!-- Users Taken TOEIC Card -->
+                <div class="col-lg-3 col-md-6 col-sm-6 col-12 mb-4">
+                    <a href="{{ route('exam-results.index') }}" class="text-decoration-none">
+                        <div class="card stat-card h-100">
+                            <div class="card-header bg-success text-white p-3 d-flex align-items-center justify-content-center">
+                                <h6 class="mb-0 text-center">Taken TOEIC</h6>
+                            </div>
+                            <div class="card-body p-4 d-flex align-items-center justify-content-center">
+                                <h2 class="font-weight-bold text-center mb-0">{{ number_format($totalExamParticipants ?? 0) }}</h2>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                
+                <!-- Users Not Taken TOEIC Card -->
+                <div class="col-lg-3 col-md-6 col-sm-6 col-12 mb-4">
+                    <a href="{{ route('users') }}" class="text-decoration-none">
+                        <div class="card stat-card h-100">
+                            <div class="card-header bg-info text-white p-3 d-flex align-items-center justify-content-center">
+                                <h6 class="mb-0 text-center">Not Taken TOEIC</h6>
+                            </div>
+                            <div class="card-body p-4 d-flex align-items-center justify-content-center">
+                                <h2 class="font-weight-bold text-center mb-0">{{ number_format(($totalUsers ?? 0) - ($totalExamParticipants ?? 0)) }}</h2>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                
+                <!-- Average Score Card -->
+                <div class="col-lg-3 col-md-6 col-sm-6 col-12 mb-4">
+                    <div class="card stat-card h-100">
+                        <div class="card-header bg-warning text-white p-3 d-flex align-items-center justify-content-center">
+                            <h6 class="mb-0 text-center">Average Score</h6>
+                        </div>
+                        <div class="card-body p-4 d-flex align-items-center justify-content-center">
+                            <h2 class="font-weight-bold text-center mb-0">{{ number_format($averageScore ?? 0, 1) }}</h2>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </a>
-    </div>
-    
-    <!-- Users Taken TOEIC Card -->
-    <div class="col-lg-3 col-md-6 col-sm-6 col-12 mb-4">
-        <a href="{{ route('exam-results.index') }}" class="text-decoration-none">
-            <div class="card stat-card h-100">
-                <div class="card-header bg-success text-white p-3 d-flex align-items-center justify-content-center">
-                    <h6 class="mb-0 text-center">Taken TOEIC</h6>
-                </div>
-                <div class="card-body p-4 d-flex align-items-center justify-content-center">
-                    <h2 class="font-weight-bold text-center mb-0">{{ number_format($totalExamParticipants ?? 0) }}</h2>
-                </div>
-            </div>
-        </a>
-    </div>
-    
-    <!-- Users Not Taken TOEIC Card -->
-    <div class="col-lg-3 col-md-6 col-sm-6 col-12 mb-4">
-        <a href="{{ route('users') }}" class="text-decoration-none">
-            <div class="card stat-card h-100">
-                <div class="card-header bg-info text-white p-3 d-flex align-items-center justify-content-center">
-                    <h6 class="mb-0 text-center">Not Taken TOEIC</h6>
-                </div>
-                <div class="card-body p-4 d-flex align-items-center justify-content-center">
-                    <h2 class="font-weight-bold text-center mb-0">{{ number_format(($totalUsers ?? 0) - ($totalExamParticipants ?? 0)) }}</h2>
-                </div>
-            </div>
-        </a>
-    </div>
-    
-    <!-- Average Score Card -->
-    <div class="col-lg-3 col-md-6 col-sm-6 col-12 mb-4">
-        <div class="card stat-card h-100">
-            <div class="card-header bg-warning text-white p-3 d-flex align-items-center justify-content-center">
-                <h6 class="mb-0 text-center">Average Score</h6>
-            </div>
-            <div class="card-body p-4 d-flex align-items-center justify-content-center">
-                <h2 class="font-weight-bold text-center mb-0">{{ number_format($averageScore ?? 0, 1) }}</h2>
-            </div>
-        </div>
-    </div>
-</div>
-                <!-- Charts and Results Row -->
-                <div class="row">
+                
+            <!-- Charts and Results Row -->
+                <div class="row" style="margin-top: -20px;">
                     <!-- Recent Exam Results -->
                     <div class="col-lg-8 mb-4">
                         <div class="card card-dashboard h-100">
@@ -301,10 +302,9 @@
                     
                     <!-- Score Distribution Chart -->
                     <div class="col-lg-4 mb-4">
-                        <div class="card card-dashboard h-100">
+                        <div class="card card-dashboard h-70">
                             <div class="card-header">
                                 <h4 class="mb-0"><i class="fas fa-chart-pie mr-2 text-primary"></i> Exam Qualification</h4>
-                                <small class="text-muted">TOEIC score threshold (500)</small>
                             </div>
                             <div class="card-body">
                                 <div class="chart-container" style="position: relative; height:250px;">
@@ -337,87 +337,91 @@
                     </div>
                 
                     <!-- Campus Distribution and Announcements Row -->
-                    <div class="row ml-1">
-                        <!-- Campus Distribution -->
-                        <div class="col-lg-5 mb-4">
-                            <div class="card card-dashboard h-100">
-                            <div class="card-header">
-                                <h4 class="mb-0"><i class="fas fa-university mr-2 text-primary"></i> Campus Distribution</h4>
-                                <small class="text-muted">Student distribution</small>
-                            </div>
-                            <div class="card-body">
-                                @if(isset($campusDistribution) && $campusDistribution->count() > 0)
-                                    @foreach($campusDistribution as $campus)
-                                        <div class="campus-item">
-                                            <div class="d-flex justify-content-between mb-2">
-                                                <span>
-                                                    <i class="fas fa-map-marker-alt text-primary mr-1"></i>
-                                                    {{ ucfirst(str_replace('_', ' ', $campus->campus ?? 'Unknown')) }}
-                                                </span>
-                                                <span class="badge badge-primary">{{ $campus->total ?? 0 }}</span>
-                                            </div>
-                                            <div class="progress" style="height: 8px; border-radius: 4px;">
-                                                <div class="progress-bar bg-primary" 
-                                                     style="width: {{ ($totalStudents ?? 1) > 0 ? (($campus->total ?? 0) / ($totalStudents ?? 1)) * 100 : 0 }}%"></div>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                @else
-                                    <div class="text-center py-5">
-                                        <i class="fas fa-university fa-3x text-muted mb-3"></i>
-                                        <p class="text-muted">No campus data available</p>
+                    <div class="row ml-1 flex-row flex-lg-nowrap"> 
+                            <!-- Campus Distribution -->
+                            <div class="col-lg-8 mb-4">
+                                <div class="card card-dashboard h-100">
+                                    <div class="card-header d-flex flex-column align-items-start">
+                                        <h4 class="mb-0">
+                                            <i class="fas fa-university mr-2 text-primary"></i> 
+                                            Campus Distribution
+                                        </h4>
+                                        <medium class="text-muted">Student distribution</medium>
                                     </div>
-                                @endif
+                                <div class="card-body">
+                                    @if(isset($campusDistribution) && $campusDistribution->count() > 0)
+                                        @foreach($campusDistribution as $campus)
+                                            <div class="campus-item">
+                                                <div class="d-flex justify-content-between mb-2">
+                                                    <span>
+                                                        <i class="fas fa-map-marker-alt text-primary mr-1"></i>
+                                                        {{ ucfirst(str_replace('_', ' ', $campus->campus ?? 'Unknown')) }}
+                                                    </span>
+                                                    <span class="badge badge-primary">{{ $campus->total ?? 0 }}</span>
+                                                </div>
+                                                <div class="progress" style="height: 8px; border-radius: 4px;">
+                                                    <div class="progress-bar bg-primary" 
+                                                        style="width: {{ ($totalStudents ?? 1) > 0 ? (($campus->total ?? 0) / ($totalStudents ?? 1)) * 100 : 0 }}%"></div>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    @else
+                                        <div class="text-center py-5">
+                                            <i class="fas fa-university fa-3x text-muted mb-3"></i>
+                                            <p class="text-muted">No campus data available</p>
+                                        </div>
+                                    @endif
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    
-                    <!-- Announcements -->
-                    <div class="col-lg-7 mb-4">
-                        <div class="card card-dashboard h-100">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h4 class="mb-0"><i class="fas fa-bullhorn mr-2 text-primary"></i> Announcements</h4>
-                                    <small class="text-muted">Latest system announcements</small>
-                                </div>
-                                @if(Route::has('announcements.index'))
-                                <a href="{{ route('announcements.index') }}" class="btn btn-primary btn-sm">
-                                    All Announcements <i class="fas fa-arrow-right ml-1"></i>
-                                </a>
-                                @endif
-                            </div>
-                            <div class="card-body">
-                                @if(isset($recentAnnouncements) && $recentAnnouncements->count() > 0)
-                                    @foreach($recentAnnouncements as $announcement)
-                                        <div class="announcement-item">
-                                            <div class="d-flex justify-content-between mb-2">
-                                                <h6 class="mb-0 font-weight-bold">{{ Str::limit($announcement->title ?? 'No Title', 50) }}</h6>
-                                                <span class="badge badge-light">
-                                                    {{ isset($announcement->created_at) ? $announcement->created_at->format('M d') : '' }}
-                                                </span>
-                                            </div>
-                                            <p class="text-muted small mb-1">
-                                                {{ Str::limit(strip_tags($announcement->content ?? ''), 100) }}
-                                            </p>
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <small class="text-muted">
-                                                    <i class="fas fa-clock mr-1"></i>
-                                                    {{ isset($announcement->created_at) ? $announcement->created_at->diffForHumans() : 'Unknown date' }}
-                                                </small>
-                                                @if(Route::has('announcements.show'))
-                                                <a href="{{ route('announcements.show', $announcement->id) }}" class="btn btn-sm btn-light">
-                                                    Read more
-                                                </a>
-                                                @endif
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                @else
-                                    <div class="text-center py-5">
-                                        <i class="fas fa-bullhorn fa-3x text-muted mb-3"></i>
-                                        <p class="text-muted">No announcements found</p>
+                        
+                        <!-- Announcements -->
+                        <div class="col-lg-8 mb-4">
+                            <div class="card card-dashboard h-100">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h4 class="mb-0"><i class="fas fa-bullhorn mr-2 text-primary"></i> Announcements</h4>
+                                        <medium class="text-muted">Latest system announcements</medium>
                                     </div>
-                                @endif
+                                    @if(Route::has('announcements.index'))
+                                    <a href="{{ route('announcements.index') }}" class="btn btn-primary btn-sm">
+                                        All Announcements <i class="fas fa-arrow-right ml-1"></i>
+                                    </a>
+                                    @endif
+                                </div>
+                                <div class="card-body" style="max-height: 300px; overflow-y: auto;">
+                                    @if(isset($recentAnnouncements) && $recentAnnouncements->count() > 0)
+                                        @foreach($recentAnnouncements->take(3) as $announcement)
+                                            <div class="announcement-item">
+                                                <div class="d-flex justify-content-between mb-2">
+                                                    <h6 class="mb-0 font-weight-bold">{{ Str::limit($announcement->title ?? 'No Title', 50) }}</h6>
+                                                    <span class="badge badge-light">
+                                                        {{ isset($announcement->created_at) ? $announcement->created_at->format('M d') : '' }}
+                                                    </span>
+                                                </div>
+                                                <p class="text-muted small mb-1">
+                                                    {{ Str::limit(strip_tags($announcement->content ?? ''), 100) }}
+                                                </p>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <small class="text-muted">
+                                                        <i class="fas fa-clock mr-1"></i>
+                                                        {{ isset($announcement->created_at) ? $announcement->created_at->diffForHumans() : 'Unknown date' }}
+                                                    </small>
+                                                    @if(Route::has('announcements.show'))
+                                                    <a href="{{ route('announcements.show', $announcement->id) }}" class="btn btn-sm btn-light">
+                                                        Read more
+                                                    </a>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    @else
+                                        <div class="text-center py-5">
+                                            <i class="fas fa-bullhorn fa-3x text-muted mb-3"></i>
+                                            <p class="text-muted">No announcements found</p>
+                                        </div>
+                                    @endif
+                                </div>
                             </div>
                         </div>
                     </div>

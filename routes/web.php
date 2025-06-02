@@ -227,11 +227,6 @@ Route::prefix('auth')->name('auth.')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
 
-// Dashboard routes
-Route::get('/dashboard', function () {
-    return view('pages.dashboard-admin', ['type_menu' => 'dashboard']);
-})->name('dashboard')->middleware('auth');
-
 // Admin dashboard route
 Route::get('/dashboard-admin', function () {
     return view('pages.dashboard-admin', ['type_menu' => 'dashboard']);

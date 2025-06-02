@@ -38,7 +38,7 @@
                                                 </select>
                                                 <small class="form-text text-muted">Announcement Status</small>
                                         </div>
-                                        <a href="{{ url('announcements/create') }}" class="btn btn-success">Add Announcement</a>
+                                        <a href="{{ url('announcements/create') }}" class="btn btn-success">+ Add Announcement</a>
                                     </div>
                                 </div>
                             </div>

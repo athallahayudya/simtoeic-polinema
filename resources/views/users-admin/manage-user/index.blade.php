@@ -10,16 +10,15 @@
     <div class="main-content">
         <section class="section">
             <div class="section-header">
-                <h1><i class="fas fa-users mr-2 text-primary"></i> Manage Users</h1>
+                <h1></i> Manage Users</h1>
                 <div class="section-header-breadcrumb">
                     <div class="breadcrumb-item active"><a href="{{ url('/dashboard-admin') }}">Dashboard</a></div>
                     <div class="breadcrumb-item">Manage Users</div>
                 </div>
             </div>
 
-            <div class="section-body">
+            <div class="section-body " style="margin-top: -10px;">
                 <h2 class="section-title">User Management Panel</h2>
-                <p class="section-subtitle">Manage all system users by category</p>
 
                 <!-- User statistics summary -->
                 <div class="row mb-4">
@@ -41,19 +40,22 @@
                                     </div>
                                     <div class="col-md-3 col-sm-6 mb-3 mb-lg-0">
                                         <div class="p-3">
-                                            <div id="student-count" class="text-danger stats-number">{{ $studentCount }}</div>
+                                            <div id="student-count" class="text-danger stats-number">{{ $studentCount }}
+                                            </div>
                                             <div class="text-muted">Total Students</div>
                                         </div>
                                     </div>
                                     <div class="col-md-3 col-sm-6 mb-3 mb-lg-0">
                                         <div class="p-3">
-                                            <div id="alumni-count" class="text-warning stats-number">{{ $alumniCount }}</div>
+                                            <div id="alumni-count" class="text-warning stats-number">{{ $alumniCount }}
+                                            </div>
                                             <div class="text-muted">Total Alumni</div>
                                         </div>
                                     </div>
                                     <div class="col-md-3 col-sm-6">
                                         <div class="p-3">
-                                            <div id="lecturer-count" class="text-success stats-number">{{ $lecturerCount }}</div>
+                                            <div id="lecturer-count" class="text-success stats-number">{{ $lecturerCount }}
+                                            </div>
                                             <div class="text-muted">Total Lecturers</div>
                                         </div>
                                     </div>
@@ -63,7 +65,7 @@
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row" style="margin-top: -20px;">
                     <!-- Staff -->
                     <div class="col-lg-3 col-md-6 col-sm-6 col-12 mb-4">
                         <a href="{{ url('/manage-users/staff/') }}" class="text-decoration-none">

@@ -232,9 +232,6 @@
         <section class="section">
             <div class="section-header">
                 <div class="d-flex align-items-center">
-                    <div class="icon-decoration">
-                        <i class="fas fa-user-shield"></i>
-                    </div>
                     <div>
                         <h1>Admin Profile</h1>
                     </div>
