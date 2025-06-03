@@ -100,7 +100,7 @@
                 {
                     data: "action",
                     className: "",
-                    width: "17%", // Reduced width for better layout
+                    width: "11%", // Reduced width for better layout
                     orderable: false,
                     searchable: false
                 }

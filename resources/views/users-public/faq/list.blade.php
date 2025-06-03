@@ -24,7 +24,7 @@
                                 @forelse ($faqs as $index => $faq)
                                     <div class="accordion">
                                         <div class="accordion-header" data-toggle="collapse" data-target="#faq-{{ $faq->faq_id }}">
-                                            <h4>{{ $faq->question }}</h4>
+                                            <h4>{{ $faq->question }} <i class="fas fa-chevron-down" style="float: right;"></i></h4>
                                         </div>
                                         <div id="faq-{{ $faq->faq_id }}" class="accordion-body collapse" data-parent="#accordion-faqs">
                                             <p>{!! nl2br(e($faq->answer)) !!}</p>
