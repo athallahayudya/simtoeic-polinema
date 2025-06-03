@@ -30,9 +30,9 @@ class StaffController extends Controller
                 return $staff->photo ? asset($staff->photo) : '-';
             })
             ->addColumn('action', function ($staff) {
-                $btn = '<button onclick="modalAction(\''.url('/manage-users/staff/' . $staff->staff_id . '/show_ajax').'\')" class="btn btn-info btn-sm">Detail</button> ';
-                $btn .= '<button onclick="modalAction(\''.url('/manage-users/staff/' . $staff->staff_id . '/edit_ajax').'\')" class="btn btn-warning btn-sm">Edit</button> ';
-                $btn .= '<button onclick="modalAction(\''.url('/manage-users/staff/' . $staff->staff_id . '/delete_ajax').'\')" class="btn btn-danger btn-sm">Delete</button> ';
+                $btn = '<button onclick="modalAction(\''.url('/manage-users/staff/' . $staff->staff_id . '/show_ajax').'\')" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></button> ';
+                $btn .= '<button onclick="modalAction(\''.url('/manage-users/staff/' . $staff->staff_id . '/edit_ajax').'\')" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></button> ';
+                $btn .= '<button onclick="modalAction(\''.url('/manage-users/staff/' . $staff->staff_id . '/delete_ajax').'\')" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button> ';
                 return $btn;
             })
             ->rawColumns(['action', 'ktp_scan', 'photo'])

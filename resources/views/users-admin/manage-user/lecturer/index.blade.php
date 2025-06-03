@@ -133,7 +133,7 @@
                 {
                     data: "action",
                     className: "",
-                    width: "15%",
+                    width: "12%",
                     orderable: false,
                     searchable: false
                 }
