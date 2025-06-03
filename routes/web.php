@@ -351,6 +351,7 @@ Route::group(['prefix' => 'student'], function () {
 // Staff routes
 Route::group(['prefix' => 'staff'], function (){
     Route::get('/profile', [StaffController::class, 'profile'])->name('staff.profile');
+    Route::post('/profile/update', [StaffController::class, 'updateProfile'])->name('staff.profile.update');
     Route::get('/dashboard', [StaffController::class, 'dashboard'])->name('staff.dashboard');
     Route::get('/registration', [StaffController::class, 'showRegistrationForm'])->name('staff.registration.form');
 });
@@ -367,6 +368,7 @@ Route::group(['prefix' => 'alumni'], function (){
 Route::group(['prefix' => 'lecturer'], function (){
     Route::get('/dashboard', [LecturerController::class, 'dashboard'])->name('lecturer.dashboard');
     Route::get('/profile', [LecturerController::class, 'profile'])->name('lecturer.profile');
+    Route::post('/profile/update', [LecturerController::class, 'updateProfile'])->name('lecturer.profile.update');
     Route::get('/registration', [LecturerController::class, 'showRegistrationForm'])->name('lecturer.registration.form');
 });
 
@@ -375,10 +377,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/profile', [AdminProfileController::class, 'show'])->name('admin.profile');
     Route::post('/admin/profile/update', [AdminProfileController::class, 'update'])->name('admin.profile.update');
 });
-
-// Admin Profile routes
-Route::get('/lecturer/profile', [LecturerController::class, 'show'])->name('lecturer.profile');
-Route::post('/lecturer/profile', [LecturerController::class, 'update'])->name('lecturer.profile.update');
 
 // Student Exam Registration routes
 Route::get('/student/registration', [StudentController::class, 'showRegistrationForm'])->name('student.registration.form');
@@ -393,7 +391,6 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/exam-results/{id}', [ExamResultController::class, 'update'])->name('exam-results.update');
     Route::delete('/exam-results/{id}', [ExamResultController::class, 'destroy'])->name('exam-results.destroy');
 });
-
 
 // Admin dashboard route
 Route::get('/dashboard-admin', [App\Http\Controllers\AdminDashboardController::class, 'index'])
@@ -418,4 +415,3 @@ Route::group(['prefix' => 'faqs'], function () {
 });
 
 Route::get('/faq', [FaqController::class, 'publicFaqList'])->name('public.faqs');
-

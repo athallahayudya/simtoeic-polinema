@@ -126,7 +126,7 @@
 
                     <div class="col-12 col-md-12 col-lg-7">
                         <div class="card">
-                            <form method="POST" action="{{ route('alumni.profle.update') }}" class="needs-validation"
+                            <form method="POST" action="{{ route('alumni.profile.update') }}" class="needs-validation"
                                 enctype="multipart/form-data" novalidate="">
                                 @csrf
                                 <div class="card-header">

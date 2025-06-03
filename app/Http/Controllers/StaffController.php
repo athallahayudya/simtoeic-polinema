@@ -8,6 +8,7 @@ use App\Models\ExamScheduleModel;
 use App\Models\ExamResultModel;
 use App\Models\AnnouncementModel;
 use App\Models\ExamRegistrationModel;
+use App\Models\UserModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
@@ -30,9 +31,9 @@ class StaffController extends Controller
                 return $staff->photo ? asset($staff->photo) : '-';
             })
             ->addColumn('action', function ($staff) {
-                $btn = '<button onclick="modalAction(\''.url('/manage-users/staff/' . $staff->staff_id . '/show_ajax').'\')" class="btn btn-info btn-sm">Detail</button> ';
-                $btn .= '<button onclick="modalAction(\''.url('/manage-users/staff/' . $staff->staff_id . '/edit_ajax').'\')" class="btn btn-warning btn-sm">Edit</button> ';
-                $btn .= '<button onclick="modalAction(\''.url('/manage-users/staff/' . $staff->staff_id . '/delete_ajax').'\')" class="btn btn-danger btn-sm">Delete</button> ';
+                $btn = '<button onclick="modalAction(\''.url('/manage-users/staff/' . $staff->staff_id . '/show_ajax').'\')" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></button> ';
+                $btn .= '<button onclick="modalAction(\''.url('/manage-users/staff/' . $staff->staff_id . '/edit_ajax').'\')" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></button> ';
+                $btn .= '<button onclick="modalAction(\''.url('/manage-users/staff/' . $staff->staff_id . '/delete_ajax').'\')" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button> ';
                 return $btn;
             })
             ->rawColumns(['action', 'ktp_scan', 'photo'])
@@ -141,54 +142,65 @@ class StaffController extends Controller
         return view('users-staff.staff-dashboard', compact('type_menu', 'schedules', 'examResults', 'examScores', 'announcements'));
     }
 
-    // Profile method disamakan dengan LecturerController
     public function profile()
     {
-        $user = Auth::guard('web')->user();
-        if (!$user) {
-            abort(403, 'Unauthorized');
-        }
+        $staff = StaffModel::where('user_id', auth()->id())->first();
 
-        if ($user->role !== 'staff') {
-            abort(403, 'Only staff users can access this page.');
-        }
-
-        $userId = $user->user_id;
-        $staff = StaffModel::where('user_id', $userId)->first();
-
-        if (!$staff) {
-            return view('users-staff.profile.not-found', [
-                'message' => 'Your staff profile has not been set up yet. Please contact the system administrator.'
-            ]);
-        }
-
-        return view('users-staff.staff-profile', compact('staff'));
+        return view('users-staff.staff-profile', [
+            'type_menu' => 'profile',
+            'staff' => $staff
+        ]);
     }
 
-    // Update profile method disamakan dengan LecturerController
-    public function update(Request $request)
+    public function updateProfile(Request $request)
     {
         $user = Auth::guard('web')->user();
-        $staff = StaffModel::where('user_id', $user->user_id)->firstOrFail();
-
-        $request->validate([
-            'photo'        => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'phone_number' => 'nullable|string|max:20',
-        ]);
-
-        // Update nomor telepon pada tabel users
-        $user->phone_number = $request->input('phone_number');
-        $user->save();
-
-        // Upload foto jika ada dan hapus foto lama jika tersedia
-        if ($request->hasFile('photo')) {
-            if ($staff->photo && Storage::disk('public')->exists($staff->photo)) {
-                Storage::disk('public')->delete($staff->photo);
-            }
-            $path = $request->file('photo')->store('staff/photos', 'public');
-            $staff->photo = $path;
+        if (!$user || $user->role !== 'staff') {
+            abort(403, 'Unauthorized or insufficient permissions.');
         }
 
+        $staff = staffModel::where('user_id', $user->user_id)->firstOrFail();
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'phone_number' => 'required|string|min:10|max:15|regex:/^[0-9+\-\s]+$/',  
+            'home_address' => 'required|string',
+            'current_address' => 'required|string',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'ktp_scan' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:2048',
+        ]);
+
+        $staff->name = $request->input('name');
+        $staff->home_address = $request->input('home_address');
+        $staff->current_address = $request->input('current_address');
+
+        // Update phone number
+        $userModel = UserModel::find($user->user_id);
+        if ($userModel) {
+            $userModel->phone_number = $request->input('phone_number');
+            $userModel->save();
+        }
+
+        // Handle photo upload  
+        if ($request->hasFile('photo')) {
+            // Delete old photo if exists
+            if ($staff->photo && Storage::disk('public')->exists(str_replace('storage/', '', $staff->photo))) {
+                Storage::disk('public')->delete(str_replace('storage/', '', $staff->photo));
+            }
+            $path = $request->file('photo')->store('staff/photos', 'public');
+            $staff->photo = 'storage/' . $path;
+        }
+
+        // Handle KTP scan upload
+        if ($request->hasFile('ktp_scan')) {
+            if ($staff->ktp_scan && Storage::disk('public')->exists(str_replace('storage/', '', $staff->ktp_scan))) {
+                Storage::disk('public')->delete(str_replace('storage/', '', $staff->ktp_scan));
+            }
+            $ktpPath = $request->file('ktp_scan')->store('staff/ktp', 'public');
+            $staff->ktp_scan = 'storage/' . $ktpPath;
+        }
+
+        // Save the staff model
         $staff->save();
 
         return redirect()->route('staff.profile')->with('success', 'Profile updated successfully!');
