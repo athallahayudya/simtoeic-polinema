@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ExamRegistrationModel;
 use App\Models\LecturerModel;
+use App\Models\UserModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
@@ -152,91 +153,69 @@ class LecturerController extends Controller
     /**
      * Display lecturer profile
      */
-    public function show()
+    public function profile()
+    {
+        $lecturer = LecturerModel::where('user_id', auth()->id())->first();
+
+        return view('users-lecturer.lecturer-profile', [
+            'type_menu' => 'profile',
+            'lecturer' => $lecturer
+        ]);
+    }
+
+    public function updateProfile(Request $request)
     {
         $user = Auth::guard('web')->user();
-        if (!$user) {
-            abort(403, 'Unauthorized');
+        if (!$user || $user->role !== 'lecturer') {
+            abort(403, 'Unauthorized or insufficient permissions.');
         }
 
-        if ($user->role !== 'lecturer') {
-            abort(403, 'Only lecturer users can access this page.');
+        $lecturer = LecturerModel::where('user_id', $user->user_id)->firstOrFail();
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'phone_number' => 'required|string|min:10|max:15|regex:/^[0-9+\-\s]+$/',  
+            'home_address' => 'required|string',
+            'current_address' => 'required|string',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'ktp_scan' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:2048',
+        ]);
+
+        $lecturer -> name = $request->input('name');
+        $lecturer -> home_address = $request->input('home_address');
+        $lecturer -> current_address = $request->input('current_address');
+
+        // Update phone number
+        $userModel = UserModel::find($user->user_id);
+        if ($userModel) {
+            $userModel->phone_number = $request->input('phone_number');
+            $userModel->save();
         }
 
-        $userId = $user->user_id;
-        $lecturer = LecturerModel::where('user_id', $userId)->first();
-
-        // If no record exists
-        if (!$lecturer) {
-            return view('users-lecturer.profile.not-found', [
-                'message' => 'Your lecturer profile has not been set up yet. Please contact the system administrator.'
-            ]);
+        // Handle photo upload  
+        if ($request->hasFile('photo')) {
+            // Delete old photo if exists
+            if ($lecturer->photo && Storage::disk('public')->exists(str_replace('storage/', '', $lecturer->photo))) {
+                Storage::disk('public')->delete(str_replace('storage/', '', $lecturer->photo));
+            }
+            $path = $request->file('photo')->store('lecturer/photos', 'public');
+            $lecturer->photo = 'storage/' . $path;
         }
 
-        return view('users-lecturer.lecturer-profile', compact('lecturer'));
+        // Handle KTP scan upload
+        if ($request->hasFile('ktp_scan')) {
+            if ($lecturer->ktp_scan && Storage::disk('public')->exists(str_replace('storage/', '', $lecturer->ktp_scan))) {
+                Storage::disk('public')->delete(str_replace('storage/', '', $lecturer->ktp_scan));
+            }
+            $ktpPath = $request->file('ktp_scan')->store('lecturer/ktp', 'public');
+            $lecturer->ktp_scan = 'storage/' . $ktpPath;
+        }
+
+        // Save lecturer data
+        $lecturer->save();
+
+        return redirect()->route('lecturer.profile')->with('success', 'Profile updated successfully!');
     }
-
-public function update(Request $request)
-{
-    $user = Auth::guard('web')->user();
-    $lecturer = LecturerModel::where('user_id', $user->user_id)->firstOrFail();
-
-    $request->validate([
-        'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-        'phone_number' => 'nullable|string|max:20',
-    ]);
-
-    // Update nomor telepon
-    $user->phone_number = $request->input('phone_number');
-    $user->save();
-
-    // Hapus foto lama jika ada dan unggah foto baru
-    if ($request->hasFile('photo')) {
-        // Hapus file lama jika ada
-        if ($lecturer->photo && Storage::disk('public')->exists($lecturer->photo)) {
-            Storage::disk('public')->delete($lecturer->photo);
-        }
-
-        // Simpan file baru
-        $path = $request->file('photo')->store('lecturer/photos', 'public');
-        $lecturer->photo = $path; // Simpan path tanpa "storage/"
-    }
-
-    // // Update lecturer data
-    // $lecturer->name = $request->input('name');
-    // $lecturer->nidn = $request->input('nidn');
-
-    // Update phone number and identity_number in users table
-    $userModel = \App\Models\lecturerModel::find($user->lecturer_id);
-    if ($userModel) {
-        $userModel->phone_number = $request->input('phone_number');
-        $userModel->identity_number = $request->input('nidn');
-        $userModel->save();
-    }
-
-    // Handle photo upload
-    if ($request->hasFile('photo')) {
-        // Delete old photo if exists
-        if ($lecturer->photo && Storage::disk('public')->exists($lecturer->photo)) {
-            Storage::disk('public')->delete($lecturer->photo);
-        }
-        $path = $request->file('photo')->store('lecturer/photos', 'public');
-        $lecturer->photo = $path;
-    }
-
-    // Handle KTP scan upload
-    if ($request->hasFile('ktp_scan')) {
-        if ($lecturer->ktp_scan && Storage::disk('public')->exists($lecturer->ktp_scan)) {
-            Storage::disk('public')->delete($lecturer->ktp_scan);
-        }
-        $ktpPath = $request->file('ktp_scan')->store('lecturer/ktp', 'public');
-        $lecturer->ktp_scan = $ktpPath;
-    }
-
-    $lecturer->save();
-
-    return redirect()->route('lecturer.profile')->with('success', 'Profile updated successfully!');
-}
 
     public function showRegistrationForm()
     {

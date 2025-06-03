@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Lecturer Profile')
+@section('title', 'Staff Profile')
 
 @push('style')
     <!-- CSS Libraries -->
@@ -72,9 +72,9 @@
     <div class="main-content">
         <section class="section">
             <div class="section-header">
-                <h1>Lecturer Profile</h1>
+                <h1>Staff Profile</h1>
                 <div class="section-header-breadcrumb">
-                    <div class="breadcrumb-item active"><a href="{{ route('lecturer.dashboard') }}">Dashboard</a></div>
+                    <div class="breadcrumb-item active"><a href="{{ route('staff.dashboard') }}">Dashboard</a></div>
                     <div class="breadcrumb-item">Profile</div>
                 </div>
             </div>
@@ -88,7 +88,7 @@
                     </div>
                 @endif
 
-                <h2 class="section-title">Hi, {{ $lecturer->name ?? 'Lecturer' }}!</h2>
+                <h2 class="section-title">Hi, {{ $staff->name ?? 'Staff' }}!</h2>
                 <p class="section-lead">
                     Change information about yourself on this page.
                 </p>
@@ -98,14 +98,14 @@
                         <div class="card profile-widget">
                             <div class="profile-widget-header">
                                 <img alt="profile photo"
-                                    src="{{ $lecturer->photo ? asset($lecturer->photo) : asset('img/avatar/avatar-1.png') }}"
+                                    src="{{ $staff->photo ? asset($staff->photo) : asset('img/avatar/avatar-1.png') }}"
                                     class="rounded-circle profile-widget-picture">
                             </div>
 
                             <div class="profile-widget-items">
                                 <div class="profile-widget-item">
-                                    <div class="profile-widget-item-label">NIDN</div>
-                                    <div class="profile-widget-item-value">{{ $lecturer->nidn ?? 'N/A' }}</div>
+                                    <div class="profile-widget-item-label">NIP</div>
+                                    <div class="profile-widget-item-value">{{ $staff->nip ?? 'N/A' }}</div>
                                 </div>
                             </div>
 
@@ -113,9 +113,9 @@
                                 <div class="font-weight-bold mb-2">Documents</div>
                                 <div class="row justify-content-center">
                                     <div class="col-6">
-                                        <a href="{{ $lecturer->ktp_scan ? asset($lecturer->ktp_scan) : '#' }}"
-                                            class="btn btn-outline-primary btn-block {{ !$lecturer->ktp_scan ? 'disabled' : '' }}"
-                                            {{ $lecturer->ktp_scan ? 'target="_blank"' : '' }}>
+                                        <a href="{{ $staff->ktp_scan ? asset($staff->ktp_scan) : '#' }}"
+                                            class="btn btn-outline-primary btn-block {{ !$staff->ktp_scan ? 'disabled' : '' }}"
+                                            {{ $staff->ktp_scan ? 'target="_blank"' : '' }}>
                                             <i class="fas fa-id-card mr-1"></i> KTP
                                         </a>
                                     </div>
@@ -126,7 +126,7 @@
 
                     <div class="col-12 col-md-12 col-lg-7">
                         <div class="card">
-                            <form method="POST" action="{{ route('lecturer.profile.update') }}" class="needs-validation"
+                            <form method="POST" action="{{ route('staff.profile.update') }}" class="needs-validation"
                                 enctype="multipart/form-data" novalidate="">
                                 @csrf
                                 <div class="card-header">
@@ -136,16 +136,16 @@
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label>Lecturer ID</label>
+                                                <label>Staff ID</label>
                                                 <input type="text" class="form-control readonly-field"
-                                                    value="{{ $lecturer->lecturer_id ?? '-' }}" readonly>
+                                                    value="{{ $staff->staff_id ?? '-' }}" readonly>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label>NIDN</label>
+                                                <label>NIP</label>
                                                 <input type="text" class="form-control readonly-field"
-                                                    value="{{ $lecturer->nidn ?? '' }}" readonly>
+                                                    value="{{ $staff->nip ?? '' }}" readonly>
                                             </div>
                                         </div>
                                     </div>
@@ -154,8 +154,8 @@
                                             <div class="form-group">
                                                 <label>Full Name</label>
                                                 <input type="text" name="name" class="form-control readonly-field"
-                                                    value="{{ $lecturer->name ?? '' }}" readonly>
-                                                <input type="hidden" name="name" value="{{ $lecturer->name ?? '' }}">
+                                                    value="{{ $staff->name ?? '' }}" readonly>
+                                                <input type="hidden" name="name" value="{{ $staff->name ?? '' }}">
                                                 @error('name')
                                                     <div class="text-danger">{{ $message }}</div>
                                                 @enderror
@@ -165,7 +165,7 @@
                                             <div class="form-group">
                                                 <label>Phone Number</label>
                                                 <input type="tel" name="phone_number" class="form-control"
-                                                    value="{{ $lecturer->user->phone_number ?? '' }}" required>
+                                                    value="{{ $staff->user->phone_number ?? '' }}" required>
                                                 @error('phone_number')
                                                     <div class="text-danger">{{ $message }}</div>
                                                 @enderror
@@ -178,7 +178,7 @@
                                             <div class="form-group">
                                                 <label>Home Address</label>
                                                 <textarea name="home_address" class="form-control"
-                                                    required>{{ $lecturer->home_address ?? '' }}</textarea>
+                                                    required>{{ $staff->home_address ?? '' }}</textarea>
                                                 @error('home_address')
                                                     <div class="text-danger">{{ $message }}</div>
                                                 @enderror
@@ -188,7 +188,7 @@
                                             <div class="form-group">
                                                 <label>Current Address</label>
                                                 <textarea name="current_address" class="form-control"
-                                                    required>{{ $lecturer->current_address ?? '' }}</textarea>
+                                                    required>{{ $staff->current_address ?? '' }}</textarea>
                                                 @error('current_address')
                                                     <div class="text-danger">{{ $message }}</div>
                                                 @enderror
@@ -199,8 +199,8 @@
                                     <div class="form-group">
                                         <label>Profile Photo</label>
                                         <input type="file" name="photo" class="form-control-file" id="profile-photo-input"
-                                            {{ $lecturer->photo ? 'disabled' : '' }}>
-                                        @if($lecturer->photo)
+                                            {{ $staff->photo ? 'disabled' : '' }}>
+                                        @if($staff->photo)
                                             <div class="warning-text">
                                                 <i class="fas fa-exclamation-triangle"></i> Profile photo cannot be changed
                                                 once
@@ -213,9 +213,9 @@
                                             </div>
                                         @endif
 
-                                        @if($lecturer && $lecturer->photo)
+                                        @if($staff && $staff->photo)
                                             <div class="document-preview mt-2">
-                                                <img src="{{ asset($lecturer->photo) }}" alt="Profile" class="img-fluid"
+                                                <img src="{{ asset($staff->photo) }}" alt="Profile" class="img-fluid"
                                                     id="profile-photo-preview">
                                             </div>
                                         @else
@@ -234,14 +234,14 @@
                                             <div class="form-group">
                                                 <label>KTP Scan (ID Card)</label>
                                                 <input type="file" name="ktp_scan" class="form-control-file"
-                                                    accept="image/*" id="ktp-scan-input" {{ $lecturer->ktp_scan ? 'disabled' : '' }}>
-                                                @if($lecturer->ktp_scan)
+                                                    accept="image/*" id="ktp-scan-input" {{ $staff->ktp_scan ? 'disabled' : '' }}>
+                                                @if($staff->ktp_scan)
                                                     <div class="warning-text">
                                                         <i class="fas fa-exclamation-triangle"></i> KTP document cannot be
                                                         changed once uploaded.
                                                     </div>
                                                     <div class="mt-2">
-                                                        <a href="{{ asset($lecturer->ktp_scan) }}" target="_blank"
+                                                        <a href="{{ asset($staff->ktp_scan) }}" target="_blank"
                                                             class="btn btn-sm btn-info">View KTP Document</a>
                                                     </div>
                                                 @else
