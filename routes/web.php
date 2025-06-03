@@ -17,6 +17,7 @@ use App\Models\AnnouncementModel;
 use App\Models\UserModel;
 use App\Http\Controllers\UserDataTableController;
 use App\Http\Controllers\FaqController;
+use App\Models\FaqModel;
 
 /*
 |--------------------------------------------------------------------------
@@ -393,7 +394,28 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/exam-results/{id}', [ExamResultController::class, 'destroy'])->name('exam-results.destroy');
 });
 
+
 // Admin dashboard route
 Route::get('/dashboard-admin', [App\Http\Controllers\AdminDashboardController::class, 'index'])
     ->name('admin.dashboard')
     ->middleware('auth');
+
+// Admin FAQs route
+Route::group(['prefix' => 'faqs'], function () {
+    Route::get('/', function () {
+        return view('users-admin.faq.index', [
+            'type_menu' => 'faqs'
+        ]);
+    })->name('faqs.index');
+    Route::post('/list', [FaqController::class, 'list']);
+    Route::get('/create', [FaqController::class, 'create']);
+    Route::post('/store', [FaqController::class, 'store']);
+    Route::get('/{id}/show_ajax', [FaqController::class, 'show_ajax']);
+    Route::get('/{id}/edit', [FaqController::class, 'edit']);
+    Route::put('/{id}/update', [FaqController::class, 'update']);
+    Route::get('/{id}/delete_ajax', [FaqController::class, 'confirm_ajax']);
+    Route::post('/{id}/delete_ajax', [FaqController::class, 'delete_ajax']);
+});
+
+Route::get('/faq', [FaqController::class, 'publicFaqList'])->name('public.faqs');
+
