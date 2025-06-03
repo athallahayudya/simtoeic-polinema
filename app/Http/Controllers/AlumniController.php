@@ -145,7 +145,7 @@ class AlumniController extends Controller
         ])->get();
 
         // Ambil announcement terbaru
-        $announcements = AnnouncementModel::latest()->first();
+        $announcements = AnnouncementModel::orderBy('announcement_date', 'desc')->first();
 
         return view('users-alumni.alumni-dashboard', compact('type_menu', 'schedules', 'examResults', 'examScores', 'announcements'));
     }

@@ -396,7 +396,7 @@
                                                 <div class="d-flex justify-content-between mb-2">
                                                     <h6 class="mb-0 font-weight-bold">{{ Str::limit($announcement->title ?? 'No Title', 50) }}</h6>
                                                     <span class="badge badge-light">
-                                                        {{ isset($announcement->created_at) ? $announcement->created_at->format('M d') : '' }}
+                                                        {{ isset($announcement->announcement_date) ? \Carbon\Carbon::parse($announcement->announcement_date)->format('M d') : '' }}
                                                     </span>
                                                 </div>
                                                 <p class="text-muted small mb-1">
@@ -405,7 +405,7 @@
                                                 <div class="d-flex justify-content-between align-items-center">
                                                     <small class="text-muted">
                                                         <i class="fas fa-clock mr-1"></i>
-                                                        {{ isset($announcement->created_at) ? $announcement->created_at->diffForHumans() : 'Unknown date' }}
+                                                        {{ isset($announcement->announcement_date) ? \Carbon\Carbon::parse($announcement->announcement_date)->diffForHumans() : 'Unknown date' }}
                                                     </small>
                                                     @if(Route::has('announcements.show'))
                                                     <a href="{{ route('announcements.show', $announcement->id) }}" class="btn btn-sm btn-light">

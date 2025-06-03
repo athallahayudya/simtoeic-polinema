@@ -41,7 +41,8 @@
                 </li>
 
                 <!-- Notices Dropdown -->
-                <li class="nav-item dropdown {{ in_array(Request::segment(1), ['announcements', 'faq']) ? 'active' : '' }}">
+                <li
+                    class="nav-item dropdown {{ in_array(Request::segment(1), ['announcements', 'faqs']) ? 'active' : '' }}">
                     <a href="#" class="nav-link has-dropdown">
                         <i class="fas fa-bullhorn"></i> <span>Notices</span>
                     </a>
@@ -65,25 +66,16 @@
                 <!-- OTHER USERS SIDEBAR MENU (Staff, Alumni, Student, Lecturer) -->
                 <!-- Dashboard -->
                 <li class="{{ Request::is('*/dashboard') ? 'active' : '' }}">
-                    <a class="nav-link" href="{{ url(Auth::user()->role . '/dashboard') }}">
+                    <a class="nav-link" href="{{ url(Auth::user()?->role . '/dashboard') }}">
                         <i class="fas fa-fire"></i><span>Dashboard</span>
                     </a>
                 </li>
 
-                <!-- Exam Dropdown -->
-                <li
-                    class="nav-item dropdown {{ in_array(Request::segment(2), ['registration', 'schedule']) ? 'active' : '' }}">
-                    <a href="#" class="nav-link has-dropdown">
-                        <i class="fas fa-clipboard-list"></i> <span>Exam</span>
+                <!-- Registration -->
+                <li class="{{ Request::is('*/registration*') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ url(Auth::user()?->role . '/registration') }}">
+                        <i class="fas fa-clipboard-list"></i> <span>Registration</span>
                     </a>
-                    <ul class="dropdown-menu">
-                        <li class="{{ Request::is('*/registration*') ? 'active' : '' }}">
-                            <a class="nav-link" href="{{ url(Auth::user()->role . '/registration') }}">Registration</a>
-                        </li>
-                        <li class="{{ Request::is('*/schedule*') ? 'active' : '' }}">
-                            <a class="nav-link" href="{{ url(Auth::user()->role . '/schedule') }}">Schedule</a>
-                        </li>
-                    </ul>
                 </li>
 
                 <!-- FAQs -->
@@ -95,7 +87,7 @@
 
                 <!-- Profile -->
                 <li class="{{ Request::is('*/profile') ? 'active' : '' }}">
-                    <a class="nav-link" href="{{ url(Auth::user()->role . '/profile') }}">
+                    <a class="nav-link" href="{{ url(Auth::user()?->role . '/profile') }}">
                         <i class="fas fa-user"></i> <span>Profile</span>
                     </a>
                 </li>

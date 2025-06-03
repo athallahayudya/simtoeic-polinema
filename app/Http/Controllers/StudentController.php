@@ -24,7 +24,7 @@ class StudentController extends Controller
             ->paginate(10);
         $examResults = ExamResultModel::where('user_id', auth()->id())->latest()->first();
         $type_menu = 'dashboard';
-        $announcements = AnnouncementModel::where('announcement_status', 'published')->latest()->first();
+        $announcements = AnnouncementModel::where('announcement_status', 'published')->orderBy('announcement_date', 'desc')->first();
 
         // Enhanced profile completeness check
         $student = StudentModel::where('user_id', auth()->id())->first();

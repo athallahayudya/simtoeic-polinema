@@ -145,7 +145,7 @@ class LecturerController extends Controller
     ])->get();
     
     // Ambil announcement terbaru dari AnnouncementModel
-    $announcements = \App\Models\AnnouncementModel::latest()->first();
+    $announcements = \App\Models\AnnouncementModel::orderBy('announcement_date', 'desc')->first();
     
     return view('users-lecturer.lecturer-dashboard', compact('type_menu', 'schedules', 'examResults', 'examScores', 'announcements'));
 }

@@ -116,7 +116,7 @@
                                             <div class="d-flex justify-content-between align-items-center mb-2">
                                                 <h4 class="text-primary mb-0">{{ $announcements->title }}</h4>
                                                 <span
-                                                    class="badge badge-primary">{{ $announcements->created_at->format('d M Y') }}</span>
+                                                    class="badge badge-primary">{{ isset($announcements->announcement_date) ? \Carbon\Carbon::parse($announcements->announcement_date)->format('d M Y') : '' }}</span>
                                             </div>
 
                                             <div class="announcement-content p-3 bg-light rounded">
@@ -126,7 +126,7 @@
                                             <div class="d-flex justify-content-end mt-2">
                                                 <small class="text-muted">
                                                     <i class="fas fa-clock mr-1"></i> Posted
-                                                    {{ $announcements->created_at->diffForHumans() }}
+                                                    {{ isset($announcements->announcement_date) ? \Carbon\Carbon::parse($announcements->announcement_date)->diffForHumans() : 'Unknown date' }}
                                                 </small>
                                             </div>
                                         </div>

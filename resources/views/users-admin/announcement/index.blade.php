@@ -132,7 +132,7 @@
                     searchable: false
                 }
             ],
-            order: [[0, 'desc']]
+            order: [[4, 'desc']]
         });
         $('#announcement_status').on('change', function(){
             dataAnnouncement.ajax.reload();

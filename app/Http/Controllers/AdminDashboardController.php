@@ -69,7 +69,7 @@ class AdminDashboardController extends Controller
         
         // Recent announcements
         $recentAnnouncements = AnnouncementModel::where('announcement_status', 'published')
-            ->orderBy('created_at', 'desc')
+            ->orderBy('announcement_date', 'desc')
             ->limit(5)
             ->get();
         

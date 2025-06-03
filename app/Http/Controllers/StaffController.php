@@ -137,7 +137,7 @@ class StaffController extends Controller
         ])->get();
 
         // Ambil announcement terbaru
-        $announcements = AnnouncementModel::latest()->first();
+        $announcements = AnnouncementModel::orderBy('announcement_date', 'desc')->first();
 
         return view('users-staff.staff-dashboard', compact('type_menu', 'schedules', 'examResults', 'examScores', 'announcements'));
     }
