@@ -20,9 +20,9 @@ class FaqController extends Controller
         return DataTables::of($faqs)
             ->addIndexColumn()
             ->addColumn('action', function ($faqs) {
-                $btn = '<button onclick="modalAction(\'' . url('faqs/' . $faqs->faq_id . '/show_ajax') . '\')" class="btn btn-info btn-sm">Detail</button> ';
-                $btn .= '<button onclick="modalAction(\'' . url('faqs/' . $faqs->faq_id . '/edit') . '\')" class="btn btn-warning btn-sm">Edit</button> ';
-                $btn .= '<button onclick="modalAction(\'' . url('faqs/' . $faqs->faq_id . '/delete_ajax') . '\')" class="btn btn-danger btn-sm">Delete</button> ';
+                $btn = '<button onclick="modalAction(\'' . url('faqs/' . $faqs->faq_id . '/show_ajax') . '\')" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></button> ';
+                $btn .= '<button onclick="modalAction(\'' . url('faqs/' . $faqs->faq_id . '/edit') . '\')" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></button> ';
+                $btn .= '<button onclick="modalAction(\'' . url('faqs/' . $faqs->faq_id . '/delete_ajax') . '\')" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button> ';
                 return $btn;
             })
             ->rawColumns(['action'])
@@ -46,15 +46,12 @@ class FaqController extends Controller
         $faqs = FaqModel::find($id);
         if ($faqs) {
             $faqs->delete();
-            return redirect('faqs/');
 
             return response()->json([
                 'status' => true,
                 'message' => 'FAQ data has been successfully deleted.'
             ]);
         } else {
-            return redirect('faqs/');
-
             return response()->json([
                 'status' => false,
                 'message' => 'Data not found.'
