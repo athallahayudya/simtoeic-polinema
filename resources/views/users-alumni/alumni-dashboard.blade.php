@@ -1,11 +1,9 @@
-
 @extends('layouts.app')
 
 @section('title', 'Alumni Dashboard')
 
 @push('style')
     <link rel="stylesheet" href="{{ asset('assets/modules/chartjs/Chart.min.css') }}">
-    <!-- DataTables CSS (gunakan asset lokal atau CDN sesuai kebutuhan) -->
     <link rel="stylesheet" href="{{ asset('assets/modules/datatables/datatables.min.css') }}">
 @endpush
 
@@ -134,7 +132,7 @@
             </div>
          </div>
 
-         <!-- Row: Exam Schedule & Exam Score -->
+         <!-- Row: Exam Schedule & Exam Scores -->
          <div class="row">
             <!-- Exam Schedule -->
             <div class="col-md-6">
@@ -154,7 +152,7 @@
                            <table class="table table-hover mb-0">
                               <thead class="thead-light">
                                  <tr>
-                                    <th class="px-4 py-3">#</th>
+                                    <th class="px-4 py-3">No</th>
                                     <th class="px-4 py-3">
                                        <i class="far fa-calendar mr-1 text-muted"></i> Date
                                     </th>
@@ -208,37 +206,43 @@
                </div>
             </div>
 
-            <!-- Exam Score -->
+            <!-- Exam Scores -->
             <div class="col-md-6">
                <div class="card shadow-sm border-0">
-                  <div class="card-header py-2" style="padding-top:8px; padding-bottom:8px;">
-                     <strong style="font-size:15px;">Exam Score</strong>
+                  <div class="card-header">
+                     <h4>Exam Scores</h4>
                   </div>
-                  <div class="card-body py-2" style="padding-top:8px; padding-bottom:8px;">
-                     <table class="table table-striped mb-1" style="margin-bottom:4px;">
+                  <div class="card-body">
+                     <table id="examScoreTable" class="table table-striped">
                         <thead>
                            <tr>
-                              <th style="font-size:13px;">Score</th>
-                              <th style="font-size:13px;">Certificate</th>
+                              <th>Identity Number</th>
+                              <th>Name</th>
+                              <th>Score</th>
                            </tr>
                         </thead>
                         <tbody>
-                           @if($examResults)
-                           <tr>
-                              <td style="font-size:13px;">{{ $examResults->score }}</td>
-                              <td>
-                                  @if($examResults->certificate_url)
-                                      <a href="{{ asset($examResults->certificate_url) }}" target="_blank" class="btn btn-info btn-sm" style="font-size:12px; padding:2px 10px;">Download</a>
-                                  @else
-                                      -
-                                  @endif
-                              </td>
-                           </tr>
-                           @else
-                           <tr>
-                              <td colspan="2" class="text-center" style="font-size:13px;">No exam score available.</td>
-                           </tr>
-                           @endif
+                           @foreach($examScores as $score)
+                              <tr>
+                                 <td>{{ $score->user->identity_number }}</td>
+                                 <td>
+                                    @if(!empty($score->user->name))
+                                       {{ $score->user->name }}
+                                    @elseif(!empty($score->user->lecturer->name))
+                                       {{ $score->user->lecturer->name }}
+                                    @elseif(!empty($score->user->staff->name))
+                                       {{ $score->user->staff->name }}
+                                    @elseif(!empty($score->user->student->name))
+                                       {{ $score->user->student->name }}
+                                    @elseif(!empty($score->user->alumni->name))
+                                       {{ $score->user->alumni->name }}
+                                    @else
+                                       {{ $score->user->identity_number }}
+                                    @endif
+                                 </td>
+                                 <td>{{ $score->score }}</td>
+                              </tr>
+                           @endforeach
                         </tbody>
                      </table>
                   </div>
@@ -253,7 +257,6 @@
 
 @push('scripts')
    <script src="{{ asset('assets/modules/chartjs/Chart.min.js') }}"></script>
-   <!-- DataTables JS (gunakan asset lokal atau CDN sesuai kebutuhan) -->
    <script src="{{ asset('assets/modules/datatables/datatables.min.js') }}"></script>
    <script>
        $(document).ready(function(){

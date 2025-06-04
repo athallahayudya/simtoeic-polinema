@@ -1,11 +1,9 @@
-
 @extends('layouts.app')
 
-@section('title', 'Alumni Dashboard')
+@section('title', 'Staff Dashboard')
 
 @push('style')
     <link rel="stylesheet" href="{{ asset('assets/modules/chartjs/Chart.min.css') }}">
-    <!-- DataTables CSS (gunakan asset lokal atau CDN sesuai kebutuhan) -->
     <link rel="stylesheet" href="{{ asset('assets/modules/datatables/datatables.min.css') }}">
 @endpush
 
@@ -56,7 +54,7 @@
                                     @endforeach
                                  </div>
                               @endif
-                              <a href="{{ route('alumni.profile') }}" class="btn btn-warning">
+                              <a href="{{ route('staff.profile') }}" class="btn btn-warning">
                                  <i class="fas fa-arrow-right mr-1"></i> Complete Profile Now
                               </a>
                            </div>
@@ -83,7 +81,7 @@
                               <p class="mb-3">
                                  Thank you for completing your profile data. You are now ready to register for exams!
                               </p>
-                              <a href="{{ route('alumni.profile') }}" class="btn btn-success">
+                              <a href="{{ route('staff.profile') }}" class="btn btn-success">
                                  <i class="fas fa-user mr-1"></i> View Profile
                               </a>
                            </div>
@@ -134,7 +132,7 @@
             </div>
          </div>
 
-         <!-- Row: Exam Schedule & Exam Score -->
+         <!-- Row: Exam Schedule & Exam Scores -->
          <div class="row">
             <!-- Exam Schedule -->
             <div class="col-md-6">
@@ -154,7 +152,7 @@
                            <table class="table table-hover mb-0">
                               <thead class="thead-light">
                                  <tr>
-                                    <th class="px-4 py-3">#</th>
+                                    <th class="px-4 py-3">No</th>
                                     <th class="px-4 py-3">
                                        <i class="far fa-calendar mr-1 text-muted"></i> Date
                                     </th>
@@ -208,54 +206,57 @@
                </div>
             </div>
 
-            <!-- Exam Score -->
-           
-<div class="col-md-6">
-   <div class="card shadow-sm border-0">
-      <div class="card-header">
-         <h4>Exam Scores</h4>
+            <!-- Exam Scores -->
+            <div class="col-md-6">
+               <div class="card shadow-sm border-0">
+                  <div class="card-header">
+                     <h4>Exam Scores</h4>
+                  </div>
+                  <div class="card-body">
+                     <table id="examScoreTable" class="table table-striped">
+                        <thead>
+                           <tr>
+                              <th>Identity Number</th>
+                              <th>Name</th>
+                              <th>Score</th>
+                           </tr>
+                        </thead>
+                        <tbody>
+                           @foreach($examScores as $score)
+                              <tr>
+                                 <td>{{ $score->user->identity_number }}</td>
+                                 <td>
+                                    @if(!empty($score->user->name))
+                                       {{ $score->user->name }}
+                                    @elseif(!empty($score->user->lecturer->name))
+                                       {{ $score->user->lecturer->name }}
+                                    @elseif(!empty($score->user->staff->name))
+                                       {{ $score->user->staff->name }}
+                                    @elseif(!empty($score->user->student->name))
+                                       {{ $score->user->student->name }}
+                                    @elseif(!empty($score->user->alumni->name))
+                                       {{ $score->user->alumni->name }}
+                                    @else
+                                       {{ $score->user->identity_number }}
+                                    @endif
+                                 </td>
+                                 <td>{{ $score->score }}</td>
+                              </tr>
+                           @endforeach
+                        </tbody>
+                     </table>
+                  </div>
+               </div>
+            </div>
+         </div>
+         
       </div>
-      <div class="card-body">
-         <table id="examScoreTable" class="table table-striped">
-            <thead>
-               <tr>
-                  <th>Identity Number</th>
-                  <th>Name</th>
-                  <th>Score</th>
-               </tr>
-            </thead>
-            <tbody>
-               @foreach($examScores as $score)
-                  <tr>
-                     <td>{{ $score->user->identity_number }}</td>
-                     <td>
-                        @if(!empty($score->user->name))
-                           {{ $score->user->name }}
-                        @elseif(!empty($score->user->lecturer->name))
-                           {{ $score->user->lecturer->name }}
-                        @elseif(!empty($score->user->staff->name))
-                           {{ $score->user->staff->name }}
-                        @elseif(!empty($score->user->student->name))
-                           {{ $score->user->student->name }}
-                        @elseif(!empty($score->user->alumni->name))
-                           {{ $score->user->alumni->name }}
-                        @else
-                           {{ $score->user->identity_number }}
-                        @endif
-                     </td>
-                     <td>{{ $score->score }}</td>
-                  </tr>
-               @endforeach
-            </tbody>
-         </table>
-      </div>
-   </div>
+   </section>
 </div>
 @endsection
 
 @push('scripts')
    <script src="{{ asset('assets/modules/chartjs/Chart.min.js') }}"></script>
-   <!-- DataTables JS (gunakan asset lokal atau CDN sesuai kebutuhan) -->
    <script src="{{ asset('assets/modules/datatables/datatables.min.js') }}"></script>
    <script>
        $(document).ready(function(){
