@@ -93,6 +93,61 @@
             </div>
          </div>
 
+         <!-- PDF Announcement Section -->
+         @if(isset($announcements) && $announcements && $announcements->announcement_file)
+         <div class="row mb-3">
+            <div class="col-12">
+               <div class="card shadow-sm border-0">
+                  <div class="card-header bg-primary text-white d-flex align-items-center">
+                     <i class="fas fa-file-pdf mr-2"></i>
+                     <strong style="font-size:16px;">PDF Announcement</strong>
+                  </div>
+                  
+                  <div class="card-body py-3">
+                     <div class="announcement-pdf-container">
+                        <div class="row">
+                           <div class="col-md-8">
+                              <h5 class="text-primary mb-2">{{ $announcements->title }}</h5>
+                              <p class="text-muted mb-3">
+                                 <small><i class="fas fa-calendar-alt mr-1"></i> Posted on {{ $announcements->announcement_date->format('d M Y') }}</small>
+                              </p>
+                              <p class="mb-3">{{ $announcements->content }}</p>
+                           </div>
+                           <div class="col-md-4 text-center d-flex flex-column justify-content-center">
+                              <div class="pdf-icon mb-3">
+                                 <i class="fas fa-file-pdf text-danger" style="font-size: 4rem;"></i>
+                              </div>
+                              <div class="btn-group-vertical">
+                                 <a href="{{ $announcements->announcement_file }}" class="btn btn-primary mb-2" target="_blank">
+                                    <i class="fas fa-eye mr-1"></i> View PDF
+                                 </a>
+                                 <a href="{{ $announcements->announcement_file }}" class="btn btn-outline-primary" download>
+                                    <i class="fas fa-download mr-1"></i> Download PDF
+                                 </a>
+                              </div>
+                           </div>
+                        </div>
+                        
+                        <!-- PDF Preview -->
+                        <div class="pdf-preview mt-4">
+                           <div class="card">
+                              <div class="card-header bg-light">
+                                 <h6 class="mb-0">PDF Preview</h6>
+                              </div>
+                              <div class="card-body p-0">
+                                 <div class="embed-responsive embed-responsive-16by9">
+                                    <iframe class="embed-responsive-item" src="{{ $announcements->announcement_file }}" allowfullscreen></iframe>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         @endif
+
          <!-- Announcement -->
          <div class="row mb-3">
             <div class="col-12">

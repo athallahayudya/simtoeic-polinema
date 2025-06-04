@@ -23,7 +23,7 @@ class ExamResultsImport implements ToModel, WithHeadingRow, SkipsOnError, SkipsE
         // Debug what we're getting from Excel
         Log::info('Excel row data:', $row);
         
-        // Skip rows without IDs
+        // Skip rows without IDs or if ID column is missing
         if (empty($row['id'])) {
             return null;
         }

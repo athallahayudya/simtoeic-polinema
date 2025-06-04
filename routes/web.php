@@ -253,6 +253,7 @@ Route::group(['prefix' => 'announcements'], function () {
     Route::put('/{id}/update', [AnnouncementController::class, 'update']);
     Route::get('/{id}/delete_ajax', [AnnouncementController::class, 'confirm_ajax']);
     Route::post('/{id}/delete_ajax', [AnnouncementController::class, 'delete_ajax']);
+    Route::post('/upload', [AnnouncementController::class, 'upload'])->name('announcements.upload');
 });
 
 
@@ -394,6 +395,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/exam-results/{id}', [ExamResultController::class, 'show'])->name('exam-results.show');
     Route::put('/exam-results/{id}', [ExamResultController::class, 'update'])->name('exam-results.update');
     Route::delete('/exam-results/{id}', [ExamResultController::class, 'destroy'])->name('exam-results.destroy');
+    Route::delete('/exam-results/delete-all', [ExamResultController::class, 'deleteAll'])->name('exam-results.delete-all');
 });
 
 // Admin dashboard route

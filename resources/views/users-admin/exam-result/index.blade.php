@@ -95,24 +95,6 @@
 
                 <div class="row">
                     <div class="col-12">
-                        @if (session('success'))
-                            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                <strong>Success!</strong> {{ session('success') }}
-                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                        @endif
-
-                        @if (session('error'))
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                <strong>Error!</strong> {{ session('error') }}
-                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                        @endif
-
                         <!-- Import Section -->
                         <div class="card">
                             <div class="card-header">
@@ -160,6 +142,87 @@
                                                 <code>TOT</code> (Total Score)<br>
                                                 <code>TEST DATE</code> (Optional, date of exam)<br>
                                                 Note: Excel column names are case-insensitive when importing.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Upload Announcement PDF -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h4><i class="fas fa-bullhorn mr-2"></i>Upload Announcement PDF</h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="import-section">
+                                    <form id="announcementForm" action="{{ route('announcements.upload') }}" method="POST" enctype="multipart/form-data">
+                                        @csrf
+                                        <div class="form-group">
+                                            <label>Announcement Title</label>
+                                            <input type="text" class="form-control" name="title" required placeholder="Enter announcement title">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Select PDF Announcement</label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="announcementFile" name="announcement_file" accept=".pdf" required>
+                                                <label class="custom-file-label" for="announcementFile">Choose PDF file...</label>
+                                                <small class="form-text text-muted">Upload PDF announcement (max 10MB)</small>
+                                            </div>
+                                            @error('announcement_file')
+                                                <span class="text-danger">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Announcement Description</label>
+                                            <textarea class="form-control" name="description" rows="3" placeholder="Enter a brief description of this announcement"></textarea>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Visible To</label>
+                                            <div class="row">
+                                                <div class="col-md-3">
+                                                    <div class="custom-control custom-checkbox">
+                                                        <input type="checkbox" class="custom-control-input" id="visibleToStudents" name="visible_to[]" value="student" checked>
+                                                        <label class="custom-control-label" for="visibleToStudents">Students</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="custom-control custom-checkbox">
+                                                        <input type="checkbox" class="custom-control-input" id="visibleToAlumni" name="visible_to[]" value="alumni" checked>
+                                                        <label class="custom-control-label" for="visibleToAlumni">Alumni</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="custom-control custom-checkbox">
+                                                        <input type="checkbox" class="custom-control-input" id="visibleToStaff" name="visible_to[]" value="staff" checked>
+                                                        <label class="custom-control-label" for="visibleToStaff">Staff</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="custom-control custom-checkbox">
+                                                        <input type="checkbox" class="custom-control-input" id="visibleToLecturers" name="visible_to[]" value="lecturer" checked>
+                                                        <label class="custom-control-label" for="visibleToLecturers">Lecturers</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="text-center">
+                                            <button type="submit" class="btn btn-primary" id="announcementButton">
+                                                <i class="fas fa-upload mr-1"></i> Upload Announcement
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                <div class="alert alert-info">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-info-circle fa-2x mr-3"></i>
+                                        <div>
+                                            <strong>Announcement Guidelines</strong>
+                                            <p class="mb-0">
+                                                Uploaded announcements will be displayed on the dashboards of selected user types.<br>
+                                                Only PDF files are supported for announcements.<br>
+                                                The most recent announcement will be displayed prominently on user dashboards.
                                             </p>
                                         </div>
                                     </div>
@@ -232,6 +295,11 @@
                         <div class="card">
                             <div class="card-header">
                                 <h4><i class="fas fa-table mr-2"></i>Exam Results</h4>
+                                <div class="card-header-action">
+                                    <button id="deleteAllButton" class="btn btn-danger btn-sm">
+                                        <i class="fas fa-trash-alt"></i> Delete All
+                                    </button>
+                                </div>
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
@@ -277,6 +345,10 @@
                                                         <button class="btn btn-sm btn-info view-details"
                                                             data-id="{{ $result->id }}">
                                                             <i class="fas fa-eye"></i>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-danger delete-result"
+                                                            data-id="{{ $result->result_id }}">
+                                                            <i class="fas fa-trash"></i>
                                                         </button>
                                                     </td>
                                                 </tr>
@@ -342,6 +414,26 @@
             </div>
         </div>
     </div>
+
+    <!-- Alert Message Modal -->
+    <div class="modal fade" id="messageModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="messageModalTitle">Notification</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="messageModalBody">
+                    <!-- Message will be inserted here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('scripts')
@@ -361,10 +453,29 @@
     <script>
         $(document).ready(function () {
 
+            // Function to show message modal
+            function showMessageModal(message, isSuccess) {
+                $('#messageModalTitle').text(isSuccess ? 'Success' : 'Error');
+                $('#messageModalBody').html(message);
+                
+                // Set header color based on message type
+                $('.modal-header').removeClass('bg-success bg-danger')
+                    .addClass(isSuccess ? 'bg-success' : 'bg-danger');
+                $('.modal-header').css('color', 'white');
+                
+                $('#messageModal').modal('show');
+                
+                // If success, reload after closing
+                if (isSuccess) {
+                    $('#messageModal').on('hidden.bs.modal', function () {
+                        location.reload();
+                    });
+                }
+            }
+
             // Form submission with AJAX
             $('#importForm').on('submit', function (e) {
                 e.preventDefault();
-
                 var formData = new FormData(this);
 
                 $.ajax({
@@ -374,17 +485,21 @@
                     processData: false,
                     contentType: false,
                     success: function (response) {
+                        // Re-enable button
+                        $('#importButton').prop('disabled', false).html('<i class="fas fa-upload mr-1"></i> Import Results');
+                        
                         // Show success message
-                        toastr.success('Exam results imported successfully!');
-
-                        // Reload the page to show new data
-                        setTimeout(function () {
+                        showMessageModal('Exam results imported successfully!', true);
+                        
+                        // Reload the page to refresh the datatable
+                        setTimeout(function() {
                             window.location.reload();
                         }, 1500);
                     },
                     error: function (xhr) {
-                        // Show error message
-                        toastr.error('Error importing file: ' + xhr.responseText);
+                        // Re-enable button
+                        $('#importButton').prop('disabled', false).html('<i class="fas fa-upload mr-1"></i> Import Results');
+                        showMessageModal('Error importing file: ' + xhr.responseText, false);
                     }
                 });
             });
@@ -401,7 +516,7 @@
                 // Check if file is selected
                 var fileInput = $('#importFile')[0];
                 if (!fileInput.files.length) {
-                    alert('Please select a file to import.');
+                    showMessageModal('Please select a file to import.', false);
                     return false;
                 }
 
@@ -417,28 +532,12 @@
                     processData: false,
                     contentType: false,
                     success: function (response) {
-                        // Show success message
-                        if (typeof toastr !== 'undefined') {
-                            toastr.success('Exam results imported successfully!');
-                        } else {
-                            alert('Exam results imported successfully!');
-                        }
-
-                        // Reload the page to show new data
-                        setTimeout(function () {
-                            window.location.reload();
-                        }, 1500);
+                        showMessageModal('Exam results imported successfully!', true);
                     },
                     error: function (xhr) {
                         // Re-enable button
                         $('#importButton').prop('disabled', false).html('<i class="fas fa-upload mr-1"></i> Import Results');
-
-                        // Show error message
-                        if (typeof toastr !== 'undefined') {
-                            toastr.error('Error importing file: ' + xhr.responseText);
-                        } else {
-                            alert('Error importing file: ' + xhr.responseText);
-                        }
+                        showMessageModal('Error importing file: ' + xhr.responseText, false);
                     }
                 });
             });
@@ -560,6 +659,105 @@
                     $.fn.dataTable.ext.search.pop();
                 }
             }
+
+            // Delete All Results handler
+            $('#deleteAllButton').on('click', function () {
+                if (confirm('Are you sure you want to delete ALL exam results? This action cannot be undone and will remove all data and associated files.')) {
+                    $.ajax({
+                        url: '/exam-results/delete-all', // Direct URL path instead of named route
+                        type: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function (response) {
+                            showMessageModal('All exam results deleted successfully!', true);
+                        },
+                        error: function(xhr) {
+                            let errorMsg = 'Error deleting exam results';
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                errorMsg = xhr.responseJSON.message;
+                            }
+                            showMessageModal(errorMsg, false);
+                        }
+                    });
+                }
+            });
+
+            // Delete single result handler
+            $(document).on('click', '.delete-result', function() {
+                var id = $(this).data('id');
+                if (confirm('Are you sure you want to delete this exam result?')) {
+                    $.ajax({
+                        url: '/exam-results/' + id,
+                        type: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function(response) {
+                            showMessageModal('Exam result deleted successfully!', true);
+                        },
+                        error: function(xhr) {
+                            let errorMsg = 'Error deleting exam result';
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                errorMsg = xhr.responseJSON.message;
+                            }
+                            showMessageModal(errorMsg, false);
+                        }
+                    });
+                }
+            });
+
+            // Initialize custom file input for announcement file
+            $('#announcementFile').on('change', function () {
+                let fileName = $(this).val().split('\\').pop();
+                $(this).next('.custom-file-label').addClass("selected").html(fileName);
+            });
+
+            // Announcement form submission with AJAX
+            $('#announcementForm').on('submit', function (e) {
+                e.preventDefault();
+
+                // Check if file is selected
+                var fileInput = $('#announcementFile')[0];
+                if (!fileInput.files.length) {
+                    showMessageModal('Please select a PDF file to upload.', false);
+                    return false;
+                }
+
+                // Disable button to prevent multiple submissions
+                $('#announcementButton').prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i> Uploading...');
+
+                var formData = new FormData(this);
+
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        // Re-enable button
+                        $('#announcementButton').prop('disabled', false).html('<i class="fas fa-upload mr-1"></i> Upload Announcement');
+                        
+                        // Show success message
+                        showMessageModal('Announcement uploaded successfully!', true);
+                        
+                        // Reset form
+                        $('#announcementForm')[0].reset();
+                        $('.custom-file-label').html('Choose PDF file...');
+                    },
+                    error: function (xhr) {
+                        // Re-enable button
+                        $('#announcementButton').prop('disabled', false).html('<i class="fas fa-upload mr-1"></i> Upload Announcement');
+                        
+                        let errorMsg = 'Error uploading announcement';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMsg = xhr.responseJSON.message;
+                        }
+                        showMessageModal(errorMsg, false);
+                    }
+                });
+            });
         });
     </script>
 @endpush

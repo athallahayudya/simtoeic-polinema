@@ -73,4 +73,10 @@ class ExamResultModel extends Model
     {
         return $this->score >= 500 ? 'pass' : 'fail';
     }
+
+    // Add this method to handle bulk deletion
+    public static function deleteAllResults()
+    {
+        return self::truncate();
+    }
 }

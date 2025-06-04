@@ -138,7 +138,16 @@ class AlumniController extends Controller
             ->paginate(10);
             
         $examResults = ExamResultModel::where('user_id', auth()->id())->latest()->first();
-        $announcements = AnnouncementModel::where('announcement_status', 'published')->orderBy('announcement_date', 'desc')->first();
+        // Get the latest published announcement with PDF that's visible to alumni
+        $announcements = AnnouncementModel::where('announcement_status', 'published')
+            ->whereNotNull('announcement_file')
+            ->where(function($query) {
+                $query->whereJsonContains('visible_to', 'alumni')
+                      ->orWhereNull('visible_to')
+                      ->orWhere('visible_to', '[]');
+            })
+            ->orderBy('announcement_date', 'desc')
+            ->first();
         $examScores = ExamResultModel::with([
             'user' => function ($query) {
                 $query->with(['student', 'staff', 'lecturer', 'alumni']);

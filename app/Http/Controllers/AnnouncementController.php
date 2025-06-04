@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\AnnouncementModel; 
+use App\Models\AnnouncementModel;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class AnnouncementController extends Controller
 {
@@ -106,5 +108,52 @@ class AnnouncementController extends Controller
         ]);
         
         return redirect('/announcements/')->with('success', 'Announcement created successfully.');
+    }
+
+    /**
+     * Upload a new announcement PDF
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function upload(Request $request)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'announcement_file' => 'required|file|mimes:pdf|max:10240',
+            'description' => 'nullable|string',
+            'visible_to' => 'required|array'
+        ]);
+
+        try {
+            // Store the file
+            $file = $request->file('announcement_file');
+            $fileName = 'announcement_' . time() . '.pdf';
+            $filePath = $file->storeAs('public/announcements', $fileName);
+            
+            // Create announcement record
+            $announcement = new AnnouncementModel();
+            $announcement->title = $request->title;
+            $announcement->content = $request->description ?? '';
+            $announcement->announcement_file = Storage::url($filePath);
+            $announcement->announcement_date = now();
+            $announcement->announcement_status = 'published';
+            $announcement->visible_to = json_encode($request->visible_to);
+            $announcement->created_by = auth()->id();
+            $announcement->save();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Announcement uploaded successfully',
+                'data' => $announcement
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error uploading announcement: ' . $e->getMessage());
+            
+            return response()->json([
+                'status' => false,
+                'message' => 'Error uploading announcement: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

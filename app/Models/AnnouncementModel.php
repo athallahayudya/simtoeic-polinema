@@ -9,29 +9,37 @@ class AnnouncementModel extends Model
 {
     use HasFactory;
     
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
     protected $table = 'announcement';
-    
-    /**
-     * The primary key for the model.
-     *
-     * @var string
-     */
     protected $primaryKey = 'announcement_id';
     
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'title',
         'content',
+        'announcement_file',
         'announcement_status',
-        'announcement_date'
+        'announcement_date',
+        'visible_to',
+        'created_by'
     ];
+    
+    protected $casts = [
+        'announcement_date' => 'date',
+        'visible_to' => 'array'
+    ];
+    
+    // Check if announcement is visible to a specific role
+    public function isVisibleTo($role)
+    {
+        if (empty($this->visible_to)) {
+            return true; // If not specified, visible to all
+        }
+        
+        return in_array($role, is_array($this->visible_to) ? $this->visible_to : []);
+    }
+    
+    // Get the user who created this announcement
+    public function creator()
+    {
+        return $this->belongsTo(UserModel::class, 'created_by', 'user_id');
+    }
 }
