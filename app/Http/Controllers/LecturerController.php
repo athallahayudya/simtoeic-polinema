@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AnnouncementModel;
 use App\Models\ExamRegistrationModel;
+use App\Models\ExamResultModel;
+use App\Models\ExamScheduleModel;
 use App\Models\LecturerModel;
 use App\Models\UserModel;
 use Illuminate\Http\Request;
@@ -130,25 +133,90 @@ class LecturerController extends Controller
         /**
      * Display lecturer dashboard
      */
-   public function dashboard()
-{
-    $type_menu = 'dashboard';
-    // Get schedules and exam results similar to other controllers
-    $schedules = \App\Models\ExamScheduleModel::paginate(10);
-    $examResults = \App\Models\ExamResultModel::where('user_id', auth()->id())->latest()->first();
+    public function dashboard()
+    {
+        $type_menu = 'dashboard';
+        $schedules = ExamScheduleModel::join('exam_result', 'exam_schedule.shcedule_id', '=', 'exam_result.schedule_id')
+            ->where('exam_result.user_id', auth()->id())
+            ->select('exam_schedule.*')
+            ->paginate(10);
+            
+        $examResults = ExamResultModel::where('user_id', auth()->id())->latest()->first();
+        $announcements = AnnouncementModel::where('announcement_status', 'published')->orderBy('announcement_date', 'desc')->first();
+        $examScores = ExamResultModel::with([
+            'user' => function ($query) {
+                $query->with(['student', 'staff', 'lecturer', 'alumni']);
+            }
+        ])->get();
 
-    // ambil skor dari 4 tabel user: student, staff, lecturer, alumni
-    $examScores = \App\Models\ExamResultModel::with([
-        'user' => function ($query) {
-            $query->with(['student', 'staff', 'lecturer', 'alumni']);
+        // Enhanced profile completeness check
+        $lecturer = LecturerModel::where('user_id', auth()->id())->first();
+        $user = Auth::guard('web')->user();
+
+        $isComplete = true;
+        $missingFiles = [];
+        $completedItems = 0;
+        $totalItems = 5; // Total required fields: photo, ktp_scan, home_address, current_address, phone_number
+
+        // Check each required field and count completed ones
+        if ($lecturer && $lecturer->photo) {
+            $completedItems++;
+        } else {
+            $isComplete = false;
+            $missingFiles[] = 'Profile Photo';
         }
-    ])->get();
-    
-    // Ambil announcement terbaru dari AnnouncementModel
-    $announcements = \App\Models\AnnouncementModel::orderBy('announcement_date', 'desc')->first();
-    
-    return view('users-lecturer.lecturer-dashboard', compact('type_menu', 'schedules', 'examResults', 'examScores', 'announcements'));
-}
+
+        if ($lecturer && $lecturer->ktp_scan) {
+            $completedItems++;
+        } else {
+            $isComplete = false;
+            $missingFiles[] = 'ID Card (KTP) Scan';
+        }
+
+        if ($lecturer && $lecturer->home_address) {
+            $completedItems++;
+        } else {
+            $isComplete = false;
+            $missingFiles[] = 'Home Address';
+        }
+
+        if ($lecturer && $lecturer->current_address) {
+            $completedItems++;
+        } else {
+            $isComplete = false;
+            $missingFiles[] = 'Current Address';
+        }
+
+        if ($user && $user->phone_number) {
+            $completedItems++;
+        } else {
+            $isComplete = false;
+            $missingFiles[] = 'Phone Number';
+        }
+
+        // Calculate accurate completion percentage
+        $completionPercentage = $totalItems > 0 ? round(($completedItems / $totalItems) * 100) : 0;
+
+        // Check if the score is below or equal to 70
+        $examFailed = false;
+        if ($examResults && $examResults->score <= 70) {
+            $examFailed = true;
+        }
+
+        return view('users-lecturer.lecturer-dashboard', compact(
+            'schedules',
+            'type_menu',
+            'examResults',
+            'announcements',
+            'examFailed',
+            'isComplete',
+            'missingFiles',
+            'completedItems',
+            'totalItems',
+            'completionPercentage',
+            'examScores'
+        ));
+    }
     
     /**
      * Display lecturer profile

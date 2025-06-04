@@ -128,26 +128,90 @@ class AlumniController extends Controller
 
     /**
      * Display alumni dashboard
-     * (Disamakan dengan LecturerController)
      */
     public function dashboard()
     {
         $type_menu = 'dashboard';
-        // Get schedules and exam results similar to other controllers
-        $schedules = ExamScheduleModel::paginate(10);
+        $schedules = ExamScheduleModel::join('exam_result', 'exam_schedule.shcedule_id', '=', 'exam_result.schedule_id')
+            ->where('exam_result.user_id', auth()->id())
+            ->select('exam_schedule.*')
+            ->paginate(10);
+            
         $examResults = ExamResultModel::where('user_id', auth()->id())->latest()->first();
-
-        // Ambil exam scores beserta relasi (student, staff, lecturer, alumni)
+        $announcements = AnnouncementModel::where('announcement_status', 'published')->orderBy('announcement_date', 'desc')->first();
         $examScores = ExamResultModel::with([
             'user' => function ($query) {
                 $query->with(['student', 'staff', 'lecturer', 'alumni']);
             }
         ])->get();
 
-        // Ambil announcement terbaru
-        $announcements = AnnouncementModel::orderBy('announcement_date', 'desc')->first();
+        // Enhanced profile completeness check
+        $alumni = AlumniModel::where('user_id', auth()->id())->first();
+        $user = Auth::guard('web')->user();
 
-        return view('users-alumni.alumni-dashboard', compact('type_menu', 'schedules', 'examResults', 'examScores', 'announcements'));
+        $isComplete = true;
+        $missingFiles = [];
+        $completedItems = 0;
+        $totalItems = 5; // Total required fields: photo, ktp_scan, home_address, current_address, phone_number
+
+        // Check each required field and count completed ones
+        if ($alumni && $alumni->photo) {
+            $completedItems++;
+        } else {
+            $isComplete = false;
+            $missingFiles[] = 'Profile Photo';
+        }
+
+        if ($alumni && $alumni->ktp_scan) {
+            $completedItems++;
+        } else {
+            $isComplete = false;
+            $missingFiles[] = 'ID Card (KTP) Scan';
+        }
+
+        if ($alumni && $alumni->home_address) {
+            $completedItems++;
+        } else {
+            $isComplete = false;
+            $missingFiles[] = 'Home Address';
+        }
+
+        if ($alumni && $alumni->current_address) {
+            $completedItems++;
+        } else {
+            $isComplete = false;
+            $missingFiles[] = 'Current Address';
+        }
+
+        if ($user && $user->phone_number) {
+            $completedItems++;
+        } else {
+            $isComplete = false;
+            $missingFiles[] = 'Phone Number';
+        }
+
+        // Calculate accurate completion percentage
+        $completionPercentage = $totalItems > 0 ? round(($completedItems / $totalItems) * 100) : 0;
+
+        // Check if the score is below or equal to 70
+        $examFailed = false;
+        if ($examResults && $examResults->score <= 70) {
+            $examFailed = true;
+        }
+
+        return view('users-alumni.alumni-dashboard', compact(
+            'schedules',
+            'type_menu',
+            'examResults',
+            'announcements',
+            'examFailed',
+            'isComplete',
+            'missingFiles',
+            'completedItems',
+            'totalItems',
+            'completionPercentage',
+            'examScores'
+        ));
     }
 
     /**

@@ -1,14 +1,10 @@
 <div class="main-sidebar sidebar-style-2">
     <aside id="sidebar-wrapper">
         <div class="sidebar-brand">
-            <a href="{{ url('dashboard-admin') }}">
-                <img src="{{ asset('img/simtoeic0.png') }}" alt="logo" style="height: 40px; margin: bottom 3px;">
-            </a>
+            <img src="{{ asset('img/simtoeic0.png') }}" alt="logo" style="height: 40px; margin: bottom 3px;">
         </div>
         <div class="sidebar-brand sidebar-brand-sm">
-            <a href="{{ url('dashboard-admin') }}">
-                <img src="{{ asset('img/simtoeic-1.png') }}" alt="logo" style="height: 50px; vertical-align:bottom;">
-            </a>
+            <img src="{{ asset('img/simtoeic-1.png') }}" alt="logo" style="height: 50px; vertical-align:bottom;">
         </div>
         <ul class="sidebar-menu">
             @if(Auth::check() && Auth::user()->isAdmin())

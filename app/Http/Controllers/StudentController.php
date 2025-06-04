@@ -18,13 +18,19 @@ class StudentController extends Controller
 {
     public function dashboard()
     {
+        $type_menu = 'dashboard';
         $schedules = ExamScheduleModel::join('exam_result', 'exam_schedule.shcedule_id', '=', 'exam_result.schedule_id')
             ->where('exam_result.user_id', auth()->id())
             ->select('exam_schedule.*')
             ->paginate(10);
+            
         $examResults = ExamResultModel::where('user_id', auth()->id())->latest()->first();
-        $type_menu = 'dashboard';
         $announcements = AnnouncementModel::where('announcement_status', 'published')->orderBy('announcement_date', 'desc')->first();
+        $examScores = ExamResultModel::with([
+            'user' => function ($query) {
+                $query->with(['student', 'staff', 'lecturer', 'alumni']);
+            }
+        ])->get();
 
         // Enhanced profile completeness check
         $student = StudentModel::where('user_id', auth()->id())->first();
@@ -97,7 +103,8 @@ class StudentController extends Controller
             'missingFiles',
             'completedItems',
             'totalItems',
-            'completionPercentage'
+            'completionPercentage',
+            'examScores'
         ));
     }
 

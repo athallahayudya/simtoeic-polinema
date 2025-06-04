@@ -1,4 +1,3 @@
-
 @extends('layouts.app')
 
 @section('title', 'Lecturer Dashboard')
@@ -154,7 +153,7 @@
                            <table class="table table-hover mb-0">
                               <thead class="thead-light">
                                  <tr>
-                                    <th class="px-4 py-3">#</th>
+                                    <th class="px-4 py-3">No</th>
                                     <th class="px-4 py-3">
                                        <i class="far fa-calendar mr-1 text-muted"></i> Date
                                     </th>
