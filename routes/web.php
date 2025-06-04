@@ -216,9 +216,9 @@ Route::get('/features-setting-detail', function () {
     return view('pages.features-setting-detail', ['type_menu' => 'features']);
 });
 
-// Redirect root URL to login page
+// Landing Page Route
 Route::get('/', function () {
-    return redirect()->route('auth.login');
+    return view('pages.landing-page');
 });
 
 // Authentication Routes
