@@ -92,7 +92,6 @@ class LecturerController extends Controller
                     'message' => 'Data not found.'
                 ]);
             }
-        return redirect('/manage-users/lecturer');
     }
 
     public function confirm_ajax(string $id)
@@ -118,7 +117,6 @@ class LecturerController extends Controller
                 'message' => 'Data not found.'
             ]);
         }
-        return redirect('/manage-users/lecturer');
     }
 
     public function show_ajax(string $id)

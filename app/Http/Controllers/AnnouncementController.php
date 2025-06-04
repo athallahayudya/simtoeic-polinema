@@ -59,7 +59,6 @@ class AnnouncementController extends Controller
                 'message' => 'Data not found.'
             ]);
         }
-        return redirect('announcements/');
     }
 
     public function edit(string $id)

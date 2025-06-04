@@ -114,7 +114,6 @@ class AlumniController extends Controller
                 'message' => 'Alumni data not found.'
             ]);
         }
-        return redirect('/manage-users/alumni');
     }
 
     public function show_ajax(string $id)

@@ -237,9 +237,7 @@ class StudentController extends Controller
                 'status' => false,
                 'message' => 'Data not found.'
             ]);
-
         }
-        return redirect('/manage-users/student/');
     }
 
     public function show_ajax(string $id)
