@@ -1,0 +1,17 @@
+.custom-badge {
+    padding: 5px 10px;
+    font-size: 12px;
+    line-height: 1;
+    border-radius: 12px;
+    display: inline-block;
+    text-align: center;
+    min-width: 80px; 
+}
+.badge-success {
+    background-color: #28a745;
+    color: white;
+}
+.badge-secondary {
+    background-color: #6c757d;
+    color: white;
+}

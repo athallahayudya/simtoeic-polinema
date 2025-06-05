@@ -82,7 +82,7 @@
                     searchable: false
                 },
                 {
-                    data: "user.exam_status",
+                    data: "exam_status",
                     className: "",
                     orderable: true,
                     searchable: true
@@ -140,4 +140,8 @@
         });
     });
 </script>
+@endpush
+
+@push('style')
+    <link rel="stylesheet" href="{{ asset('css/user-management.css') }}">
 @endpush

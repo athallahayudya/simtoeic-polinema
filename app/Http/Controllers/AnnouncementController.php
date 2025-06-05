@@ -21,13 +21,22 @@ class AnnouncementController extends Controller
 
         return DataTables::of($announcements)
             ->addIndexColumn()
+            ->addColumn('announcement_date', function ($announcements) {
+            return \Carbon\Carbon::parse($announcements->announcement_date)
+                ->setTimezone('Asia/Jakarta')
+                ->format('d-m-Y');
+            })
+            ->addColumn('announcement_status', function ($announcements) {
+                $badgeClass = $announcements->announcement_status == 'published' ? 'badge-success' : 'badge-secondary';
+                return '<span class="badge custom-badge ' . $badgeClass . '">' . ucfirst($announcements->announcement_status) . '</span>';
+            })
             ->addColumn('action', function ($announcements) {
                 $btn = '<button onclick="modalAction(\''.url('announcements/' . $announcements->announcement_id . '/show_ajax').'\')" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></button> ';
                 $btn .= '<button onclick="modalAction(\''.url('announcements/' . $announcements->announcement_id . '/edit').'\')" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></button> ';
                 $btn .= '<button onclick="modalAction(\''.url('announcements/' . $announcements->announcement_id . '/delete_ajax').'\')" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button> ';
                 return $btn;
             })
-            ->rawColumns(['action'])
+            ->rawColumns(['action', 'announcement_status'])
             ->make(true);
     }
     

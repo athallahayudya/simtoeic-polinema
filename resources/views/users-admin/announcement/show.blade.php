@@ -37,7 +37,7 @@
             </div>
             <div class="form-group">
                 <label>Announcement Date</label>
-                <input type="text" class="form-control" value="{{ $announcements->announcement_date }}" readonly>
+                <input type="text" class="form-control" value="{{ \Carbon\Carbon::parse($announcements->announcement_date)->setTimezone('Asia/Jakarta')->format('d-m-Y') }}" readonly>
             </div>
         </div>
         <div class="modal-footer">
