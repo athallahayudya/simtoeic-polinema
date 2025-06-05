@@ -20,9 +20,9 @@ class AuthController extends Controller
     public function showLoginForm()
     {
         if (Auth::check()) {
-            return redirect()->route('dashboard');
+            $user = Auth::user();
+            return $this->redirectBasedOnRole($user);
         }
-        // return view('pages.auth-login2', ['type_menu' => 'auth']);
         return view('pages.auth-login2', ['type_menu' => 'auth']);
     }
 
