@@ -140,3 +140,7 @@
     });
 </script>
 @endpush
+
+@push('style')
+    <link rel="stylesheet" href="{{ asset('css/announcement.css') }}">
+@endpush

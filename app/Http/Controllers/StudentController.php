@@ -150,13 +150,31 @@ class StudentController extends Controller
             ->editColumn('photo', function ($student) {
                 return $student->photo ? asset($student->photo) : '-';
             })
+            ->addColumn('exam_status', function ($student) {
+                $examStatus = $student->user ? $student->user->exam_status : '-';
+                $badgeClass = '';
+                switch (strtolower($examStatus)) {
+                    case 'success':
+                        $badgeClass = 'badge-success';
+                        break;
+                    case 'not_yet':
+                        $badgeClass = 'badge-warning';
+                        break;
+                    case 'fail':
+                        $badgeClass = 'badge-danger';
+                        break;
+                    default:
+                        $badgeClass = 'badge-secondary';
+                }
+                return '<span class="badge ' . $badgeClass . '">' . ucfirst($examStatus) . '</span>';
+            })
             ->addColumn('action', function ($student) {
                 $btn = '<button onclick="modalAction(\'' . url('/manage-users/student/' . $student->student_id . '/show_ajax') . '\')" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></button> ';
                 $btn .= '<button onclick="modalAction(\'' . url('/manage-users/student/' . $student->student_id . '/edit_ajax') . '\')" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></button> ';
                 $btn .= '<button onclick="modalAction(\'' . url('/manage-users/student/' . $student->student_id . '/delete_ajax') . '\')" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button> ';
                 return $btn;
             })
-            ->rawColumns(['action', 'ktp_scan', 'ktm_scan', 'photo'])
+            ->rawColumns(['action', 'ktp_scan', 'ktm_scan', 'photo', 'exam_status'])
             ->make(true);
     }
 
