@@ -147,6 +147,46 @@
          </div>
          @endif
 
+        <!-- Announcement -->
+         <div class="row mb-3">
+            <div class="col-12">
+               <div class="card shadow-sm border-0">
+                  <div class="card-header bg-primary text-white d-flex align-items-center">
+                     <i class="fas fa-bullhorn mr-2"></i>
+                     <strong style="font-size:16px;">Announcements</strong>
+                  </div>
+                  <div class="card-body py-3">
+                     @if ($announcements)
+                        <div class="announcement-container">
+                           <div class="d-flex justify-content-between align-items-center mb-2">
+                              <h4 class="text-primary mb-0">{{ $announcements->title }}</h4>
+                              <span class="badge badge-primary">
+                                 {{ isset($announcements->announcement_date) ? \Carbon\Carbon::parse($announcements->announcement_date)->format('d M Y') : '' }}
+                              </span>
+                           </div>
+                           <div class="announcement-content p-3 bg-light rounded">
+                              <p class="mb-0">{{ $announcements->content }}</p>
+                           </div>
+                           <div class="d-flex justify-content-end mt-2">
+                              <small class="text-muted">
+                                 <i class="fas fa-clock mr-1"></i> Posted {{ isset($announcements->announcement_date) ? \Carbon\Carbon::parse($announcements->announcement_date)->diffForHumans() : 'Unknown date' }}
+                              </small>
+                           </div>
+                        </div>
+                     @else
+                        <div class="text-center py-4">
+                           <i class="fas fa-info-circle fa-3x text-muted mb-3"></i>
+                           <h5 class="text-muted">No Announcements</h5>
+                           <p class="text-muted mb-0">
+                              There are no announcements at this time. Check back later!
+                           </p>
+                        </div>
+                     @endif
+                  </div>
+               </div>
+            </div>
+         </div>
+
          <!-- Row: Exam Schedule & Exam Scores -->
          <div class="row">
             <!-- Exam Schedule -->
