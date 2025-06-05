@@ -415,8 +415,9 @@ class UserDataTableController extends Controller
             $rules['study_program'] = 'required';
             $rules['campus'] = 'required';
         }
-
-        $validator = Validator::make($request->all(), $rules, [
+        
+        // Validate only relevant fields
+        $validator = Validator::make($request->only(array_keys($rules)), $rules, [
             'password.regex' => 'Password must include at least one letter and one number',
             'password_confirmation.same' => 'Password confirmation must match password'
         ]);

@@ -128,56 +128,53 @@
                             </div>
 
                             <!-- Student-specific fields - will be shown/hidden based on role selection -->
-                            <div id="studentFields">
-                                <h6><i class="fas fa-user-graduate mr-2"></i>Student Information</h6>
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="major">Major</label>
-                                            <select class="form-control validation-field" id="major" name="major"
-                                                data-validation="required">
-                                                <option value="">Select Major</option>
-                                                <option value="Teknik Elektro">Teknik Elektro</option>
-                                                <option value="Teknik Sipil">Teknik Sipil</option>
-                                                <option value="Teknik Mesin">Teknik Mesin</option>
-                                                <option value="Teknik Kimia">Teknik Kimia</option>
-                                                <option value="Akuntansi">Akuntansi</option>
-                                                <option value="Administrasi Niaga">Administrasi Niaga</option>
-                                                <option value="Teknologi Informasi">Teknologi Informasi</option>
-                                            </select>
-                                            <small class="form-text text-muted validation-message" id="major-validation">
-                                                <i class="fas fa-info-circle mr-1"></i> Required for students
-                                            </small>
+                            <div id="studentFieldsContainer">
+                                <div id="studentFields" style="display: none;">
+                                    <h6><i class="fas fa-user-graduate mr-2"></i>Student Information</h6>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="major">Major</label>
+                                                <select class="form-control validation-field" id="major" name="major" data-validation="required">
+                                                    <option value="">Select Major</option>
+                                                    <option value="Teknik Elektro">Teknik Elektro</option>
+                                                    <option value="Teknik Sipil">Teknik Sipil</option>
+                                                    <option value="Teknik Mesin">Teknik Mesin</option>
+                                                    <option value="Teknik Kimia">Teknik Kimia</option>
+                                                    <option value="Akuntansi">Akuntansi</option>
+                                                    <option value="Administrasi Niaga">Administrasi Niaga</option>
+                                                    <option value="Teknologi Informasi">Teknologi Informasi</option>
+                                                </select>
+                                                <small class="form-text text-muted validation-message" id="major-validation">
+                                                    <i class="fas fa-info-circle mr-1"></i> Required for students
+                                                </small>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="study_program">Study Program</label>
-                                            <select class="form-control validation-field" id="study_program"
-                                                name="study_program" data-validation="required">
-                                                <option value="">Select Study Program</option>
-                                                <!-- Options will be populated based on selected major -->
-                                            </select>
-                                            <small class="form-text text-muted validation-message"
-                                                id="study_program-validation">
-                                                <i class="fas fa-info-circle mr-1"></i> Will appear after selecting a major
-                                            </small>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="study_program">Study Program</label>
+                                                <select class="form-control validation-field" id="study_program" name="study_program" data-validation="required">
+                                                    <option value="">Select Study Program</option>
+                                                </select>
+                                                <small class="form-text text-muted validation-message" id="study_program-validation">
+                                                    <i class="fas fa-info-circle mr-1"></i> Will appear after selecting a major
+                                                </small>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="campus">Campus</label>
-                                            <select class="form-control validation-field" id="campus" name="campus"
-                                                data-validation="required">
-                                                <option value="">Select Campus</option>
-                                                <option value="malang">Malang</option>
-                                                <option value="psdku_kediri">PSDKU Kediri</option>
-                                                <option value="psdku_lumajang">PSDKU Lumajang</option>
-                                                <option value="psdku_pamekasan">PSDKU Pamekasan</option>
-                                            </select>
-                                            <small class="form-text text-muted validation-message" id="campus-validation">
-                                                <i class="fas fa-info-circle mr-1"></i> Required for students
-                                            </small>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="campus">Campus</label>
+                                                <select class="form-control validation-field" id="campus" name="campus" data-validation="required">
+                                                    <option value="">Select Campus</option>
+                                                    <option value="malang">Malang</option>
+                                                    <option value="psdku_kediri">PSDKU Kediri</option>
+                                                    <option value="psdku_lumajang">PSDKU Lumajang</option>
+                                                    <option value="psdku_pamekasan">PSDKU Pamekasan</option>
+                                                </select>
+                                                <small class="form-text text-muted validation-message" id="campus-validation">
+                                                    <i class="fas fa-info-circle mr-1"></i> Required for students
+                                                </small>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -364,15 +361,25 @@
             // Validate all fields on form submission
             $('form').off('submit').on('submit', function (e) {
                 const form = $(this);
+                const role = $('#role').val();
+
+                if (role !== 'student') {
+                    $('#studentFieldsContainer').empty();
+                }
 
                 // Mark all fields as submitted for validation
                 form.find('.validation-field').addClass('form-submitted');
 
                 // Validate all fields
                 let isValid = true;
+                let errorMessages = [];
+
                 form.find('.validation-field').each(function () {
                     if (!validateField($(this))) {
                         isValid = false;
+                        const fieldId = $(this).attr('id');
+                        const fieldLabel = $('label[for="' + fieldId + '"]').text();
+                        errorMessages.push(`${fieldLabel} is invalid.`);
                     }
                 });
 
@@ -381,7 +388,7 @@
                     Swal.fire({
                         icon: 'error',
                         title: 'Validation Error',
-                        text: 'Please check all fields and try again.'
+                        html: errorMessages.join('<br>') || 'Please check all fields and try again.'
                     });
                     return false;
                 }
@@ -455,7 +462,7 @@
                     'D-IV Manajemen Pemasaran'
                 ],
                 'Teknologi Informasi': [
-                    'D-III Teknologi Informasi',
+                    'D-IV Sistem Informasi Bisnis',
                     'D-IV Teknik Informatika'
                 ]
             };
@@ -474,6 +481,15 @@
                 $('.validation-message i')
                     .removeClass('fa-check-circle fa-times-circle')
                     .addClass('fa-info-circle');
+
+                const role = $('#role').val();
+                if (role === 'student') {
+                    $('#studentFieldsContainer').empty().append(studentFieldsTemplate.clone());
+                    $('#studentFields').show();
+                    bindStudentFieldsEvents();
+                } else {
+                    $('#studentFieldsContainer').empty();
+                }
             });
 
             // Cancel button
@@ -495,20 +511,19 @@
             });
 
             // Show/hide student fields based on role selection
+            const studentFieldsTemplate = $('#studentFields').clone();
+
             $('#role').on('change', function () {
-                const studentFields = $('#studentFields');
-                const majorField = $('#major');
-                const studyProgramField = $('#study_program');
-                const campusField = $('#campus');
+                const studentFieldsContainer = $('#studentFieldsContainer');
 
                 if ($(this).val() === 'student') {
+                    // Add studentFields back to the DOM
+                    studentFieldsContainer.empty().append(studentFieldsTemplate.clone());
+                    const studentFields = $('#studentFields');
                     studentFields.show();
-                    // Make fields required when student role is selected
-                    majorField.attr('required', '');
-                    studyProgramField.attr('required', '');
-                    campusField.attr('required', '');
 
-                    // Use a subtle animation to draw attention
+                    bindStudentFieldsEvents();
+
                     studentFields.css('opacity', '0');
                     setTimeout(() => {
                         studentFields.css({
@@ -517,39 +532,33 @@
                         });
                     }, 10);
                 } else {
-                    studentFields.hide();
-                    // Remove required attribute for non-student roles
-                    majorField.removeAttr('required');
-                    studyProgramField.removeAttr('required');
-                    campusField.removeAttr('required');
-
-                    // Clear validation states for hidden fields
-                    majorField.removeClass('is-valid is-invalid');
-                    studyProgramField.removeClass('is-valid is-invalid');
-                    campusField.removeClass('is-valid is-invalid');
+                    // Delete studentFields to DOM
+                    studentFieldsContainer.empty();
                 }
             });
 
             // Populate study program dropdown based on selected major
-            $('#major').on('change', function () {
-                const studyProgramSelect = $('#study_program');
-                const selectedMajor = $(this).val();
+            function bindStudentFieldsEvents() {
+                $('#major').off('change').on('change', function () {
+                    const studyProgramSelect = $('#study_program');
+                    const selectedMajor = $(this).val();
 
-                // Clear existing options
-                studyProgramSelect.html('<option value="">Select Study Program</option>');
+                    // Clear existing options
+                    studyProgramSelect.html('<option value="">Select Study Program</option>');
 
-                // If a major is selected, populate its study programs
-                if (selectedMajor && studyPrograms[selectedMajor]) {
-                    studyPrograms[selectedMajor].forEach(program => {
-                        studyProgramSelect.append(`<option value="${program}">${program}</option>`);
-                    });
-                }
+                    // If a major is selected, populate its study programs
+                    if (selectedMajor && studyPrograms[selectedMajor]) {
+                        studyPrograms[selectedMajor].forEach(program => {
+                            studyProgramSelect.append(`<option value="${program}">${program}</option>`);
+                        });
+                    }
 
-                // Revalidate the field if it was already validated
-                if ($(this).hasClass('is-valid') || $(this).hasClass('is-invalid')) {
-                    validateField($(this));
-                }
-            });
+                    // Revalidate the field if it was already validated
+                    if ($(this).hasClass('is-valid') || $(this).hasClass('is-invalid')) {
+                        validateField($(this));
+                    }
+                });
+            }
 
             // Event handler for form submissions in modal
             $(document).on('submit', '#form-edit, #form-delete', function (e) {
