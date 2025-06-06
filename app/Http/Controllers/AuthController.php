@@ -20,9 +20,9 @@ class AuthController extends Controller
     public function showLoginForm()
     {
         if (Auth::check()) {
-            return redirect()->route('dashboard');
+            $user = Auth::user();
+            return $this->redirectBasedOnRole($user);
         }
-        // return view('pages.auth-login2', ['type_menu' => 'auth']);
         return view('pages.auth-login2', ['type_menu' => 'auth']);
     }
 
@@ -99,63 +99,5 @@ class AuthController extends Controller
 
         // Change this line
         return redirect()->route('auth.login');
-    }
-
-    public function register(Request $request)
-    {
-        // dd($request->all());
-        $request->validate([
-            'name' => 'required|string|max:100',
-            'role' => 'required|in:student,lecturer,staff,alumni,admin',
-            'identity_number' => 'required|string|max:50',
-            'password' => 'required|string|min:8|confirmed',
-            'study_program' => 'required_if:role,student|string|nullable',
-            'major' => 'required_if:role,student|string|nullable',
-            'campus' => 'required_if:role,student|string|nullable',
-        ]);
-
-        $user = UserModel::create([
-            'role' => $request->role,
-            'identity_number' => $request->identity_number,
-            'password' => Hash::make($request->password),
-        ]);
-
-        // Save the name to the corresponding role table
-        if ($request->role === 'student') {
-            StudentModel::create([
-                'user_id' => $user->user_id,
-                'name' => $request->name,
-                'nim' => $request->identity_number,
-                'study_program' => $request->study_program,
-                'major' => $request->major,          
-                'campus' => $request->campus
-            ]);
-        } elseif ($request->role === 'lecturer') {
-            LecturerModel::create([
-                'user_id' => $user->user_id,
-                'name' => $request->name,
-                'nidn' => $request->identity_number,
-            ]);
-        } elseif ($request->role === 'staff') {
-            StaffModel::create([
-                'user_id' => $user->user_id,
-                'name' => $request->name,
-                'nip' => $request->identity_number,
-            ]);
-        } elseif ($request->role === 'alumni') {
-            AlumniModel::create([
-                'user_id' => $user->user_id,
-                'name' => $request->name,
-                'nik' => $request->identity_number,
-            ]);
-        } elseif ($request->role === 'admin') {
-            AdminModel::create([
-                'user_id' => $user->user_id,
-                'name' => $request->name,
-                'nidn' => $request->identity_number,
-            ]);
-        }
-
-        return redirect('/registration')->with('success', 'Registration successful');
     }
 }
