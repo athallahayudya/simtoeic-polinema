@@ -69,8 +69,8 @@
         }
 
         .btn-itc:hover {
-            background-color: #2c88d9;
-            color: white;
+            background-color: #5cb3f0 !important; /* Lighter blue background on hover, forced */
+            color: white; /* Keep text white */
         }
 
         .score-badge {

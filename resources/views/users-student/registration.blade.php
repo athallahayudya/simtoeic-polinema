@@ -253,37 +253,30 @@
                                     </div>
 
                                     <div class="text-center mt-3">
-                                        <div class="text-center mt-3">
-                                            @if(isset($isRegistered) && $isRegistered)
-                                                <!-- Check for profile completeness -->
-                                                @php
-                                                    $isProfileComplete = true;
-                                                    if (!isset($student) || !$student->photo || !$student->ktp_scan || !$student->home_address) {
-                                                        $isProfileComplete = false;
-                                                    }
-                                                @endphp
-
-                                                @if($isProfileComplete)
-                                                    <!-- Show registration button only if profile is complete -->
-                                                    <form action="{{ route('student.register.exam') }}" method="POST">
-                                                        @csrf
-                                                        <button type="submit" class="btn btn-primary btn-lg btn-register">
-                                                            <i class="fas fa-clipboard-list mr-2"></i> Register for Exam
-                                                        </button>
-                                                    </form>
-                                                @else
-                                                    <!-- Show profile completion notice instead of registration button -->
-                                                    <div class="alert alert-warning">
-                                                        <i class="fas fa-exclamation-triangle mr-2"></i>
-                                                        <strong>Profile Incomplete!</strong> Please complete your profile before
-                                                        registering for the exam.
-                                                    </div>
-                                                    <a href="{{ route('student.profile') }}" class="btn btn-warning btn-lg">
-                                                        <i class="fas fa-user-edit mr-2"></i> Complete Your Profile
-                                                    </a>
-                                                @endif
+                                    <div class="text-center mt-3">
+                                        @if($isProfileComplete)
+                                            @if(!$isRegistered)
+                                                <!-- Show registration button only if profile is complete and not already registered -->
+                                                <form action="{{ route('student.register.exam') }}" method="POST">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-primary btn-lg btn-register">
+                                                        <i class="fas fa-clipboard-list mr-2"></i> Register for Exam
+                                                    </button>
+                                                </form>
+                                            @else
+                                                <!-- Show message if already registered -->
+                                                <div class="alert alert-info">
+                                                    <i class="fas fa-info-circle mr-2"></i>
+                                                    You are already registered for an upcoming exam.
+                                                </div>
                                             @endif
-                                        </div>
+                                        @else
+                                            <!-- Show profile completion notice if profile is incomplete -->
+                                            <a href="{{ route('student.profile') }}" class="btn btn-warning btn-lg">
+                                                <i class="fas fa-user-edit mr-2"></i> Complete Your Profile
+                                            </a>
+                                        @endif
+                                    </div>
                                     </div>
                                 </div>
 
