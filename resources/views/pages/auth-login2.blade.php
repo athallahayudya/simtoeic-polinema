@@ -72,25 +72,6 @@
                                 </div>
                             </div>
 
-                            <div class="form-group">
-                                <label for="role">Select Role</label>
-                                <select class="form-control @error('role') is-invalid @enderror" id="role" name="role"
-                                    tabindex="3" required>
-                                    <option value="" disabled selected>-- Select Your Role --</option>
-                                    <option value="student" {{ old('role') == 'student' ? 'selected' : '' }}>Student
-                                    </option>
-                                    <option value="lecturer" {{ old('role') == 'lecturer' ? 'selected' : '' }}>Lecturer
-                                    </option>
-                                    <option value="staff" {{ old('role') == 'staff' ? 'selected' : '' }}>Staff</option>
-                                    <option value="alumni" {{ old('role') == 'alumni' ? 'selected' : '' }}>Alumni</option>
-                                    <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
-                                </select>
-                                @error('role')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                                @else
-                                <div class="invalid-feedback">Please select your role</div>
-                                @enderror
-                            </div>
 
                             <div class="form-group">
                                 <div class="custom-control custom-checkbox">

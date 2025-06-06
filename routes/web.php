@@ -228,10 +228,28 @@ Route::prefix('auth')->name('auth.')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
 
-// Admin dashboard route
-Route::get('/dashboard-admin', function () {
-    return view('pages.dashboard-admin', ['type_menu' => 'dashboard']);
-})->name('admin.dashboard');
+// Dashboard routes for each role (protected with auth middleware)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard-admin', function () {
+        return view('pages.dashboard-admin', ['type_menu' => 'dashboard']);
+    })->name('admin.dashboard');
+
+    Route::get('/dashboard-lecturer', function () {
+        return view('pages.dashboard-lecturer', ['type_menu' => 'dashboard']);
+    })->name('lecturer.dashboard');
+
+    Route::get('/dashboard-student', function () {
+        return view('pages.dashboard-student', ['type_menu' => 'dashboard']);
+    })->name('student.dashboard');
+
+    Route::get('/dashboard-staff', function () {
+        return view('pages.dashboard-staff', ['type_menu' => 'dashboard']);
+    })->name('staff.dashboard');
+
+    Route::get('/dashboard-alumni', function () {
+        return view('pages.dashboard-alumni', ['type_menu' => 'dashboard']);
+    })->name('alumni.dashboard');
+});
 
 // Admin Notices Announcements route
 Route::group(['prefix' => 'announcements'], function () {

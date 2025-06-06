@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\UserModel;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -34,37 +35,68 @@ class AuthController extends Controller
         $credentials = $request->validate([
             'identity_number' => 'required',
             'password' => 'required',
-            'role' => 'required|in:student,lecturer,staff,alumni,admin',
         ]);
 
-        // Check if the user exists
+        // Coba login langsung dengan UserModel terlebih dahulu
         $user = UserModel::where('identity_number', $credentials['identity_number'])->first();
+        
+        if ($user && Hash::check($credentials['password'], $user->password)) {
+            Auth::login($user);
+            return $this->redirectBasedOnRole($user);
+        }
+        
+        // Jika tidak berhasil, coba dengan model spesifik
+        $identityColumns = [
+            'admin' => 'nidn',
+            'lecturer' => 'nidn',
+            'student' => 'nim',
+            'staff' => 'nip',
+            'alumni' => 'nik',
+        ];
+        
+        $models = [
+            'admin' => AdminModel::class,
+            'lecturer' => LecturerModel::class,
+            'student' => StudentModel::class,
+            'staff' => StaffModel::class,
+            'alumni' => AlumniModel::class,
+        ];
 
-        if (!$user) {
-            return back()->withErrors([
-                'identity_number' => 'No user found with this identity number.',
-            ])->withInput($request->except('password'));
+        // For debugging
+        $attempts = [];
+
+        foreach ($models as $role => $model) {
+            $identityColumn = $identityColumns[$role];
+            try {
+                $foundUser = $model::where($identityColumn, $credentials['identity_number'])->first();
+                
+                $attempts[$role] = [
+                    'column' => $identityColumn,
+                    'value' => $credentials['identity_number'],
+                    'found' => $foundUser ? true : false
+                ];
+                
+                if ($foundUser) {
+                    $userRecord = $foundUser->user;
+                    $attempts[$role]['user_record_found'] = $userRecord ? true : false;
+                    
+                    if ($userRecord && Hash::check($credentials['password'], $userRecord->password)) {
+                        Auth::login($userRecord);
+                        return $this->redirectBasedOnRole($userRecord);
+                    }
+                }
+            } catch (\Exception $e) {
+                $attempts[$role] = ['error' => $e->getMessage()];
+                continue;
+            }
         }
 
-        // // Check if the password is correct
-        if (!Hash::check($credentials['password'], $user->password)) {
-            return back()->withErrors([
-                'password' => 'The password is incorrect.',
-            ])->withInput($request->except('password'));
-        }
-
-        // Check if the role matches
-        if ($user->role !== $credentials['role']) {
-            return back()->withErrors([
-                'role' => "The selected role '{$credentials['role']}' does not match the user's role '{$user->role}'.",
-            ])->withInput($request->except('password'));
-        }
-
-        // If all checks pass, log the user in
-        Auth::login($user);
-
-        // Redirect based on role
-        return $this->redirectBasedOnRole($user);
+        // Log debug info
+        Log::debug('Login attempts:', $attempts);
+        
+        return back()->withErrors([
+            'identity_number' => 'Invalid credentials. Please check your identity number and password.',
+        ])->withInput($request->except('password'));
     }
 
     /**
@@ -72,15 +104,36 @@ class AuthController extends Controller
      */
     private function redirectBasedOnRole($user)
     {
-        if ($user->isAdmin()) {
+        // Check if user has role property
+        if (isset($user->role)) {
+            $role = $user->role;
+        } else {
+            // Try to determine role from relationships
+            if ($user->admin) {
+                $role = 'admin';
+            } elseif ($user->lecturer) {
+                $role = 'lecturer';
+            } elseif ($user->student) {
+                $role = 'student';
+            } elseif ($user->staff) {
+                $role = 'staff';
+            } elseif ($user->alumni) {
+                $role = 'alumni';
+            } else {
+                $role = null;
+            }
+        }
+        
+        // Redirect based on role
+        if ($role === 'admin') {
             return redirect('/dashboard-admin');
-        } elseif ($user->isLecturer()) {
+        } elseif ($role === 'lecturer') {
             return redirect()->route('lecturer.dashboard');
-        } elseif ($user->isStudent()) {
+        } elseif ($role === 'student') {
             return redirect()->route('student.dashboard');
-        } elseif ($user->isStaff()) {
+        } elseif ($role === 'staff') {
             return redirect()->route('staff.dashboard');
-        } elseif ($user->isAlumni()) {
+        } elseif ($role === 'alumni') {
             return redirect()->route('alumni.dashboard');
         }
 

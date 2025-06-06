@@ -27,7 +27,7 @@ class LecturerSeeder extends Seeder
                 'phone_number' => '081234567001',
             ]
         );
-        
+
         LecturerModel::firstOrCreate(
             ['user_id' => $user1->user_id],
             [
