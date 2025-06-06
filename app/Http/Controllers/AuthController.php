@@ -37,11 +37,13 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
+        $remember = $request->boolean('remember');
+
         // Coba login langsung dengan UserModel terlebih dahulu
         $user = UserModel::where('identity_number', $credentials['identity_number'])->first();
         
         if ($user && Hash::check($credentials['password'], $user->password)) {
-            Auth::login($user);
+            Auth::login($user, $remember);
             return $this->redirectBasedOnRole($user);
         }
         
@@ -81,7 +83,7 @@ class AuthController extends Controller
                     $attempts[$role]['user_record_found'] = $userRecord ? true : false;
                     
                     if ($userRecord && Hash::check($credentials['password'], $userRecord->password)) {
-                        Auth::login($userRecord);
+                        Auth::login($userRecord, $remember);
                         return $this->redirectBasedOnRole($userRecord);
                     }
                 }
