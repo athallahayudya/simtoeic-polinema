@@ -9,6 +9,12 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Foundation\Auth\User as Authenticatable; //implement auth
 use App\Models\StudentModel;
+use App\Models\LecturerModel;
+use App\Models\StaffModel;
+use App\Models\AlumniModel;
+use App\Models\ExamResultModel;
+use App\Models\ExamRegistrationModel;
+use App\Models\AdminModel;
 
 class UserModel extends Authenticatable
 {
@@ -113,5 +119,44 @@ class UserModel extends Authenticatable
     public function alumni()
     {
         return $this->hasOne(AlumniModel::class, 'user_id', 'user_id');
+    }
+
+    public function admin()
+    {
+        return $this->hasOne(AdminModel::class, 'user_id', 'user_id');
+    }
+
+    public function examResults()
+    {
+        return $this->hasMany(ExamResultModel::class, 'user_id', 'user_id');
+    }
+
+    public function examRegistrations()
+    {
+        return $this->hasMany(ExamRegistrationModel::class, 'user_id', 'user_id');
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($user) {
+            // Delete related profile based on role
+            if ($user->isStudent() && $user->student) {
+                $user->student->delete();
+            } elseif ($user->isLecturer() && $user->lecturer) {
+                $user->lecturer->delete();
+            } elseif ($user->isStaff() && $user->staff) {
+                $user->staff->delete();
+            } elseif ($user->isAlumni() && $user->alumni) {
+                $user->alumni->delete();
+            } elseif ($user->isAdmin() && $user->admin) { // Add this block for admin
+                $user->admin->delete();
+            }
+
+            // Delete related exam results and registrations
+            $user->examResults()->delete();
+            $user->examRegistrations()->delete();
+        });
     }
 }

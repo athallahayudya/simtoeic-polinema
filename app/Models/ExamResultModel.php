@@ -23,7 +23,7 @@ class ExamResultModel extends Model
     
     public function schedule()
     {
-        return $this->belongsTo(ExamScheduleModel::class, 'schedule_id', 'shcedule_id');
+        return $this->belongsTo(ExamScheduleModel::class, 'schedule_id', 'schedule_id');
     }
     
     // Get user's NIM through the relationship

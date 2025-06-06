@@ -246,18 +246,7 @@ class UserDataTableController extends Controller
         try {
             $user = UserModel::findOrFail($id);
 
-            // Delete related profile data based on role
-            if ($user->role === 'student') {
-                StudentModel::where('user_id', $id)->delete();
-            } elseif ($user->role === 'lecturer') {
-                LecturerModel::where('user_id', $id)->delete();
-            } elseif ($user->role === 'staff') {
-                StaffModel::where('user_id', $id)->delete();
-            } elseif ($user->role === 'alumni') {
-                AlumniModel::where('user_id', $id)->delete();
-            }
-
-            $user->delete();
+            $user->delete(); // This will trigger the deleting event in UserModel
 
             return response()->json([
                 'status' => true,

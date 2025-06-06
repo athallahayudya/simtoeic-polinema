@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('exam_schedule', function (Blueprint $table) {
-            $table->id('shcedule_id');
+            $table->id('schedule_id');
             $table->date('exam_date');
             $table->time('exam_time');
             $table->string('itc_link');

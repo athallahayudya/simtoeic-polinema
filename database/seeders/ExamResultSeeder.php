@@ -17,7 +17,7 @@ class ExamResultSeeder extends Seeder
     public function run()
     {
         // Get all schedule IDs
-        $scheduleIds = ExamScheduleModel::pluck('shcedule_id')->toArray();
+        $scheduleIds = ExamScheduleModel::pluck('schedule_id')->toArray();
         if (empty($scheduleIds)) {
             $this->command->info('No exam schedules found. Please run ExamScheduleSeeder first.');
             return;

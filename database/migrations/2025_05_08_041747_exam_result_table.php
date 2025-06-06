@@ -22,8 +22,8 @@ return new class extends Migration
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
 
-            $table->foreign('schedule_id')->references('shcedule_id')->on('exam_schedule');
-            $table->foreign('user_id')->references('user_id')->on('users');
+            $table->foreign('schedule_id')->references('schedule_id')->on('exam_schedule')->onDelete('cascade');
+            $table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
         });
     }
 
