@@ -15,7 +15,29 @@
     <ul class="navbar-nav navbar-right">
         <li class="dropdown"><a href="#" data-toggle="dropdown"
                 class="nav-link dropdown-toggle nav-link-lg nav-link-user">
-                <img alt="image" src="{{ asset('img/avatar/avatar-1.png') }}" class="rounded-circle mr-1">
+                <img alt="image" src="
+                    @if(Auth::check())
+                        @php
+                            $profilePicture = null;
+                            if (Auth::user()->role === 'student' && Auth::user()->student && Auth::user()->student->photo) {
+                                $profilePicture = Auth::user()->student->photo;
+                            } elseif (Auth::user()->role === 'lecturer' && Auth::user()->lecturer && Auth::user()->lecturer->photo) {
+                                $profilePicture = Auth::user()->lecturer->photo;
+                            } elseif (Auth::user()->role === 'staff' && Auth::user()->staff && Auth::user()->staff->photo) {
+                                $profilePicture = Auth::user()->staff->photo;
+                            } elseif (Auth::user()->role === 'alumni' && Auth::user()->alumni && Auth::user()->alumni->photo) {
+                                $profilePicture = Auth::user()->alumni->photo;
+                            }
+                            // Remove 'storage/' prefix if it exists, as asset('storage/') will add it
+                            if ($profilePicture && str_starts_with($profilePicture, 'storage/')) {
+                                $profilePicture = substr($profilePicture, 8);
+                            }
+                        @endphp
+                        {{ $profilePicture ? asset('storage/' . $profilePicture) : asset('img/avatar/avatar-1.png') }}
+                    @else
+                        {{ asset('img/avatar/avatar-1.png') }}
+                    @endif
+                " class="rounded-circle mr-1" style="width: 30px; height: 30px; object-fit: cover;">
                 <div class="d-sm-none d-lg-inline-block">
                     Hi, 
                     @if(Auth::check())

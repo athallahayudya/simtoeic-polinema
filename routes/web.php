@@ -379,7 +379,7 @@ Route::group(['prefix' => 'staff'], function (){
 Route::group(['prefix' => 'alumni'], function (){
     Route::get('/dashboard', [AlumniController::class, 'dashboard'])->name('alumni.dashboard');
     Route::get('/profile', [AlumniController::class, 'profile'])->name('alumni.profile');
-    Route::post('/profile/update', [AlumniController::class, 'updateProfile'])->name('alumni.profle.update');
+    Route::post('/profile/update', [AlumniController::class, 'updateProfile'])->name('alumni.profile.update');
     Route::get('/registration', [AlumniController::class, 'showRegistrationForm'])->name('alumni.registration.form');
 });
 
