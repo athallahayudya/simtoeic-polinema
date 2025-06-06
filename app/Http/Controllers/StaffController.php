@@ -131,7 +131,6 @@ class StaffController extends Controller
                 'message' => 'Data not found.'
             ]);
         }
-        return redirect('/manage-users/staff/');
     }
 
     public function show_ajax(string $id)
@@ -144,7 +143,7 @@ class StaffController extends Controller
     public function dashboard()
     {
         $type_menu = 'dashboard';
-        $schedules = ExamScheduleModel::join('exam_result', 'exam_schedule.shcedule_id', '=', 'exam_result.schedule_id')
+        $schedules = ExamScheduleModel::join('exam_result', 'exam_schedule.schedule_id', '=', 'exam_result.schedule_id')
             ->where('exam_result.user_id', auth()->id())
             ->select('exam_schedule.*')
             ->paginate(10);
