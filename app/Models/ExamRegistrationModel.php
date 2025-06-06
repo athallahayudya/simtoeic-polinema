@@ -37,6 +37,6 @@ class ExamRegistrationModel extends Model
     public function schedule()
     {
         // Fix the column name to match your migration (shcedule_id)
-        return $this->belongsTo(ExamScheduleModel::class, 'schedule_id', 'shcedule_id');
+        return $this->belongsTo(ExamScheduleModel::class, 'schedule_id', 'schedule_id');
     }
 }
