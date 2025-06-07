@@ -29,13 +29,15 @@
                     #
                 @endif
             @else
-                        #
-                    @endif" class="nav-link nav-link-lg nav-link-user">
+                #
+            @endif" class="nav-link nav-link-lg nav-link-user">
                 <img alt="image" src="
                     @if(Auth::check())
                         @php
                             $profilePicture = null;
-                            if (Auth::user()->role === 'student' && Auth::user()->student && Auth::user()->student->photo) {
+                            if (Auth::user()->role === 'admin' && Auth::user()->admin && Auth::user()->admin->photo) {
+                                $profilePicture = Auth::user()->admin->photo;
+                            } elseif (Auth::user()->role === 'student' && Auth::user()->student && Auth::user()->student->photo) {
                                 $profilePicture = Auth::user()->student->photo;
                             } elseif (Auth::user()->role === 'lecturer' && Auth::user()->lecturer && Auth::user()->lecturer->photo) {
                                 $profilePicture = Auth::user()->lecturer->photo;
@@ -44,12 +46,14 @@
                             } elseif (Auth::user()->role === 'alumni' && Auth::user()->alumni && Auth::user()->alumni->photo) {
                                 $profilePicture = Auth::user()->alumni->photo;
                             }
-                            // Remove 'storage/' prefix if it exists, as asset('storage/') will add it
-                            if ($profilePicture && str_starts_with($profilePicture, 'storage/')) {
-                                $profilePicture = substr($profilePicture, 8);
+                            // Handle different photo path formats
+                            if ($profilePicture && !str_contains($profilePicture, 'img/avatar/')) {
+                                if (!str_starts_with($profilePicture, 'storage/')) {
+                                    $profilePicture = 'storage/' . $profilePicture;
+                                }
                             }
                         @endphp
-                        {{ $profilePicture ? asset('storage/' . $profilePicture) : asset('img/avatar/avatar-1.png') }}
+                        {{ $profilePicture ? asset($profilePicture) : asset('img/avatar/avatar-1.png') }}
                     @else
                         {{ asset('img/avatar/avatar-1.png') }}
                     @endif

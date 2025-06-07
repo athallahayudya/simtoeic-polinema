@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\AdminModel;
 use Illuminate\Support\Facades\Storage;
 use App\Models\UserModel;
+use Illuminate\Support\Facades\Log;
 
 class AdminProfileController extends Controller
 {
@@ -34,7 +35,10 @@ class AdminProfileController extends Controller
             $admin->save();
         }
 
-        return view('users-admin.profile.profile', compact('admin', 'user'));
+        // Check if admin has uploaded a custom photo
+        $hasCustomPhoto = $admin->photo && !str_contains($admin->photo, 'img/avatar/');
+
+        return view('users-admin.profile.profile', compact('admin', 'user', 'hasCustomPhoto'));
     }
 
     public function update(Request $request)
@@ -69,22 +73,87 @@ class AdminProfileController extends Controller
 
         // Handle photo upload
         if ($request->hasFile('photo')) {
+            // Check if admin already has a custom photo (one-time upload rule)
+            $hasCustomPhoto = $admin->photo && !str_contains($admin->photo, 'img/avatar/');
+
+            if ($hasCustomPhoto) {
+                return redirect()->route('admin.profile')->with('error', 'You can only upload a profile photo once. Your current photo is already set.');
+            }
+
+            $file = $request->file('photo');
+
+            // Debug: Log file information
+            Log::info('Admin photo upload attempt', [
+                'file_name' => $file->getClientOriginalName(),
+                'file_size' => $file->getSize(),
+                'file_mime' => $file->getMimeType(),
+                'admin_id' => $admin->admin_id
+            ]);
+
             // Delete old photo if it exists and it's not the default photo
-            if (
-                $admin->photo &&
-                !str_contains($admin->photo, 'img/avatar/') &&
-                Storage::disk('public')->exists(str_replace('storage/', '', $admin->photo))
-            ) {
-                Storage::disk('public')->delete(str_replace('storage/', '', $admin->photo));
+            if ($admin->photo && !str_contains($admin->photo, 'img/avatar/')) {
+                $oldPhotoPath = str_replace('storage/', '', $admin->photo);
+                if (Storage::disk('public')->exists($oldPhotoPath)) {
+                    Storage::disk('public')->delete($oldPhotoPath);
+                    Log::info('Deleted old admin photo: ' . $oldPhotoPath);
+                }
             }
 
             // Store new photo
-            $path = $request->file('photo')->store('admin/photos', 'public');
-            $admin->photo = 'storage/' . $path;
+            try {
+                // Create directory if it doesn't exist
+                $uploadPath = 'admin/photos';
+                if (!Storage::disk('public')->exists($uploadPath)) {
+                    Storage::disk('public')->makeDirectory($uploadPath);
+                }
+
+                $path = $file->store($uploadPath, 'public');
+                $admin->photo = $path; // Remove 'storage/' prefix for now
+
+                Log::info('Admin photo uploaded successfully', [
+                    'path' => $path,
+                    'full_path' => $admin->photo,
+                    'admin_id' => $admin->admin_id
+                ]);
+
+                // Sync file to public/storage
+                $this->syncStorageFile($path);
+            } catch (\Exception $e) {
+                Log::error('Failed to upload admin photo: ' . $e->getMessage());
+                return redirect()->route('admin.profile')->with('error', 'Failed to upload photo: ' . $e->getMessage());
+            }
         }
 
         $admin->save();
 
         return redirect()->route('admin.profile')->with('success', 'Profile updated successfully!');
+    }
+
+    /**
+     * Sync uploaded file from storage/app/public to public/storage
+     */
+    private function syncStorageFile($filePath)
+    {
+        try {
+            $sourcePath = storage_path('app/public/' . $filePath);
+            $targetPath = public_path('storage/' . $filePath);
+
+            // Create target directory if it doesn't exist
+            $targetDir = dirname($targetPath);
+            if (!is_dir($targetDir)) {
+                mkdir($targetDir, 0755, true);
+            }
+
+            // Copy file
+            if (file_exists($sourcePath)) {
+                copy($sourcePath, $targetPath);
+                Log::info('File synced successfully', [
+                    'source' => $sourcePath,
+                    'target' => $targetPath
+                ]);
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to sync storage file: ' . $e->getMessage());
+        }
     }
 }

@@ -12,8 +12,9 @@ use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
-class UserDataTableController extends Controller
+class UserDataTableController extends Controller 
 {
     /**
      * Display the registration index page.
@@ -409,7 +410,7 @@ class UserDataTableController extends Controller
             Log::info("Preserving main admin user ID: {$mainAdminUserId}");
 
             // Use database transaction for safety
-            \DB::transaction(function () use ($currentUserId, $mainAdminUserId) {
+            DB::transaction(function () use ($currentUserId, $mainAdminUserId) {
                 // Build query to exclude both current user and main admin
                 $excludeUserIds = array_filter([$currentUserId, $mainAdminUserId]);
 
