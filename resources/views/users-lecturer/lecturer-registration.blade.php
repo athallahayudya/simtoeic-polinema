@@ -63,14 +63,20 @@
         }
 
         .btn-itc {
-            background-color: #3d9cec;
-            color: white;
-            border: none;
+            background-color: #3d9cec !important;
+            color: white !important;
+            border: none !important;
+            text-decoration: none !important;
         }
 
-        .btn-itc:hover {
-            background-color: #2c88d9;
-            color: white;
+        .btn-itc:hover,
+        .btn-itc:focus,
+        .btn-itc:active {
+            background-color: #2c88d9 !important;
+            color: white !important;
+            text-decoration: none !important;
+            border: none !important;
+            box-shadow: 0 4px 8px rgba(60, 156, 236, 0.3) !important;
         }
 
         .score-badge {
@@ -153,7 +159,7 @@
                                     <div>
                                         <h5 class="mb-0">{{ $lecturer->name ?? 'User' }}</h5>
                                     </div>
-                                </div>  
+                                </div>
                                 <div class="info-item d-flex justify-content-between">
                                     <span>Exam Status</span>
                                     <span class="font-weight-bold">
@@ -172,7 +178,8 @@
                                 @if(isset($examResults))
                                     <div class="mt-3 text-center">
                                         <div class="score-badge {{ $examResults->score < 500 ? 'score-low' : 'score-high' }}">
-                                            <i class="fas {{ $examResults->score < 500 ? 'fa-times-circle' : 'fa-check-circle' }} mr-1"></i>
+                                            <i
+                                                class="fas {{ $examResults->score < 500 ? 'fa-times-circle' : 'fa-check-circle' }} mr-1"></i>
                                             Score: {{ $examResults->score }}
                                         </div>
                                     </div>
@@ -190,98 +197,98 @@
 
                     <!-- Registration -->
                     <div class="col-12 col-lg-8 col-md-6">
-                                <!-- Paid Exam Registration Card -->
-                                <div class="card status-card card-paid">
-                                    <div class="status-header d-flex align-items-center">
-                                        <div class="status-icon icon-paid">
-                                            <i class="fas fa-file-invoice-dollar"></i>
-                                        </div>
+                        <!-- Paid Exam Registration Card -->
+                        <div class="card status-card card-paid">
+                            <div class="status-header d-flex align-items-center">
+                                <div class="status-icon icon-paid">
+                                    <i class="fas fa-file-invoice-dollar"></i>
+                                </div>
+                                <div>
+                                    <h4>Paid Exam Registration</h4>
+                                    <p class="mb-0">
+                                        You need to register for a paid examination
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="exam-info">
+                                    <h6><i class="fas fa-info-circle mr-2"></i>Exam Information:</h6>
+                                    <div class="info-item d-flex justify-content-between">
+                                        <span>Status</span>
+                                        <span class="badge badge-danger">PAID</span>
+                                    </div>
+                                    <div class="info-item d-flex justify-content-between">
+                                        <span>Provider</span>
+                                        <span>ITC Indonesia</span>
+                                    </div>
+                                    <div class="info-item d-flex justify-content-between">
+                                        <span>Cost</span>
+                                        <span>Based on Selected Package</span>
+                                    </div>
+                                    <div class="info-item d-flex justify-content-between">
+                                        <span>Payment Methods</span>
+                                        <span>Credit Card, Bank Transfer</span>
+                                    </div>
+                                </div>
+
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-exclamation-triangle mr-1"></i>
+                                    You will be redirected to ITC Indonesia's website to complete your registration.
+                                </div>
+
+                                <div class="text-center mt-3">
+                                    <a href="https://itc-indonesia.com/" target="_blank"
+                                        class="btn btn-itc btn-lg btn-register">
+                                        <i class="fas fa-external-link-alt mr-2"></i> Register at ITC Indonesia
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Exam Guidelines -->
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                <h4><i class="fas fa-clipboard-check mr-2"></i>Exam Guidelines</h4>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group">
+                                    <li class="list-group-item d-flex align-items-center">
+                                        <i class="fas fa-check-circle text-success mr-3"></i>
                                         <div>
-                                            <h4>Paid Exam Registration</h4>
-                                            <p class="mb-0">
-                                                You need to register for a paid examination
+                                            <strong>Be prepared</strong>
+                                            <p class="mb-0 text-muted">Arrive at least 30 minutes before the exam starts
                                             </p>
                                         </div>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="exam-info">
-                                            <h6><i class="fas fa-info-circle mr-2"></i>Exam Information:</h6>
-                                            <div class="info-item d-flex justify-content-between">
-                                                <span>Status</span>
-                                                <span class="badge badge-danger">PAID</span>
-                                            </div>
-                                            <div class="info-item d-flex justify-content-between">
-                                                <span>Provider</span>
-                                                <span>ITC Indonesia</span>
-                                            </div>
-                                            <div class="info-item d-flex justify-content-between">
-                                                <span>Cost</span>
-                                                <span>Based on Selected Package</span>
-                                            </div>
-                                            <div class="info-item d-flex justify-content-between">
-                                                <span>Payment Methods</span>
-                                                <span>Credit Card, Bank Transfer</span>
-                                            </div>
+                                    </li>
+                                    <li class="list-group-item d-flex align-items-center">
+                                        <i class="fas fa-check-circle text-success mr-3"></i>
+                                        <div>
+                                            <strong>Bring necessary documents</strong>
+                                            <p class="mb-0 text-muted">Lecturer ID card and registration confirmation</p>
                                         </div>
-
-                                        <div class="alert alert-warning">
-                                            <i class="fas fa-exclamation-triangle mr-1"></i>
-                                            You will be redirected to ITC Indonesia's website to complete your registration.
+                                    </li>
+                                    <li class="list-group-item d-flex align-items-center">
+                                        <i class="fas fa-check-circle text-success mr-3"></i>
+                                        <div>
+                                            <strong>Follow dress code</strong>
+                                            <p class="mb-0 text-muted">Formal or semi-formal attire is required</p>
                                         </div>
-
-                                        <div class="text-center mt-3">
-                                            <a href="https://itc-indonesia.com/" target="_blank"
-                                                class="btn btn-itc btn-lg btn-register">
-                                                <i class="fas fa-external-link-alt mr-2"></i> Register at ITC Indonesia
-                                            </a>
+                                    </li>
+                                    <li class="list-group-item d-flex align-items-center">
+                                        <i class="fas fa-check-circle text-success mr-3"></i>
+                                        <div>
+                                            <strong>No electronic devices</strong>
+                                            <p class="mb-0 text-muted">Mobile phones and electronic devices are not
+                                                allowed
+                                                during the exam</p>
                                         </div>
-                                    </div>
-                                </div>
-
-                            <!-- Exam Guidelines -->
-                            <div class="card mt-4">
-                                <div class="card-header">
-                                    <h4><i class="fas fa-clipboard-check mr-2"></i>Exam Guidelines</h4>
-                                </div>
-                                <div class="card-body">
-                                    <ul class="list-group">
-                                        <li class="list-group-item d-flex align-items-center">
-                                            <i class="fas fa-check-circle text-success mr-3"></i>
-                                            <div>
-                                                <strong>Be prepared</strong>
-                                                <p class="mb-0 text-muted">Arrive at least 30 minutes before the exam starts
-                                                </p>
-                                            </div>
-                                        </li>
-                                        <li class="list-group-item d-flex align-items-center">
-                                            <i class="fas fa-check-circle text-success mr-3"></i>
-                                            <div>
-                                                <strong>Bring necessary documents</strong>
-                                                <p class="mb-0 text-muted">Lecturer ID card and registration confirmation</p>
-                                            </div>
-                                        </li>
-                                        <li class="list-group-item d-flex align-items-center">
-                                            <i class="fas fa-check-circle text-success mr-3"></i>
-                                            <div>
-                                                <strong>Follow dress code</strong>
-                                                <p class="mb-0 text-muted">Formal or semi-formal attire is required</p>
-                                            </div>
-                                        </li>
-                                        <li class="list-group-item d-flex align-items-center">
-                                            <i class="fas fa-check-circle text-success mr-3"></i>
-                                            <div>
-                                                <strong>No electronic devices</strong>
-                                                <p class="mb-0 text-muted">Mobile phones and electronic devices are not
-                                                    allowed
-                                                    during the exam</p>
-                                            </div>
-                                        </li>
-                                    </ul>
-                                </div>
+                                    </li>
+                                </ul>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
         </section>
     </div>
 @endsection
