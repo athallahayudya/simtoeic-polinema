@@ -19,7 +19,7 @@ class LecturerController extends Controller
     public function list()
     {
         $lecturers = LecturerModel::select('lecturer_id', 'user_id', 'name', 'nidn', 'ktp_scan', 'photo', 'home_address', 'current_address')
-                                ->with('user');
+            ->with('user');
 
         return DataTables::of($lecturers)
             ->addIndexColumn()
@@ -48,9 +48,9 @@ class LecturerController extends Controller
                 return '<span class="badge ' . $badgeClass . '">' . ucfirst($examStatus) . '</span>';
             })
             ->addColumn('action', function ($lecturer) {
-                $btn = '<button onclick="modalAction(\''.url('/manage-users/lecturer/' . $lecturer->lecturer_id . '/show_ajax').'\')" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></button> ';
-                $btn .= '<button onclick="modalAction(\''.url('/manage-users/lecturer/' . $lecturer->lecturer_id . '/edit_ajax').'\')" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></button> ';
-                $btn .= '<button onclick="modalAction(\''.url('/manage-users/lecturer/' . $lecturer->lecturer_id . '/delete_ajax').'\')" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button> ';
+                $btn = '<button onclick="modalAction(\'' . url('/manage-users/lecturer/' . $lecturer->lecturer_id . '/show_ajax') . '\')" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></button> ';
+                $btn .= '<button onclick="modalAction(\'' . url('/manage-users/lecturer/' . $lecturer->lecturer_id . '/edit_ajax') . '\')" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></button> ';
+                $btn .= '<button onclick="modalAction(\'' . url('/manage-users/lecturer/' . $lecturer->lecturer_id . '/delete_ajax') . '\')" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button> ';
                 return $btn;
             })
             ->rawColumns(['action', 'ktp_scan', 'photo', 'exam_status'])
@@ -66,30 +66,30 @@ class LecturerController extends Controller
 
     public function update_ajax(Request $request, $id)
     {
-            $rules = [
-                'name' => 'required|string|max:100',
-                'photo' => 'nullable|file|mimes:jpg,jpeg,png|max:2048',
-                'home_address' => 'required|string',
-                'current_address' => 'required|string',
-            ];
+        $rules = [
+            'name' => 'required|string|max:100',
+            'photo' => 'nullable|file|mimes:jpg,jpeg,png|max:2048',
+            'home_address' => 'required|string',
+            'current_address' => 'required|string',
+        ];
 
-            $validator = Validator::make($request->all(), $rules);
+        $validator = Validator::make($request->all(), $rules);
 
-            if ($validator->fails()) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Valiation failed.',
-                    'msgField' => $validator->errors()
-                ]);
-            }
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Valiation failed.',
+                'msgField' => $validator->errors()
+            ]);
+        }
 
-            $lecturer = LecturerModel::find($id);
-            if ($lecturer) {
-                $data = $request->only([
-                    'name', 
-                    'home_address', 
-                    'current_address'
-                ]);
+        $lecturer = LecturerModel::find($id);
+        if ($lecturer) {
+            $data = $request->only([
+                'name',
+                'home_address',
+                'current_address'
+            ]);
 
             if ($request->hasFile('photo')) {
                 if ($lecturer->photo && Storage::disk('public')->exists(str_replace('storage/', '', $lecturer->photo))) {
@@ -99,17 +99,17 @@ class LecturerController extends Controller
                 $lecturer->photo = 'storage/' . $path;
             }
 
-                $lecturer->update($data);
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Lecturer data successfully updated'
-                ]);
-            } else {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Data not found.'
-                ]);
-            }
+            $lecturer->update($data);
+            return response()->json([
+                'status' => true,
+                'message' => 'Lecturer data successfully updated'
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'Data not found.'
+            ]);
+        }
     }
 
     public function confirm_ajax(string $id)
@@ -119,7 +119,7 @@ class LecturerController extends Controller
         return view('users-admin.manage-user.lecturer.delete', ['lecturer' => $lecturer]);
     }
 
-    public function delete_ajax( string $id)
+    public function delete_ajax(string $id)
     {
         $lecturer = LecturerModel::find($id);
         if ($lecturer) {
@@ -146,7 +146,7 @@ class LecturerController extends Controller
         ]);
     }
 
-        /**
+    /**
      * Display lecturer dashboard
      */
     public function dashboard()
@@ -156,23 +156,23 @@ class LecturerController extends Controller
             ->where('exam_result.user_id', auth()->id())
             ->select('exam_schedule.*')
             ->paginate(10);
-            
+
         $examResults = ExamResultModel::where('user_id', auth()->id())->latest()->first();
         // Get the latest published announcement with PDF that's visible to lecturers
         $announcements = AnnouncementModel::where('announcement_status', 'published')
             ->whereNotNull('announcement_file')
-            ->where(function($query) {
+            ->where(function ($query) {
                 $query->whereJsonContains('visible_to', 'lecturer')
-                      ->orWhereNull('visible_to')
-                      ->orWhere('visible_to', '[]');
+                    ->orWhereNull('visible_to')
+                    ->orWhere('visible_to', '[]');
             })
             ->orderBy('announcement_date', 'desc')
             ->first();
-        $examScores = ExamResultModel::with([
-            'user' => function ($query) {
-                $query->with(['student', 'staff', 'lecturer', 'alumni']);
-            }
-        ])->get();
+        // Get exam scores only for the current logged-in lecturer
+        $examScores = ExamResultModel::where('user_id', auth()->id())
+            ->with(['user.lecturer', 'schedule'])
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         // Enhanced profile completeness check
         $lecturer = LecturerModel::where('user_id', auth()->id())->first();
@@ -242,7 +242,7 @@ class LecturerController extends Controller
             'examScores'
         ));
     }
-    
+
     /**
      * Display lecturer profile
      */
@@ -267,16 +267,16 @@ class LecturerController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'phone_number' => 'required|string|min:10|max:15|regex:/^[0-9+\-\s]+$/',  
+            'phone_number' => 'required|string|min:10|max:15|regex:/^[0-9+\-\s]+$/',
             'home_address' => 'required|string',
             'current_address' => 'required|string',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'ktp_scan' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:2048',
         ]);
 
-        $lecturer -> name = $request->input('name');
-        $lecturer -> home_address = $request->input('home_address');
-        $lecturer -> current_address = $request->input('current_address');
+        $lecturer->name = $request->input('name');
+        $lecturer->home_address = $request->input('home_address');
+        $lecturer->current_address = $request->input('current_address');
 
         // Update phone number
         $userModel = UserModel::find($user->user_id);

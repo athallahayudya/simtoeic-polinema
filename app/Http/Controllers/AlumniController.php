@@ -153,23 +153,23 @@ class AlumniController extends Controller
             ->where('exam_result.user_id', auth()->id())
             ->select('exam_schedule.*')
             ->paginate(10);
-            
+
         $examResults = ExamResultModel::where('user_id', auth()->id())->latest()->first();
         // Get the latest published announcement with PDF that's visible to alumni
         $announcements = AnnouncementModel::where('announcement_status', 'published')
             ->whereNotNull('announcement_file')
-            ->where(function($query) {
+            ->where(function ($query) {
                 $query->whereJsonContains('visible_to', 'alumni')
-                      ->orWhereNull('visible_to')
-                      ->orWhere('visible_to', '[]');
+                    ->orWhereNull('visible_to')
+                    ->orWhere('visible_to', '[]');
             })
             ->orderBy('announcement_date', 'desc')
             ->first();
-        $examScores = ExamResultModel::with([
-            'user' => function ($query) {
-                $query->with(['student', 'staff', 'lecturer', 'alumni']);
-            }
-        ])->get();
+        // Get exam scores only for the current logged-in alumni
+        $examScores = ExamResultModel::where('user_id', auth()->id())
+            ->with(['user.alumni', 'schedule'])
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         // Enhanced profile completeness check
         $alumni = AlumniModel::where('user_id', auth()->id())->first();

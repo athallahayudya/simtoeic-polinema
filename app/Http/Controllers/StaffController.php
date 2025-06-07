@@ -49,9 +49,9 @@ class StaffController extends Controller
                 return '<span class="badge ' . $badgeClass . '">' . ucfirst($examStatus) . '</span>';
             })
             ->addColumn('action', function ($staff) {
-                $btn = '<button onclick="modalAction(\''.url('/manage-users/staff/' . $staff->staff_id . '/show_ajax').'\')" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></button> ';
-                $btn .= '<button onclick="modalAction(\''.url('/manage-users/staff/' . $staff->staff_id . '/edit_ajax').'\')" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></button> ';
-                $btn .= '<button onclick="modalAction(\''.url('/manage-users/staff/' . $staff->staff_id . '/delete_ajax').'\')" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button> ';
+                $btn = '<button onclick="modalAction(\'' . url('/manage-users/staff/' . $staff->staff_id . '/show_ajax') . '\')" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></button> ';
+                $btn .= '<button onclick="modalAction(\'' . url('/manage-users/staff/' . $staff->staff_id . '/edit_ajax') . '\')" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></button> ';
+                $btn .= '<button onclick="modalAction(\'' . url('/manage-users/staff/' . $staff->staff_id . '/delete_ajax') . '\')" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button> ';
                 return $btn;
             })
             ->rawColumns(['action', 'ktp_scan', 'photo', 'exam_status'])
@@ -85,7 +85,7 @@ class StaffController extends Controller
 
         $staff = StaffModel::find($id);
         if ($staff) {
-            $data = $request->only(['name','home_address','current_address']);
+            $data = $request->only(['name', 'home_address', 'current_address']);
 
             if ($request->hasFile('photo')) {
                 if ($staff->photo && Storage::disk('public')->exists(str_replace('storage/', '', $staff->photo))) {
@@ -120,7 +120,7 @@ class StaffController extends Controller
         $staff = StaffModel::find($id);
         if ($staff) {
             $staff->delete();
-           
+
             return response()->json([
                 'status' => true,
                 'message' => 'Staff data has been successfully deleted.'
@@ -147,22 +147,22 @@ class StaffController extends Controller
             ->where('exam_result.user_id', auth()->id())
             ->select('exam_schedule.*')
             ->paginate(10);
-            
+
         $examResults = ExamResultModel::where('user_id', auth()->id())->latest()->first();
         $announcements = AnnouncementModel::where('announcement_status', 'published')
             ->whereNotNull('announcement_file')
-            ->where(function($query) {
+            ->where(function ($query) {
                 $query->whereJsonContains('visible_to', 'staff')
-                      ->orWhereNull('visible_to')
-                      ->orWhere('visible_to', '[]');
+                    ->orWhereNull('visible_to')
+                    ->orWhere('visible_to', '[]');
             })
             ->orderBy('announcement_date', 'desc')
             ->first();
-        $examScores = ExamResultModel::with([
-            'user' => function ($query) {
-                $query->with(['student', 'staff', 'lecturer', 'alumni']);
-            }
-        ])->get();
+        // Get exam scores only for the current logged-in staff
+        $examScores = ExamResultModel::where('user_id', auth()->id())
+            ->with(['user.staff', 'schedule'])
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         // Enhanced profile completeness check
         $staff = StaffModel::where('user_id', auth()->id())->first();
@@ -254,7 +254,7 @@ class StaffController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'phone_number' => 'required|string|min:10|max:15|regex:/^[0-9+\-\s]+$/',  
+            'phone_number' => 'required|string|min:10|max:15|regex:/^[0-9+\-\s]+$/',
             'home_address' => 'required|string',
             'current_address' => 'required|string',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',

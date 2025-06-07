@@ -54,7 +54,7 @@ class ExamResultController extends Controller
                         $user = \App\Models\UserModel::create([
                             'role' => 'student',
                             'identity_number' => $data['nim'],
-                            'password' => bcrypt($data['nim']), // Use NIM as default password
+                            'password' => bcrypt('password123'), // Use 'password123' as default password
                             'exam_status' => 'success', // Set to 'success' since they have exam results
                             'phone_number' => null
                         ]);
