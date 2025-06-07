@@ -14,12 +14,10 @@ class ExamResultController extends Controller
 {
     public function index()
     {
-        // Get all exam results with user data for display, ordered by NIM (ascending)
+        // Get all exam results ordered by NIM (ascending) then by total score (descending)
         $examResults = ExamResultModel::with(['user.student', 'schedule'])
-            ->join('student', 'exam_result.user_id', '=', 'student.user_id')
-            ->orderBy('student.nim', 'asc')
-            ->orderBy('exam_result.total_score', 'desc')
-            ->select('exam_result.*')
+            ->orderBy('nim', 'asc')
+            ->orderBy('total_score', 'desc')
             ->get();
 
         return view('users-admin.exam-result.index', compact('examResults'));

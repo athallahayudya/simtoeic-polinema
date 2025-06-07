@@ -66,15 +66,18 @@ async function parsePdfTables(pdfPath, outputPath) {
         if (tableData.length === 0) {
             console.log('No structured data found, trying alternative parsing...');
 
-            // Method 1: Parse the specific format from the PDF
-            // Format appears to be: NIM \n L R TOT Name Category
+            // Method 1: Parse the TOEIC PDF format with separate RESULT and ID sections
+            // First, extract all RESULT numbers (168xxxx) and their associated data
+            const resultData = [];
+            const idData = [];
+
             for (let i = 0; i < lines.length; i++) {
                 const line = lines[i].trim();
 
-                // Look for NIM pattern (7-digit number starting with 168)
-                const nimMatch = line.match(/^(168\d{4})$/);
-                if (nimMatch && i + 1 < lines.length) {
-                    const nim = nimMatch[1];
+                // Look for RESULT pattern (7-digit number starting with 168)
+                const resultMatch = line.match(/^(168\d{4})$/);
+                if (resultMatch && i + 1 < lines.length) {
+                    const resultNum = resultMatch[1];
                     const nextLine = lines[i + 1].trim();
 
                     // Parse the next line for scores and name
@@ -94,19 +97,38 @@ async function parsePdfTables(pdfPath, outputPath) {
                             readingScore >= 5 && readingScore <= 495 &&
                             totalScore >= 10 && totalScore <= 990) {
 
-                            const record = {
-                                result: `RESULT_${nim}`,
+                            resultData.push({
+                                result: resultNum,
                                 name: name,
-                                id: nim,
                                 L: listeningScore,
                                 R: readingScore,
                                 tot: totalScore
-                            };
-                            tableData.push(record);
-                            console.log('Parsed record:', record);
+                            });
                         }
                     }
                 }
+
+                // Look for ID pattern (10-digit number starting with 2)
+                const idMatch = line.match(/^(2\d{9})$/);
+                if (idMatch) {
+                    idData.push(idMatch[1]);
+                }
+            }
+
+            console.log(`Found ${resultData.length} result records and ${idData.length} ID records`);
+
+            // Match result data with ID data (assuming they are in the same order)
+            for (let i = 0; i < Math.min(resultData.length, idData.length); i++) {
+                const record = {
+                    result: resultData[i].result,
+                    name: resultData[i].name,
+                    id: idData[i], // Use the correct ID from the second section
+                    L: resultData[i].L,
+                    R: resultData[i].R,
+                    tot: resultData[i].tot
+                };
+                tableData.push(record);
+                console.log('Matched record:', record);
             }
 
             // Method 2: Try parsing the raw text as a continuous string

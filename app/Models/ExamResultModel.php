@@ -17,6 +17,8 @@ class ExamResultModel extends Model
         'score',
         'cerfificate_url',
         'exam_id',
+        'name',
+        'nim',
         'listening_score',
         'reading_score',
         'total_score',
@@ -45,9 +47,15 @@ class ExamResultModel extends Model
         return $this->belongsTo(ExamScheduleModel::class, 'schedule_id', 'schedule_id');
     }
 
-    // Get user's name through the relationship
-    public function getNameAttribute()
+    // Get user's name through the relationship or from stored field
+    public function getNameAttribute($value)
     {
+        // If name is stored in database, use it
+        if ($value) {
+            return $value;
+        }
+
+        // Otherwise, get from user relationship
         if ($this->user) {
             // Get name based on user role
             if ($this->user->isStudent() && $this->user->student) {
@@ -65,9 +73,15 @@ class ExamResultModel extends Model
         return 'N/A';
     }
 
-    // Get user's NIM through the relationship
-    public function getNimAttribute()
+    // Get user's NIM through the relationship or from stored field
+    public function getNimAttribute($value)
     {
+        // If NIM is stored in database, use it
+        if ($value) {
+            return $value;
+        }
+
+        // Otherwise, get from user relationship
         if ($this->user && $this->user->isStudent() && $this->user->student) {
             return $this->user->student->nim;
         }

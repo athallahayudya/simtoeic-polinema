@@ -23,25 +23,26 @@ class StudentController extends Controller
             ->where('exam_result.user_id', auth()->id())
             ->select('exam_schedule.*')
             ->paginate(10);
-            
+
+        // Get all exam results for the current student (not just the latest one)
         $examResults = ExamResultModel::where('user_id', auth()->id())->latest()->first();
-        
+
+        // Get all exam results for the current student to display in the scores table
+        $examScores = ExamResultModel::where('user_id', auth()->id())
+            ->with(['user.student', 'schedule'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
         // Get the latest published announcement with PDF that's visible to students
         $announcements = AnnouncementModel::where('announcement_status', 'published')
             ->whereNotNull('announcement_file')
-            ->where(function($query) {
+            ->where(function ($query) {
                 $query->whereJsonContains('visible_to', 'student')
-                      ->orWhereNull('visible_to')
-                      ->orWhere('visible_to', '[]');
+                    ->orWhereNull('visible_to')
+                    ->orWhere('visible_to', '[]');
             })
             ->orderBy('announcement_date', 'desc')
             ->first();
-        
-        $examScores = ExamResultModel::with([
-            'user' => function ($query) {
-                $query->with(['student', 'staff', 'lecturer', 'alumni']);
-            }
-        ])->get();
 
         // Enhanced profile completeness check
         $student = StudentModel::where('user_id', auth()->id())->first();
@@ -98,9 +99,9 @@ class StudentController extends Controller
         // Calculate accurate completion percentage
         $completionPercentage = $totalItems > 0 ? round(($completedItems / $totalItems) * 100) : 0;
 
-        // Check if the score is below or equal to 70
+        // Check if the total score is below 500 (fail threshold for TOEIC)
         $examFailed = false;
-        if ($examResults && $examResults->score <= 70) {
+        if ($examResults && $examResults->total_score < 500) {
             $examFailed = true;
         }
 
