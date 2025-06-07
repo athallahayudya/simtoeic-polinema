@@ -8,70 +8,112 @@ use Illuminate\Database\Eloquent\Model;
 class ExamResultModel extends Model
 {
     use HasFactory;
-    
+
     protected $table = 'exam_result';
     protected $primaryKey = 'result_id';
-    protected $fillable = ['schedule_id', 'user_id', 'score', 'cerfificate_url'];
-    
+    protected $fillable = [
+        'schedule_id',
+        'user_id',
+        'score',
+        'cerfificate_url',
+        'exam_id',
+        'listening_score',
+        'reading_score',
+        'total_score',
+        'exam_date',
+        'status'
+    ];
+
     public $timestamps = true;
+
+    protected $casts = [
+        'exam_date' => 'date',
+        'listening_score' => 'integer',
+        'reading_score' => 'integer',
+        'total_score' => 'integer',
+        'score' => 'integer'
+    ];
 
     // Relationships
     public function user()
     {
         return $this->belongsTo(UserModel::class, 'user_id', 'user_id');
     }
-    
+
     public function schedule()
     {
         return $this->belongsTo(ExamScheduleModel::class, 'schedule_id', 'schedule_id');
     }
-    
-    // Get user's NIM through the relationship
-    public function getNimAttribute()
-    {
-        return $this->user ? $this->user->nim : 'N/A';
-    }
-    
+
     // Get user's name through the relationship
     public function getNameAttribute()
     {
-        return $this->user ? $this->user->name : 'N/A';
+        if ($this->user) {
+            // Get name based on user role
+            if ($this->user->isStudent() && $this->user->student) {
+                return $this->user->student->name;
+            } elseif ($this->user->isLecturer() && $this->user->lecturer) {
+                return $this->user->lecturer->name;
+            } elseif ($this->user->isStaff() && $this->user->staff) {
+                return $this->user->staff->name;
+            } elseif ($this->user->isAlumni() && $this->user->alumni) {
+                return $this->user->alumni->name;
+            } elseif ($this->user->isAdmin() && $this->user->admin) {
+                return $this->user->admin->name;
+            }
+        }
+        return 'N/A';
     }
-    
-    // Map the exam ID (could come from schedule)
+
+    // Get user's NIM through the relationship
+    public function getNimAttribute()
+    {
+        if ($this->user && $this->user->isStudent() && $this->user->student) {
+            return $this->user->student->nim;
+        }
+        return $this->user ? $this->user->identity_number : 'N/A';
+    }
+
+    // Get exam ID for display (use exam_id if available, otherwise generate from result_id)
     public function getIdExamAttribute()
     {
-        return $this->schedule ? $this->schedule->exam_code : 'TOE-' . $this->result_id;
+        return $this->exam_id ?: "TOE-{$this->result_id}";
     }
-    
-    // Split total score into listening component (assume 50%)
-    public function getListeningScoreAttribute()
+
+    // Get listening score (use listening_score if available, otherwise calculate from total)
+    public function getListeningScoreAttribute($value)
     {
-        return round($this->score * 0.5);
+        if ($value !== null) {
+            return $value;
+        }
+        // If no specific listening score, estimate as 50% of total
+        return $this->total_score ? intval($this->total_score * 0.5) : 0;
     }
-    
-    // Split total score into reading component (assume 50%)
-    public function getReadingScoreAttribute()
+
+    // Get reading score (use reading_score if available, otherwise calculate from total)
+    public function getReadingScoreAttribute($value)
     {
-        return round($this->score * 0.5);
+        if ($value !== null) {
+            return $value;
+        }
+        // If no specific reading score, estimate as 50% of total
+        return $this->total_score ? intval($this->total_score * 0.5) : 0;
     }
-    
-    // For total score, use the actual score field
-    public function getTotalScoreAttribute()
+
+    // Get total score (use total_score if available, otherwise use legacy score)
+    public function getTotalScoreAttribute($value)
     {
-        return $this->score;
+        return $value ?: $this->score;
     }
-    
-    // Get exam date from schedule or created_at
-    public function getExamDateAttribute()
+
+    // Get status based on total score
+    public function getStatusAttribute($value)
     {
-        return $this->schedule ? $this->schedule->schedule_date : $this->created_at;
-    }
-    
-    // Determine pass/fail status based on score
-    public function getStatusAttribute()
-    {
-        return $this->score >= 500 ? 'pass' : 'fail';
+        if ($value !== null) {
+            return $value;
+        }
+        $totalScore = $this->total_score ?: $this->score;
+        return $totalScore >= 500 ? 'pass' : 'fail';
     }
 
     // Add this method to handle bulk deletion

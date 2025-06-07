@@ -348,12 +348,12 @@ Route::group(['prefix' => 'manage-users/lecturer'], function () {
 Route::prefix('registration')->group(function () {
     Route::get('/', [App\Http\Controllers\UserDataTableController::class, 'index'])->name('registration.index');
     Route::get('/users-data', [App\Http\Controllers\UserDataTableController::class, 'getUsers'])->name('users.data');
-    
+
     // AJAX modal routes
     Route::get('/{id}/show_ajax', [App\Http\Controllers\UserDataTableController::class, 'show_ajax']);
     Route::get('/{id}/edit_ajax', [App\Http\Controllers\UserDataTableController::class, 'edit_ajax']);
     Route::get('/{id}/delete_ajax', [App\Http\Controllers\UserDataTableController::class, 'confirm_ajax']);
-    
+
     // AJAX action routes - make sure these are POST routes
     Route::post('/{id}/update_ajax', [App\Http\Controllers\UserDataTableController::class, 'update_ajax']);
     Route::post('/{id}/delete_ajax', [App\Http\Controllers\UserDataTableController::class, 'delete_ajax']);
@@ -368,7 +368,7 @@ Route::group(['prefix' => 'student'], function () {
 });
 
 // Staff routes
-Route::group(['prefix' => 'staff'], function (){
+Route::group(['prefix' => 'staff'], function () {
     Route::get('/profile', [StaffController::class, 'profile'])->name('staff.profile');
     Route::post('/profile/update', [StaffController::class, 'updateProfile'])->name('staff.profile.update');
     Route::get('/dashboard', [StaffController::class, 'dashboard'])->name('staff.dashboard');
@@ -376,7 +376,7 @@ Route::group(['prefix' => 'staff'], function (){
 });
 
 // Alumni routes
-Route::group(['prefix' => 'alumni'], function (){
+Route::group(['prefix' => 'alumni'], function () {
     Route::get('/dashboard', [AlumniController::class, 'dashboard'])->name('alumni.dashboard');
     Route::get('/profile', [AlumniController::class, 'profile'])->name('alumni.profile');
     Route::post('/profile/update', [AlumniController::class, 'updateProfile'])->name('alumni.profile.update');
@@ -384,7 +384,7 @@ Route::group(['prefix' => 'alumni'], function (){
 });
 
 // Lecturer routes
-Route::group(['prefix' => 'lecturer'], function (){
+Route::group(['prefix' => 'lecturer'], function () {
     Route::get('/dashboard', [LecturerController::class, 'dashboard'])->name('lecturer.dashboard');
     Route::get('/profile', [LecturerController::class, 'profile'])->name('lecturer.profile');
     Route::post('/profile/update', [LecturerController::class, 'updateProfile'])->name('lecturer.profile.update');
@@ -406,10 +406,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/exam-results', [ExamResultController::class, 'index'])->name('exam-results.index');
     Route::get('/exam-results/data', [ExamResultController::class, 'getResults'])->name('exam-results.data');
     Route::post('/exam-results/import', [ExamResultController::class, 'import'])->name('exam-results.import.store');
+    Route::delete('/exam-results/delete-all', [ExamResultController::class, 'deleteAll'])->name('exam-results.delete-all');
     Route::get('/exam-results/{id}', [ExamResultController::class, 'show'])->name('exam-results.show');
     Route::put('/exam-results/{id}', [ExamResultController::class, 'update'])->name('exam-results.update');
     Route::delete('/exam-results/{id}', [ExamResultController::class, 'destroy'])->name('exam-results.destroy');
-    Route::delete('/exam-results/delete-all', [ExamResultController::class, 'deleteAll'])->name('exam-results.delete-all');
 });
 
 // Admin dashboard route

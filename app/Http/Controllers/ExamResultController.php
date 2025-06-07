@@ -3,19 +3,23 @@
 namespace App\Http\Controllers;
 
 use App\Models\ExamResultModel;
-use App\Models\UserModel;
-use App\Imports\ExamResultsImport;
+use App\Models\StudentModel;
+use App\Models\ExamScheduleModel;
+use App\Services\PdfTableParserService;
 use Illuminate\Http\Request;
-use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Log;
+
 
 class ExamResultController extends Controller
 {
     public function index()
     {
-        // Get all exam results with user data for display
-        $examResults = ExamResultModel::with(['user', 'schedule'])
-            ->orderBy('created_at', 'desc')
+        // Get all exam results with user data for display, ordered by NIM (ascending)
+        $examResults = ExamResultModel::with(['user.student', 'schedule'])
+            ->join('student', 'exam_result.user_id', '=', 'student.user_id')
+            ->orderBy('student.nim', 'asc')
+            ->orderBy('exam_result.total_score', 'desc')
+            ->select('exam_result.*')
             ->get();
 
         return view('users-admin.exam-result.index', compact('examResults'));
@@ -24,17 +28,99 @@ class ExamResultController extends Controller
     public function import(Request $request)
     {
         $request->validate([
-            'file' => 'required|file|mimes:xlsx,xls,csv|max:10240',
+            'file' => 'required|file|mimes:pdf|max:10240',
         ]);
 
         try {
             $file = $request->file('file');
 
-            // Import the file
-            Excel::import(new ExamResultsImport, $file);
+            // Use the PDF table parser service
+            $pdfParserService = new PdfTableParserService();
+            $parsedData = $pdfParserService->parsePdfTables($file->getPathname());
+
+            Log::info('Parsed PDF Results: ' . json_encode($parsedData));
+
+            $importedCount = 0;
+            $skippedCount = 0;
+
+            foreach ($parsedData as $data) {
+                try {
+                    // Find student by NIM in student table
+                    $student = StudentModel::where('nim', $data['nim'])->first();
+
+                    if (!$student) {
+                        // Create new student and user if not found
+                        Log::info("Student with NIM {$data['nim']} not found. Creating new student record.");
+
+                        // Create new user
+                        $user = \App\Models\UserModel::create([
+                            'role' => 'student',
+                            'identity_number' => $data['nim'],
+                            'password' => bcrypt($data['nim']), // Use NIM as default password
+                            'exam_status' => 'not_yet',
+                            'phone_number' => null
+                        ]);
+
+                        // Create new student profile
+                        $student = StudentModel::create([
+                            'user_id' => $user->user_id,
+                            'name' => $data['name'],
+                            'nim' => $data['nim'],
+                            'study_program' => 'Unknown',
+                            'major' => 'Unknown',
+                            'campus' => 'malang'
+                        ]);
+                    } else {
+                        $user = $student->user;
+                    }
+
+                    // Get default schedule (you can modify this logic as needed)
+                    $defaultSchedule = ExamScheduleModel::first();
+
+                    if (!$defaultSchedule) {
+                        Log::warning("No exam schedule found. Creating default schedule.");
+                        $defaultSchedule = ExamScheduleModel::create([
+                            'exam_date' => now()->format('Y-m-d'),
+                            'exam_time' => '09:00:00',
+                            'itc_link' => '',
+                            'zoom_link' => ''
+                        ]);
+                    }
+
+                    // Create or update exam result
+                    $examResult = ExamResultModel::updateOrCreate(
+                        [
+                            'user_id' => $user->user_id,
+                            'exam_id' => $data['exam_id']
+                        ],
+                        [
+                            'schedule_id' => $defaultSchedule->schedule_id,
+                            'score' => $data['total_score'], // Keep legacy score field
+                            'listening_score' => $data['listening_score'],
+                            'reading_score' => $data['reading_score'],
+                            'total_score' => $data['total_score'],
+                            'status' => $data['status'],
+                            'exam_date' => now()->format('Y-m-d'),
+                            'cerfificate_url' => ''
+                        ]
+                    );
+
+                    Log::info("Created/Updated exam result ID: {$examResult->result_id} for user {$user->user_id}");
+
+                    $importedCount++;
+                } catch (\Exception $e) {
+                    Log::error("Error importing record for NIM {$data['nim']}: " . $e->getMessage());
+                    $skippedCount++;
+                }
+            }
+
+            $message = "PDF imported successfully! {$importedCount} records imported";
+            if ($skippedCount > 0) {
+                $message .= ", {$skippedCount} records skipped";
+            }
 
             return redirect()->route('exam-results.index')
-                ->with('success', 'Exam results imported successfully');
+                ->with('success', $message);
         } catch (\Exception $e) {
             Log::error('Import error: ' . $e->getMessage());
             return redirect()->back()
@@ -51,12 +137,20 @@ class ExamResultController extends Controller
     public function deleteAll()
     {
         try {
+            Log::info('Delete all exam results request received');
+
+            $countBefore = ExamResultModel::count();
+            Log::info("Records before deletion: {$countBefore}");
+
             // Delete all exam results using the custom method
             ExamResultModel::deleteAllResults();
 
+            $countAfter = ExamResultModel::count();
+            Log::info("Records after deletion: {$countAfter}");
+
             return response()->json([
                 'status' => true,
-                'message' => 'All exam results have been deleted successfully.'
+                'message' => "All exam results have been deleted successfully. Deleted {$countBefore} records."
             ]);
         } catch (\Exception $e) {
             Log::error('Error deleting all exam results: ' . $e->getMessage());
