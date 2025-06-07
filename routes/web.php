@@ -221,6 +221,8 @@ Route::get('/', function () {
     return view('pages.landing-page');
 });
 
+
+
 // Authentication Routes
 Route::prefix('auth')->name('auth.')->group(function () {
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');

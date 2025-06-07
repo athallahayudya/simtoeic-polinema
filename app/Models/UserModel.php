@@ -45,6 +45,7 @@ class UserModel extends Authenticatable
         'password',
         'exam_status',
         'phone_number',
+        'remember_token',
         'created_at',
         'updated_at',
     ];
@@ -56,6 +57,7 @@ class UserModel extends Authenticatable
      */
     protected $hidden = [
         'password', // Hide the password when serializing the model
+        'remember_token', // Hide the remember token when serializing the model
     ];
 
     protected $casts = [];
@@ -101,6 +103,16 @@ class UserModel extends Authenticatable
                 $this->attributes['password'] = $value; // Already hashed, store as is
             }
         }
+    }
+
+    /**
+     * Get the name of the "remember me" token.
+     *
+     * @return string
+     */
+    public function getRememberTokenName()
+    {
+        return 'remember_token';
     }
 
 
