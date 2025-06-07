@@ -159,9 +159,8 @@
         </div>
 
         <div class="card-body py-3">
-          <!-- Text Announcement Section -->
+          <!-- Announcement Section -->
           <div class="text-announcement-container">
-          <h5 class="text-primary border-bottom pb-2 mb-3">Text Announcements</h5>
           @if ($announcements)
         <div class="announcement-container">
         <div class="d-flex justify-content-between align-items-center mb-2">

@@ -33,13 +33,14 @@ class StudentController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        // Get the latest published announcement with PDF that's visible to students
+        // Get the latest published announcements that are visible to students
+        // This includes both text announcements and PDF announcements
         $announcements = AnnouncementModel::where('announcement_status', 'published')
-            ->whereNotNull('announcement_file')
             ->where(function ($query) {
                 $query->whereJsonContains('visible_to', 'student')
                     ->orWhereNull('visible_to')
-                    ->orWhere('visible_to', '[]');
+                    ->orWhere('visible_to', '[]')
+                    ->orWhere('visible_to', '');
             })
             ->orderBy('announcement_date', 'desc')
             ->first();

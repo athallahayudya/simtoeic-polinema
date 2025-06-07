@@ -150,11 +150,11 @@ class StaffController extends Controller
 
         $examResults = ExamResultModel::where('user_id', auth()->id())->latest()->first();
         $announcements = AnnouncementModel::where('announcement_status', 'published')
-            ->whereNotNull('announcement_file')
             ->where(function ($query) {
                 $query->whereJsonContains('visible_to', 'staff')
                     ->orWhereNull('visible_to')
-                    ->orWhere('visible_to', '[]');
+                    ->orWhere('visible_to', '[]')
+                    ->orWhere('visible_to', '');
             })
             ->orderBy('announcement_date', 'desc')
             ->first();

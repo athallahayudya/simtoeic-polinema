@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Storage;
 
 class AnnouncementController extends Controller
 {
-    public function list( Request $request)
+    public function list(Request $request)
     {
         $announcements = AnnouncementModel::select('announcement_id', 'title', 'content', 'announcement_status', 'announcement_date');
 
@@ -22,24 +22,24 @@ class AnnouncementController extends Controller
         return DataTables::of($announcements)
             ->addIndexColumn()
             ->addColumn('announcement_date', function ($announcements) {
-            return \Carbon\Carbon::parse($announcements->announcement_date)
-                ->setTimezone('Asia/Jakarta')
-                ->format('d-m-Y');
+                return \Carbon\Carbon::parse($announcements->announcement_date)
+                    ->setTimezone('Asia/Jakarta')
+                    ->format('d-m-Y');
             })
             ->addColumn('announcement_status', function ($announcements) {
                 $badgeClass = $announcements->announcement_status == 'published' ? 'badge-success' : 'badge-secondary';
                 return '<span class="badge custom-badge ' . $badgeClass . '">' . ucfirst($announcements->announcement_status) . '</span>';
             })
             ->addColumn('action', function ($announcements) {
-                $btn = '<button onclick="modalAction(\''.url('announcements/' . $announcements->announcement_id . '/show_ajax').'\')" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></button> ';
-                $btn .= '<button onclick="modalAction(\''.url('announcements/' . $announcements->announcement_id . '/edit').'\')" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></button> ';
-                $btn .= '<button onclick="modalAction(\''.url('announcements/' . $announcements->announcement_id . '/delete_ajax').'\')" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button> ';
+                $btn = '<button onclick="modalAction(\'' . url('announcements/' . $announcements->announcement_id . '/show_ajax') . '\')" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></button> ';
+                $btn .= '<button onclick="modalAction(\'' . url('announcements/' . $announcements->announcement_id . '/edit') . '\')" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></button> ';
+                $btn .= '<button onclick="modalAction(\'' . url('announcements/' . $announcements->announcement_id . '/delete_ajax') . '\')" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button> ';
                 return $btn;
             })
             ->rawColumns(['action', 'announcement_status'])
             ->make(true);
     }
-    
+
     public function show_ajax(string $id)
     {
         $announcements = AnnouncementModel::find($id);
@@ -75,7 +75,7 @@ class AnnouncementController extends Controller
         $announcements = AnnouncementModel::find($id);
         return view('users-admin.announcement.edit', ['announcements' => $announcements]);
     }
-    
+
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -83,13 +83,19 @@ class AnnouncementController extends Controller
             'content' => 'required|string|max:255',
             'announcement_status' => 'required|in:draft,published',
             'announcement_date' => 'required|date',
+            'visible_to' => 'nullable|array',
+            'visible_to.*' => 'in:student,staff,alumni,lecturer'
         ]);
+
+        // If no specific roles selected, make visible to all by setting null
+        $visibleTo = $request->visible_to && count($request->visible_to) > 0 ? $request->visible_to : null;
 
         AnnouncementModel::find($id)->update([
             'title' => $request->title,
             'content' => $request->content,
             'announcement_status' => $request->announcement_status,
             'announcement_date' => $request->announcement_date,
+            'visible_to' => $visibleTo,
         ]);
         return redirect('announcements/')->with('success', 'Announcement updated successfully.');
     }
@@ -106,15 +112,22 @@ class AnnouncementController extends Controller
             'content' => 'required|string|max:255',
             'announcement_status' => 'required|in:draft,published',
             'announcement_date' => 'required|date',
+            'visible_to' => 'nullable|array',
+            'visible_to.*' => 'in:student,staff,alumni,lecturer'
         ]);
+
+        // If no specific roles selected, make visible to all by setting null
+        $visibleTo = $request->visible_to && count($request->visible_to) > 0 ? $request->visible_to : null;
 
         AnnouncementModel::create([
             'title' => $request->title,
             'content' => $request->content,
             'announcement_status' => $request->announcement_status,
             'announcement_date' => $request->announcement_date,
+            'visible_to' => $visibleTo,
+            'created_by' => auth()->id(),
         ]);
-        
+
         return redirect('/announcements/')->with('success', 'Announcement created successfully.');
     }
 
@@ -130,7 +143,8 @@ class AnnouncementController extends Controller
             'title' => 'required|string|max:255',
             'announcement_file' => 'required|file|mimes:pdf|max:10240',
             'description' => 'nullable|string',
-            'visible_to' => 'required|array'
+            'visible_to' => 'nullable|array',
+            'visible_to.*' => 'in:student,staff,alumni,lecturer'
         ]);
 
         try {
@@ -138,7 +152,10 @@ class AnnouncementController extends Controller
             $file = $request->file('announcement_file');
             $fileName = 'announcement_' . time() . '.pdf';
             $filePath = $file->storeAs('public/announcements', $fileName);
-            
+
+            // If no specific roles selected, make visible to all by setting null
+            $visibleTo = $request->visible_to && count($request->visible_to) > 0 ? $request->visible_to : null;
+
             // Create announcement record
             $announcement = new AnnouncementModel();
             $announcement->title = $request->title;
@@ -146,7 +163,7 @@ class AnnouncementController extends Controller
             $announcement->announcement_file = Storage::url($filePath);
             $announcement->announcement_date = now();
             $announcement->announcement_status = 'published';
-            $announcement->visible_to = json_encode($request->visible_to);
+            $announcement->visible_to = $visibleTo; // Let Laravel handle JSON encoding via model casting
             $announcement->created_by = auth()->id();
             $announcement->save();
 
@@ -157,7 +174,7 @@ class AnnouncementController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error('Error uploading announcement: ' . $e->getMessage());
-            
+
             return response()->json([
                 'status' => false,
                 'message' => 'Error uploading announcement: ' . $e->getMessage()

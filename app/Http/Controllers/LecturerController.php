@@ -158,13 +158,13 @@ class LecturerController extends Controller
             ->paginate(10);
 
         $examResults = ExamResultModel::where('user_id', auth()->id())->latest()->first();
-        // Get the latest published announcement with PDF that's visible to lecturers
+        // Get the latest published announcements that are visible to lecturers
         $announcements = AnnouncementModel::where('announcement_status', 'published')
-            ->whereNotNull('announcement_file')
             ->where(function ($query) {
                 $query->whereJsonContains('visible_to', 'lecturer')
                     ->orWhereNull('visible_to')
-                    ->orWhere('visible_to', '[]');
+                    ->orWhere('visible_to', '[]')
+                    ->orWhere('visible_to', '');
             })
             ->orderBy('announcement_date', 'desc')
             ->first();
