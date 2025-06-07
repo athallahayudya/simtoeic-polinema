@@ -135,7 +135,8 @@
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label for="major">Major</label>
-                                                <select class="form-control validation-field" id="major" name="major" data-validation="required">
+                                                <select class="form-control validation-field" id="major" name="major"
+                                                    data-validation="required">
                                                     <option value="">Select Major</option>
                                                     <option value="Teknik Elektro">Teknik Elektro</option>
                                                     <option value="Teknik Sipil">Teknik Sipil</option>
@@ -145,7 +146,8 @@
                                                     <option value="Administrasi Niaga">Administrasi Niaga</option>
                                                     <option value="Teknologi Informasi">Teknologi Informasi</option>
                                                 </select>
-                                                <small class="form-text text-muted validation-message" id="major-validation">
+                                                <small class="form-text text-muted validation-message"
+                                                    id="major-validation">
                                                     <i class="fas fa-info-circle mr-1"></i> Required for students
                                                 </small>
                                             </div>
@@ -153,25 +155,30 @@
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label for="study_program">Study Program</label>
-                                                <select class="form-control validation-field" id="study_program" name="study_program" data-validation="required">
+                                                <select class="form-control validation-field" id="study_program"
+                                                    name="study_program" data-validation="required">
                                                     <option value="">Select Study Program</option>
                                                 </select>
-                                                <small class="form-text text-muted validation-message" id="study_program-validation">
-                                                    <i class="fas fa-info-circle mr-1"></i> Will appear after selecting a major
+                                                <small class="form-text text-muted validation-message"
+                                                    id="study_program-validation">
+                                                    <i class="fas fa-info-circle mr-1"></i> Will appear after selecting a
+                                                    major
                                                 </small>
                                             </div>
                                         </div>
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label for="campus">Campus</label>
-                                                <select class="form-control validation-field" id="campus" name="campus" data-validation="required">
+                                                <select class="form-control validation-field" id="campus" name="campus"
+                                                    data-validation="required">
                                                     <option value="">Select Campus</option>
                                                     <option value="malang">Malang</option>
                                                     <option value="psdku_kediri">PSDKU Kediri</option>
                                                     <option value="psdku_lumajang">PSDKU Lumajang</option>
                                                     <option value="psdku_pamekasan">PSDKU Pamekasan</option>
                                                 </select>
-                                                <small class="form-text text-muted validation-message" id="campus-validation">
+                                                <small class="form-text text-muted validation-message"
+                                                    id="campus-validation">
                                                     <i class="fas fa-info-circle mr-1"></i> Required for students
                                                 </small>
                                             </div>
@@ -207,8 +214,11 @@
 
                 <!-- Users DataTable Card -->
                 <div class="card">
-                    <div class="card-header">
+                    <div class="card-header d-flex justify-content-between align-items-center">
                         <h4>Registered Users</h4>
+                        <button type="button" class="btn btn-danger" id="deleteAllBtn">
+                            <i class="fas fa-trash"></i> Delete All
+                        </button>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -646,6 +656,91 @@
                         });
                     }
                 });
+            });
+        });
+
+        // Delete All Users functionality
+        $('#deleteAllBtn').on('click', function () {
+            Swal.fire({
+                title: 'Delete All Users?',
+                text: "This will permanently delete ALL registered users and their data (except admin accounts). This action cannot be undone!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete all!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Show loading state
+                    Swal.fire({
+                        title: 'Deleting...',
+                        text: 'Please wait while we delete all users.',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        showConfirmButton: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    // Make AJAX request to delete all users
+                    $.ajax({
+                        url: '{{ route('registration.delete-all') }}',
+                        type: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function (response) {
+                            console.log('Delete all response:', response);
+                            if (response.status) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Success!',
+                                    text: response.message,
+                                    confirmButtonText: 'OK'
+                                }).then(() => {
+                                    console.log('Reloading DataTable...');
+                                    // Force reload the DataTable and reset to first page
+                                    try {
+                                        dataTable.ajax.reload(function () {
+                                            console.log('DataTable reloaded successfully');
+                                            // Additional check to ensure table is updated
+                                            console.log('Current row count:', dataTable.rows().count());
+                                        }, true); // true = reset pagination to first page
+                                    } catch (error) {
+                                        console.error('DataTable reload failed:', error);
+                                        // Fallback: refresh the entire page
+                                        console.log('Falling back to page refresh...');
+                                        window.location.reload();
+                                    }
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error!',
+                                    text: response.message || 'Failed to delete users',
+                                    confirmButtonText: 'OK'
+                                });
+                            }
+                        },
+                        error: function (xhr) {
+                            console.error('Delete all error:', xhr.responseText);
+                            let errorMessage = 'An error occurred while deleting users';
+
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                errorMessage = xhr.responseJSON.message;
+                            }
+
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error!',
+                                text: errorMessage,
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    });
+                }
             });
         });
 

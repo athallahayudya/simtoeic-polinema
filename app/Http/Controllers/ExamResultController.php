@@ -55,7 +55,7 @@ class ExamResultController extends Controller
                             'role' => 'student',
                             'identity_number' => $data['nim'],
                             'password' => bcrypt($data['nim']), // Use NIM as default password
-                            'exam_status' => 'not_yet',
+                            'exam_status' => 'success', // Set to 'success' since they have exam results
                             'phone_number' => null
                         ]);
 
@@ -102,6 +102,9 @@ class ExamResultController extends Controller
                             'cerfificate_url' => ''
                         ]
                     );
+
+                    // Update user exam status to 'success' since they have exam results
+                    $user->update(['exam_status' => 'success']);
 
                     Log::info("Created/Updated exam result ID: {$examResult->result_id} for user {$user->user_id}");
 

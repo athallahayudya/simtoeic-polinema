@@ -34,77 +34,77 @@ class UserDataTableController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
     public function getUsers(Request $request)
-{
-    try {
-        // Join with profile tables to enable searching by name
-        $users = UserModel::select(['users.user_id', 'users.role', 'users.identity_number', 'users.exam_status', 'users.phone_number', 'users.created_at'])
-            ->leftJoin('student', 'users.user_id', '=', 'student.user_id')
-            ->leftJoin('lecturer', 'users.user_id', '=', 'lecturer.user_id')
-            ->leftJoin('staff', 'users.user_id', '=', 'staff.user_id')
-            ->leftJoin('alumni', 'users.user_id', '=', 'alumni.user_id');
+    {
+        try {
+            // Join with profile tables to enable searching by name
+            $users = UserModel::select(['users.user_id', 'users.role', 'users.identity_number', 'users.exam_status', 'users.phone_number', 'users.created_at'])
+                ->leftJoin('student', 'users.user_id', '=', 'student.user_id')
+                ->leftJoin('lecturer', 'users.user_id', '=', 'lecturer.user_id')
+                ->leftJoin('staff', 'users.user_id', '=', 'staff.user_id')
+                ->leftJoin('alumni', 'users.user_id', '=', 'alumni.user_id');
 
-        return DataTables::of($users)
-            ->addColumn('name', function ($user) {
-                switch ($user->role) {
-                    case 'student':
-                        $profile = StudentModel::where('user_id', $user->user_id)->first();
-                        return $profile ? $profile->name : 'N/A';
-                    case 'lecturer':
-                        $profile = LecturerModel::where('user_id', $user->user_id)->first();
-                        return $profile ? $profile->name : 'N/A';
-                    case 'staff':
-                        $profile = StaffModel::where('user_id', $user->user_id)->first();
-                        return $profile ? $profile->name : 'N/A';
-                    case 'alumni':
-                        $profile = AlumniModel::where('user_id', $user->user_id)->first();
-                        return $profile ? $profile->name : 'N/A';
-                    case 'admin':
-                        return 'Admin';
-                    default:
-                        return 'N/A';
-                }
-            })
-            ->filterColumn('name', function($query, $keyword) {
-                $query->where(function($q) use ($keyword) {
-                    $q->whereHas('student', function($q) use ($keyword) {
-                        $q->where('name', 'like', "%{$keyword}%");
-                    })
-                    ->orWhereHas('lecturer', function($q) use ($keyword) {
-                        $q->where('name', 'like', "%{$keyword}%");
-                    })
-                    ->orWhereHas('staff', function($q) use ($keyword) {
-                        $q->where('name', 'like', "%{$keyword}%");
-                    })
-                    ->orWhereHas('alumni', function($q) use ($keyword) {
-                        $q->where('name', 'like', "%{$keyword}%");
+            return DataTables::of($users)
+                ->addColumn('name', function ($user) {
+                    switch ($user->role) {
+                        case 'student':
+                            $profile = StudentModel::where('user_id', $user->user_id)->first();
+                            return $profile ? $profile->name : 'N/A';
+                        case 'lecturer':
+                            $profile = LecturerModel::where('user_id', $user->user_id)->first();
+                            return $profile ? $profile->name : 'N/A';
+                        case 'staff':
+                            $profile = StaffModel::where('user_id', $user->user_id)->first();
+                            return $profile ? $profile->name : 'N/A';
+                        case 'alumni':
+                            $profile = AlumniModel::where('user_id', $user->user_id)->first();
+                            return $profile ? $profile->name : 'N/A';
+                        case 'admin':
+                            return 'Admin';
+                        default:
+                            return 'N/A';
+                    }
+                })
+                ->filterColumn('name', function ($query, $keyword) {
+                    $query->where(function ($q) use ($keyword) {
+                        $q->whereHas('student', function ($q) use ($keyword) {
+                            $q->where('name', 'like', "%{$keyword}%");
+                        })
+                            ->orWhereHas('lecturer', function ($q) use ($keyword) {
+                                $q->where('name', 'like', "%{$keyword}%");
+                            })
+                            ->orWhereHas('staff', function ($q) use ($keyword) {
+                                $q->where('name', 'like', "%{$keyword}%");
+                            })
+                            ->orWhereHas('alumni', function ($q) use ($keyword) {
+                                $q->where('name', 'like', "%{$keyword}%");
+                            });
                     });
-                });
-            })
-            ->editColumn('role', function ($user) {
-                return ucfirst($user->role);
-            })
-            ->editColumn('exam_status', function ($user) {
-                $statusMap = [
-                    'not_yet' => '<span class="badge badge-warning">Not Yet</span>',
-                    'success' => '<span class="badge badge-success">Success</span>',
-                    'fail' => '<span class="badge badge-danger">Failed</span>'
-                ];
-                return $statusMap[$user->exam_status] ?? '<span class="badge badge-secondary">Unknown</span>';
-            })
-            ->addColumn('actions', function ($user) {
-                // Changed to use modalAction approach like staff management page
-                $btn = '<button onclick="modalAction(\'' . url('/registration/' . $user->user_id . '/show_ajax') . '\')" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></button> ';
-                $btn .= '<button onclick="modalAction(\'' . url('/registration/' . $user->user_id . '/edit_ajax') . '\')" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></button> ';
-                $btn .= '<button onclick="modalAction(\'' . url('/registration/' . $user->user_id . '/delete_ajax') . '\')" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>';
-                return $btn;
-            })
-            ->rawColumns(['exam_status', 'actions'])
-            ->make(true);
-    } catch (\Exception $e) {
-        Log::error('DataTables error: ' . $e->getMessage());
-        return response()->json(['error' => 'Failed to load user data'], 500);
+                })
+                ->editColumn('role', function ($user) {
+                    return ucfirst($user->role);
+                })
+                ->editColumn('exam_status', function ($user) {
+                    $statusMap = [
+                        'not_yet' => '<span class="badge badge-warning">Not Yet</span>',
+                        'success' => '<span class="badge badge-success">Success</span>',
+                        'fail' => '<span class="badge badge-danger">Failed</span>'
+                    ];
+                    return $statusMap[$user->exam_status] ?? '<span class="badge badge-secondary">Unknown</span>';
+                })
+                ->addColumn('actions', function ($user) {
+                    // Changed to use modalAction approach like staff management page
+                    $btn = '<button onclick="modalAction(\'' . url('/registration/' . $user->user_id . '/show_ajax') . '\')" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></button> ';
+                    $btn .= '<button onclick="modalAction(\'' . url('/registration/' . $user->user_id . '/edit_ajax') . '\')" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></button> ';
+                    $btn .= '<button onclick="modalAction(\'' . url('/registration/' . $user->user_id . '/delete_ajax') . '\')" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>';
+                    return $btn;
+                })
+                ->rawColumns(['exam_status', 'actions'])
+                ->make(true);
+        } catch (\Exception $e) {
+            Log::error('DataTables error: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to load user data'], 500);
+        }
     }
-}
 
     // Changed approach to match staff management page
     public function show_ajax($id)
@@ -388,6 +388,60 @@ class UserDataTableController extends Controller
         }
     }
 
+    /**
+     * Delete all users from the database
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function deleteAll()
+    {
+        try {
+            Log::info('Delete all users request received');
+
+            // Get current logged-in user ID and main admin user to preserve them
+            $currentUserId = auth()->id();
+            $mainAdminUser = UserModel::where('identity_number', '198506122010011002')->first();
+            $mainAdminUserId = $mainAdminUser ? $mainAdminUser->user_id : null;
+
+            $countBefore = UserModel::count();
+            Log::info("Users before deletion: {$countBefore}");
+            Log::info("Preserving current user ID: {$currentUserId}");
+            Log::info("Preserving main admin user ID: {$mainAdminUserId}");
+
+            // Use database transaction for safety
+            \DB::transaction(function () use ($currentUserId, $mainAdminUserId) {
+                // Build query to exclude both current user and main admin
+                $excludeUserIds = array_filter([$currentUserId, $mainAdminUserId]);
+
+                // Delete all related profile data first (except preserved users)
+                StudentModel::whereNotIn('user_id', $excludeUserIds)->delete();
+                LecturerModel::whereNotIn('user_id', $excludeUserIds)->delete();
+                StaffModel::whereNotIn('user_id', $excludeUserIds)->delete();
+                AlumniModel::whereNotIn('user_id', $excludeUserIds)->delete();
+
+                // Delete all users except the preserved users
+                UserModel::whereNotIn('user_id', $excludeUserIds)->delete();
+            });
+
+            $countAfter = UserModel::count();
+            $deletedCount = $countBefore - $countAfter;
+            Log::info("Users after deletion: {$countAfter}");
+            Log::info("Deleted {$deletedCount} users, preserved admin users");
+
+            return response()->json([
+                'status' => true,
+                'message' => "All users have been deleted successfully. Deleted {$deletedCount} users (admin accounts preserved)."
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error deleting all users: ' . $e->getMessage());
+
+            return response()->json([
+                'status' => false,
+                'message' => 'An error occurred while deleting users: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function store(Request $request)
     {
         $rules = [
@@ -404,7 +458,7 @@ class UserDataTableController extends Controller
             $rules['study_program'] = 'required';
             $rules['campus'] = 'required';
         }
-        
+
         // Validate only relevant fields
         $validator = Validator::make($request->only(array_keys($rules)), $rules, [
             'password.regex' => 'Password must include at least one letter and one number',

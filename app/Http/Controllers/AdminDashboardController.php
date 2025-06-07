@@ -19,40 +19,43 @@ class AdminDashboardController extends Controller
     public function index()
     {
         $type_menu = 'dashboard';
-        
+
         // Statistics for cards
         $totalUsers = UserModel::count();
         $totalStudents = StudentModel::count();
         $totalStaff = StaffModel::count();
         $totalLecturers = LecturerModel::count();
         $totalAlumni = AlumniModel::count();
-        
+
         // Exam statistics
         $totalExamResults = ExamResultModel::count();
         $totalExamSchedules = ExamScheduleModel::count();
         $totalRegistrations = ExamRegistrationModel::count();
-        
+
+        // Count users who have taken the exam (exam_status = 'success')
+        $totalExamParticipants = UserModel::where('exam_status', 'success')->count();
+
         // Recent exam results
         $recentExamResults = ExamResultModel::with(['user.student', 'user.staff', 'user.lecturer', 'user.alumni'])
             ->orderBy('created_at', 'desc')
             ->limit(10)
             ->get();
-        
+
         // Score statistics
         $averageScore = ExamResultModel::avg('score');
         $highestScore = ExamResultModel::max('score');
         $lowestScore = ExamResultModel::min('score');
-        
+
         // User registration by month (last 6 months)
         $userRegistrationData = UserModel::select(
             DB::raw('MONTH(created_at) as month'),
             DB::raw('COUNT(*) as count')
         )
-        ->where('created_at', '>=', now()->subMonths(6))
-        ->groupBy('month')
-        ->orderBy('month')
-        ->get();
-        
+            ->where('created_at', '>=', now()->subMonths(6))
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get();
+
         // Exam scores distribution
         $scoreDistribution = ExamResultModel::select(
             DB::raw('CASE 
@@ -64,15 +67,15 @@ class AdminDashboardController extends Controller
             END as grade'),
             DB::raw('COUNT(*) as count')
         )
-        ->groupBy('grade')
-        ->get();
-        
+            ->groupBy('grade')
+            ->get();
+
         // Recent announcements
         $recentAnnouncements = AnnouncementModel::where('announcement_status', 'published')
             ->orderBy('announcement_date', 'desc')
             ->limit(5)
             ->get();
-        
+
         // Campus distribution
         $campusDistribution = StudentModel::select('campus', DB::raw('count(*) as total'))
             ->groupBy('campus')
@@ -81,13 +84,14 @@ class AdminDashboardController extends Controller
         return view('users-admin.dashboard.index', compact(
             'type_menu',
             'totalUsers',
-            'totalStudents', 
+            'totalStudents',
             'totalStaff',
             'totalLecturers',
             'totalAlumni',
             'totalExamResults',
             'totalExamSchedules',
             'totalRegistrations',
+            'totalExamParticipants',
             'recentExamResults',
             'averageScore',
             'highestScore',

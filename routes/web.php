@@ -357,6 +357,9 @@ Route::prefix('registration')->group(function () {
     // AJAX action routes - make sure these are POST routes
     Route::post('/{id}/update_ajax', [App\Http\Controllers\UserDataTableController::class, 'update_ajax']);
     Route::post('/{id}/delete_ajax', [App\Http\Controllers\UserDataTableController::class, 'delete_ajax']);
+
+    // Delete all users route
+    Route::delete('/delete-all', [App\Http\Controllers\UserDataTableController::class, 'deleteAll'])->name('registration.delete-all');
 });
 Route::post('/registration', [App\Http\Controllers\UserDataTableController::class, 'store'])->name('registration.store');
 
