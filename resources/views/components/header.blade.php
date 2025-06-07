@@ -13,8 +13,24 @@
         </div>
     </form>
     <ul class="navbar-nav navbar-right">
-        <li class="dropdown"><a href="#" data-toggle="dropdown"
-                class="nav-link dropdown-toggle nav-link-lg nav-link-user">
+        <li>
+            <a href="@if(Auth::check())
+                @if(Auth::user()->role === 'admin')
+                    {{ route('admin.profile') }}
+                @elseif(Auth::user()->role === 'student')
+                    {{ route('student.profile') }}
+                @elseif(Auth::user()->role === 'lecturer')
+                    {{ route('lecturer.profile') }}
+                @elseif(Auth::user()->role === 'staff')
+                    {{ route('staff.profile') }}
+                @elseif(Auth::user()->role === 'alumni')
+                    {{ route('alumni.profile') }}
+                @else
+                    #
+                @endif
+            @else
+                        #
+                    @endif" class="nav-link nav-link-lg nav-link-user">
                 <img alt="image" src="
                     @if(Auth::check())
                         @php
@@ -39,7 +55,7 @@
                     @endif
                 " class="rounded-circle mr-1" style="width: 30px; height: 30px; object-fit: cover;">
                 <div class="d-sm-none d-lg-inline-block">
-                    Hi, 
+                    Hi,
                     @if(Auth::check())
                         @if(Auth::user()->role === 'student' && Auth::user()->student)
                             {{ Auth::user()->student->name }}
@@ -57,20 +73,6 @@
                     @endif
                 </div>
             </a>
-            <div class="dropdown-menu dropdown-menu-right">
-                <div class="dropdown-title">Logged in 5 min ago</div>
-                <a href="features-profile.html" class="dropdown-item has-icon">
-                    <i class="far fa-user"></i> Profile
-                </a>
-                <div class="dropdown-divider"></div>
-                <a href="#" class="dropdown-item has-icon text-danger"
-                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </a>
-                <form id="logout-form" action="{{ route('auth.logout') }}" method="POST" class="d-none">
-                    @csrf
-                </form>
-            </div>
         </li>
     </ul>
 </nav>
