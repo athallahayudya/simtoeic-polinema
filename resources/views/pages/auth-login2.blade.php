@@ -88,10 +88,19 @@
                                 </button>
                             </div>
                         </form>
+
+                        <div class="text-center mt-4">
+                            <p class="text-muted">Don't have an account?
+                                <a href="#" class="text-primary" data-toggle="modal" data-target="#registrationInfoModal" style="text-decoration: none;">
+                                    Register here
+                                </a>
+                            </p>
+                        </div>
                     </div>
                 </div>
-                <div class="col-lg-8 col-12 order-lg-2 min-vh-100 background-walk-y position-relative overlay-gradient-bottom order-1"
-                    data-background="{{ asset('img/gedung-polinema.jpg') }}">
+                <div class="col-lg-8 col-12 order-lg-2 background-walk-y position-relative overlay-gradient-bottom order-1"
+                    data-background="{{ asset('img/gedung-polinema.jpg') }}"
+                    style="min-height: 105vh; height: 105vh;">
                     <div class="absolute-bottom-left index-2">
                         <div class="text-light p-5 pb-2">
                             <div class="mb-5 pb-3">
@@ -103,6 +112,54 @@
                 </div>
             </div>
         </section>
+    </div>
+
+    <!-- Registration Info Modal -->
+    <div class="modal fade" id="registrationInfoModal" tabindex="-1" role="dialog" aria-labelledby="registrationInfoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="registrationInfoModalLabel">
+                        <i class="fas fa-info-circle mr-2"></i>Registration Information
+                    </h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-user-shield fa-3x text-primary mb-3"></i>
+                    </div>
+                    <h6 class="font-weight-bold mb-3">Account Registration</h6>
+                    <p class="text-muted mb-4">
+                        New user registration for SIMTOEIC is managed by the system administrator.
+                        Please contact the admin to create your account.
+                    </p>
+                    <div class="alert alert-info" role="alert">
+                        <i class="fas fa-lightbulb mr-2"></i>
+                        <strong>How it works:</strong>
+                        <ul class="text-left mt-2 mb-0">
+                            <li>Contact the system administrator</li>
+                            <li>Provide your personal information</li>
+                            <li>Admin will create your account</li>
+                            <li>You'll receive login credentials</li>
+                        </ul>
+                    </div>
+                    <div class="alert alert-warning" role="alert">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        <strong>Important:</strong> Only authorized personnel can register for TOEIC exams through this system.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        <i class="fas fa-times mr-2"></i>Close
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="contactAdmin()">
+                        <i class="fas fa-envelope mr-2"></i>Contact Admin
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- General JS Scripts -->
@@ -120,5 +177,23 @@
     
     <!-- Custom JS -->
     <script src="{{ asset('js/password-toggle.js') }}"></script>
+
+    <!-- Registration Modal JS -->
+    <script>
+        function contactAdmin() {
+            // Show contact information in a more user-friendly way
+            const adminEmail = 'admin@polinema.ac.id';
+            const subject = 'Request for SIMTOEIC Account Registration';
+            const body = 'Dear Admin,%0D%0A%0D%0AI would like to request an account for the SIMTOEIC system.%0D%0A%0D%0APlease provide me with the necessary information and steps to complete my registration.%0D%0A%0D%0AThank you.';
+
+            // Show confirmation dialog with contact options
+            if (confirm('Contact Admin via:\n\n1. Email: admin@polinema.ac.id\n2. Visit IT Department\n3. Call: (0341) 404424\n\nClick OK to open email client or Cancel to close.')) {
+                window.location.href = `mailto:${adminEmail}?subject=${subject}&body=${body}`;
+            }
+
+            // Close modal after action
+            $('#registrationInfoModal').modal('hide');
+        }
+    </script>
 </body>
 </html>=
