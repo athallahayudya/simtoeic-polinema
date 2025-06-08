@@ -126,22 +126,56 @@
                                     </form>
                                 </div>
 
-                                <div class="alert alert-info">
-                                    <div class="d-flex align-items-center">
-                                        <i class="fas fa-info-circle fa-2x mr-3"></i>
-                                        <div>
+                                <div class="alert alert-danger">
+                                    <div class="d-flex align-items-start">
+                                        <i class="fas fa-exclamation-triangle fa-lg mr-3 mt-1 text-white"></i>
+                                        <div class="text-white">
                                             <strong>Import Format Guide</strong>
+                                            <p class="mb-2">
+                                                Upload the official TOEIC results PDF. Make sure your PDF table contains
+                                                these columns:
+                                            </p>
+                                            <div class="row text-center mb-2">
+                                                <div class="col-2">
+                                                    <div class="border p-2 rounded mb-1 bg-white">
+                                                        <small class="text-dark"><strong>result</strong></small>
+                                                    </div>
+                                                    <small class="text-white"><strong>Exam ID</strong></small>
+                                                </div>
+                                                <div class="col-2">
+                                                    <div class="border p-2 rounded mb-1 bg-white">
+                                                        <small class="text-dark"><strong>name</strong></small>
+                                                    </div>
+                                                    <small class="text-white"><strong>Name</strong></small>
+                                                </div>
+                                                <div class="col-2">
+                                                    <div class="border p-2 rounded mb-1 bg-white">
+                                                        <small class="text-dark"><strong>id</strong></small>
+                                                    </div>
+                                                    <small class="text-white"><strong>NIM</strong></small>
+                                                </div>
+                                                <div class="col-2">
+                                                    <div class="border p-2 rounded mb-1 bg-white">
+                                                        <small class="text-dark"><strong>L</strong></small>
+                                                    </div>
+                                                    <small class="text-white"><strong>Listening</strong></small>
+                                                </div>
+                                                <div class="col-2">
+                                                    <div class="border p-2 rounded mb-1 bg-white">
+                                                        <small class="text-dark"><strong>R</strong></small>
+                                                    </div>
+                                                    <small class="text-white"><strong>Reading</strong></small>
+                                                </div>
+                                                <div class="col-2">
+                                                    <div class="border p-2 rounded mb-1 bg-white">
+                                                        <small class="text-dark"><strong>tot</strong></small>
+                                                    </div>
+                                                    <small class="text-white"><strong>Score</strong></small>
+                                                </div>
+                                            </div>
                                             <p class="mb-0">
-                                                Upload the official TOEIC results PDF. The system will automatically extract
-                                                table data and map the following columns:<br>
-                                                <code>result</code> → <code>exam_id</code> (Exam ID)<br>
-                                                <code>name</code> → <code>nama</code> (Student Name)<br>
-                                                <code>id</code> → <code>nim</code> (Student NIM - Required)<br>
-                                                <code>L</code> → <code>listening_score</code> (Listening Score)<br>
-                                                <code>R</code> → <code>reading_score</code> (Reading Score)<br>
-                                                <code>tot</code> → <code>total_score</code> (Total Score)<br><br>
-                                                <strong>Note:</strong> The system will automatically create student records
-                                                for new NIMs and calculate pass/fail status based on total score ≥ 500.
+                                                <small><strong>Note:</strong> System will automatically create student
+                                                    accounts and calculate pass/fail status.</small>
                                             </p>
                                         </div>
                                     </div>
