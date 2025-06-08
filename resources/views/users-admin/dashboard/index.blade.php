@@ -283,7 +283,7 @@
             <div class="row mb-0">
                 <!-- Student Users Card -->
                 <div class="col-lg-3 col-md-6 col-sm-6 col-12 mb-0">
-                    <a href="{{ route('users') }}" class="text-decoration-none">
+                    <a href="{{ route('users.index') }}" class="text-decoration-none">
                         <div class="card stat-card">
                             <div class="card-header bg-primary">
                                 <h6 class="mb-0">Student Users</h6>
@@ -308,7 +308,7 @@
 
                 <!-- Staff Users Card -->
                 <div class="col-lg-3 col-md-6 col-sm-6 col-12 mb-0">
-                    <a href="{{ route('users') }}" class="text-decoration-none">
+                    <a href="{{ route('users.index') }}" class="text-decoration-none">
                         <div class="card stat-card">
                             <div class="card-header bg-secondary">
                                 <h6 class="mb-0">Staff Users</h6>
@@ -333,7 +333,7 @@
 
                 <!-- Lecturer Users Card -->
                 <div class="col-lg-3 col-md-6 col-sm-6 col-12 mb-0">
-                    <a href="{{ route('users') }}" class="text-decoration-none">
+                    <a href="{{ route('users.index') }}" class="text-decoration-none">
                         <div class="card stat-card">
                             <div class="card-header bg-info">
                                 <h6 class="mb-0">Lecturer Users</h6>
@@ -358,7 +358,7 @@
 
                 <!-- Alumni Users Card -->
                 <div class="col-lg-3 col-md-6 col-sm-6 col-12 mb-0">
-                    <a href="{{ route('users') }}" class="text-decoration-none">
+                    <a href="{{ route('users.index') }}" class="text-decoration-none">
                         <div class="card stat-card">
                             <div class="card-header bg-warning">
                                 <h6 class="mb-0">Alumni Users</h6>
@@ -406,7 +406,7 @@
 
                 <!-- Users Not Taken TOEIC Card -->
                 <div class="col-lg-3 col-md-6 col-sm-6 col-12 mb-0">
-                    <a href="{{ route('users') }}" class="text-decoration-none">
+                    <a href="{{ route('users.index') }}" class="text-decoration-none">
                         <div class="card stat-card">
                             <div class="card-header bg-danger">
                                 <h6 class="mb-0">Not Taken TOEIC</h6>
