@@ -16,8 +16,8 @@
         .stat-card {
             background-color: #ffffff;
             /* White background for cards */
-            border-radius: 8px;
-            /* Reduced border-radius */
+            border-radius: 3px;
+            /* Same as default card border-radius */
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             /* Lighter shadow */
             transition: all 0.3s ease;
@@ -48,10 +48,10 @@
             font-size: 0.9rem;
             border-bottom: none;
             /* No border below header */
-            border-top-left-radius: 8px;
-            /* Reduced border-radius */
-            border-top-right-radius: 8px;
-            /* Reduced border-radius */
+            border-top-left-radius: 3px;
+            /* Same as card border-radius */
+            border-top-right-radius: 3px;
+            /* Same as card border-radius */
         }
 
         .stat-card .card-header h6 {
@@ -563,11 +563,7 @@
                                                 <tr>
                                                     <td>{{ Str::limit($announcement->title ?? 'No Title', 40) }}</td>
                                                     <td>
-                                                        <a href="#" class="text-primary view-announcement-content"
-                                                            data-id="{{ $announcement->announcement_id }}" data-toggle="tooltip"
-                                                            title="View/Edit Content">
-                                                            {{ Str::limit(strip_tags($announcement->content ?? ''), 70) }}
-                                                        </a>
+                                                        {{ Str::limit(strip_tags($announcement->content ?? ''), 70) }}
                                                     </td>
                                                     <td>{{ isset($announcement->announcement_date) ? \Carbon\Carbon::parse($announcement->announcement_date)->format('M d, Y') : 'N/A' }}
                                                     </td>
@@ -815,8 +811,8 @@
 
         // AJAX for editing announcements (modal)
         $(document).ready(function () {
-            // Load edit form into modal
-            $('.edit-announcement-btn, .view-announcement-content').on('click', function (e) {
+            // Load edit form into modal (hanya untuk tombol edit, bukan content)
+            $('.edit-announcement-btn').on('click', function (e) {
                 e.preventDefault();
                 var announcementId = $(this).data('id');
                 var modalBody = $('#announcementModal .modal-body');
