@@ -10,6 +10,7 @@ use App\Models\StudentModel;
 use App\Models\UserModel;
 use App\Models\ExamRegistrationModel;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
@@ -134,6 +135,21 @@ class StudentController extends Controller
 
     public function list(Request $request)
     {
+        // Validate campus filter input
+        $request->validate([
+            'campus' => 'nullable|string|in:malang,psdku_kediri,psdku_lumajang,psdku_pamekasan'
+        ]);
+
+        // Log suspicious activity
+        if ($request->campus && !in_array($request->campus, ['malang', 'psdku_kediri', 'psdku_lumajang', 'psdku_pamekasan'])) {
+            Log::warning('Suspicious campus filter attempt', [
+                'ip' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'campus_value' => $request->campus,
+                'user_id' => auth()->id()
+            ]);
+        }
+
         $students = StudentModel::select('student_id', 'user_id', 'name', 'nim', 'study_program', 'major', 'campus', 'ktp_scan', 'ktm_scan', 'photo', 'home_address', 'current_address')
             ->with('user:user_id,exam_status');
 
@@ -279,27 +295,27 @@ class StudentController extends Controller
         $student = StudentModel::where('user_id', $user->user_id)->firstOrFail();
 
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|regex:/^[a-zA-Z\s\.]+$/',  // Only letters, spaces, and dots
             'phone_number' => 'required|string|min:10|max:15|regex:/^[0-9+\-\s]+$/',  // Improved validation
             'telegram_chat_id' => 'nullable|string|regex:/^[0-9]+$/',  // Only numbers allowed
-            'home_address' => 'required|string',
-            'current_address' => 'required|string',
+            'home_address' => 'required|string|max:500',  // Add max length
+            'current_address' => 'required|string|max:500',  // Add max length
             'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',  // 2MB for profile photo
             'ktp_scan' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',  // 5MB for KTP scan
             'ktm_scan' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',  // 5MB for KTM scan
         ]);
 
-        // Update student data (exclude major and study_program)
-        $student->name = $request->input('name');
-        $student->home_address = $request->input('home_address');
-        $student->current_address = $request->input('current_address');
+        // Update student data (exclude major and study_program) with sanitization
+        $student->name = strip_tags(trim($request->input('name')));
+        $student->home_address = strip_tags(trim($request->input('home_address')));
+        $student->current_address = strip_tags(trim($request->input('current_address')));
         // Major and study_program are intentionally not updated as they should be fixed values
 
-        // Update phone number and telegram_chat_id in users table
+        // Update phone number and telegram_chat_id in users table with sanitization
         $userModel = UserModel::find($user->user_id);
         if ($userModel) {
-            $userModel->phone_number = $request->input('phone_number');
-            $userModel->telegram_chat_id = $request->input('telegram_chat_id');
+            $userModel->phone_number = strip_tags(trim($request->input('phone_number')));
+            $userModel->telegram_chat_id = $request->input('telegram_chat_id') ? strip_tags(trim($request->input('telegram_chat_id'))) : null;
             $userModel->save();
         }
 

@@ -223,7 +223,7 @@ Route::get('/', function () {
 // Authentication Routes
 Route::prefix('auth')->name('auth.')->group(function () {
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
-    Route::post('/login', [AuthController::class, 'login'])->name('process');
+    Route::post('/login', [AuthController::class, 'login'])->name('process')->middleware('throttle:5,1'); // 5 attempts per minute
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
 
