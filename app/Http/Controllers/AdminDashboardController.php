@@ -41,10 +41,57 @@ class AdminDashboardController extends Controller
             ->limit(10)
             ->get();
 
-        // Score statistics
-        $averageScore = ExamResultModel::avg('score');
-        $highestScore = ExamResultModel::max('score');
-        $lowestScore = ExamResultModel::min('score');
+        // Enhanced Score statistics with detailed calculations
+        $allScores = ExamResultModel::pluck('score')->filter()->values();
+        $averageScore = $allScores->avg();
+        $highestScore = $allScores->max();
+        $lowestScore = $allScores->min();
+
+        // Calculate additional statistics
+        $scoreCount = $allScores->count();
+        $standardDeviation = 0;
+        $median = 0;
+        $mode = 0;
+
+        if ($scoreCount > 0) {
+            // Standard Deviation calculation
+            $variance = $allScores->map(function ($score) use ($averageScore) {
+                return pow($score - $averageScore, 2);
+            })->avg();
+            $standardDeviation = sqrt($variance);
+
+            // Median calculation
+            $sortedScores = $allScores->sort()->values();
+            $middle = floor($scoreCount / 2);
+            if ($scoreCount % 2 == 0) {
+                $median = ($sortedScores[$middle - 1] + $sortedScores[$middle]) / 2;
+            } else {
+                $median = $sortedScores[$middle];
+            }
+
+            // Mode calculation (most frequent score)
+            $scoreFrequency = $allScores->countBy();
+            $maxFrequency = $scoreFrequency->max();
+            $mode = $scoreFrequency->filter(function ($frequency) use ($maxFrequency) {
+                return $frequency == $maxFrequency;
+            })->keys()->first();
+        }
+
+        // User growth statistics (last month vs previous month)
+        $currentMonth = now();
+        $lastMonth = now()->subMonth();
+        $twoMonthsAgo = now()->subMonths(2);
+
+        $currentMonthUsers = UserModel::whereMonth('created_at', $currentMonth->month)
+            ->whereYear('created_at', $currentMonth->year)->count();
+        $lastMonthUsers = UserModel::whereMonth('created_at', $lastMonth->month)
+            ->whereYear('created_at', $lastMonth->year)->count();
+
+        // Calculate growth percentages for each user type
+        $studentGrowth = $this->calculateUserGrowth('student');
+        $staffGrowth = $this->calculateUserGrowth('staff');
+        $lecturerGrowth = $this->calculateUserGrowth('lecturer');
+        $alumniGrowth = $this->calculateUserGrowth('alumni');
 
         // User registration by month (last 6 months)
         $userRegistrationData = UserModel::select(
@@ -96,10 +143,42 @@ class AdminDashboardController extends Controller
             'averageScore',
             'highestScore',
             'lowestScore',
+            'standardDeviation',
+            'median',
+            'mode',
+            'studentGrowth',
+            'staffGrowth',
+            'lecturerGrowth',
+            'alumniGrowth',
             'userRegistrationData',
             'scoreDistribution',
             'recentAnnouncements',
             'campusDistribution'
         ));
+    }
+
+    /**
+     * Calculate user growth percentage for a specific role
+     */
+    private function calculateUserGrowth($role)
+    {
+        $currentMonth = now();
+        $lastMonth = now()->subMonth();
+
+        $currentMonthCount = UserModel::where('role', $role)
+            ->whereMonth('created_at', $currentMonth->month)
+            ->whereYear('created_at', $currentMonth->year)
+            ->count();
+
+        $lastMonthCount = UserModel::where('role', $role)
+            ->whereMonth('created_at', $lastMonth->month)
+            ->whereYear('created_at', $lastMonth->year)
+            ->count();
+
+        if ($lastMonthCount == 0) {
+            return $currentMonthCount > 0 ? 100 : 0;
+        }
+
+        return round((($currentMonthCount - $lastMonthCount) / $lastMonthCount) * 100, 1);
     }
 }

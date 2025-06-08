@@ -6,83 +6,114 @@
     <!-- CSS Libraries -->
     <link rel="stylesheet" href="{{ asset('library/chart.js/dist/Chart.min.css') }}">
     <style>
-
-        
-        .stat-card .card-body {
-            display: flex;
-            align-items: center;
-            padding: 1.5rem;
-        }
+        /* General card styling for the new design */
         .stat-card {
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            background-color: #ffffff; /* White background for cards */
+            border-radius: 8px; /* Reduced border-radius */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Lighter shadow */
             transition: all 0.3s ease;
             overflow: hidden;
-            height: 100%;
+            height: auto; /* Allow height to adjust to content */
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 0px; /* Even further reduced margin between cards */
+            border: 1px solid #e0e0e0; /* Subtle border */
         }
-        
+
         .stat-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15); /* Slightly stronger hover shadow */
         }
 
-        .stat-icon-container {
-            width: 70px;
+        .stat-card .card-header {
+            padding: 10px 20px; /* Adjust padding for compact header */
             display: flex;
-            justify-content: center;
-            margin-right: 15px;
-            margin-left: 10px;
+            justify-content: space-between;
+            align-items: center; /* Align items to center */
+            font-size: 0.9rem;
+            border-bottom: none; /* No border below header */
+            border-top-left-radius: 8px; /* Reduced border-radius */
+            border-top-right-radius: 8px; /* Reduced border-radius */
         }
-        
-        .stat-icon {
-            height: 60px;
-            width: 60px;
+
+        .stat-card .card-header h6 {
+            margin-bottom: 0;
+            font-weight: 600; /* Bolder header text */
+            color: #ffffff; /* White text for highlighted header */
+            text-align: left; /* Left align header text */
+            flex-grow: 1; /* Allow title to take available space */
+        }
+
+        .stat-card .card-header .header-right {
             display: flex;
             align-items: center;
-            justify-content: center;
-            border-radius: 12px;
-            font-size: 24px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            position: relative;
-            overflow: hidden;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #ffffff; /* White text for header right content */
         }
 
-        .stat-content {
-            flex: 1;
+        .stat-card .card-header .header-right i {
+            margin-right: 5px;
+            font-size: 0.75rem; /* Smaller icon */
         }
-        
-        .stat-icon::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
-            z-index: 1;
+
+        .stat-card .card-body {
+            padding: 15px 20px; /* Adjust padding for compact body */
+            display: flex;
+            flex-direction: column;
+            text-align: left; /* Left align content in card body */
+            color: #333333; /* Darker text for body content */
         }
-        
-        .stat-icon i {
-            position: relative;
-            z-index: 2;
+
+        .stat-card h2 {
+            font-size: 2.2rem; /* Slightly smaller number */
+            font-weight: 700; /* Bolder number */
+            line-height: 1.1;
+            margin-bottom: 5px; /* Small margin below number */
+            color: #333333; /* Darker color for the number */
         }
-        
-        .bg-primary {
-            background: linear-gradient(135deg, #6777ef 0%, #4a5fe4 100%) !important;
+
+        .stat-card small {
+            font-size: 0.8rem; /* Smaller descriptive text */
+            line-height: 1.3;
+            color: #666666; /* Slightly lighter color for descriptive text */
+            margin-bottom: 2px; /* Small margin between small texts */
         }
-        
-        .bg-success {
-            background: linear-gradient(135deg, #47c363 0%, #2bb14a 100%) !important;
+
+        .stat-card small:last-child {
+            margin-bottom: 0; /* No bottom margin for the last small text */
         }
-        
-        .bg-info {
-            background: linear-gradient(135deg, #3abaf4 0%, #1a9cdc 100%) !important;
+
+        /* Specific color adjustments for icons/percentages if needed */
+        .text-success-light {
+            color: #d4edda !important; /* Lighter green for positive growth on dark background */
         }
-        
-        .bg-warning {
-            background: linear-gradient(135deg, #ffa426 0%, #f78c00 100%) !important;
+
+        .text-danger-light {
+            color: #f8d7da !important; /* Lighter red for negative growth on dark background */
         }
-        
+
+        /* Highlight colors for card headers */
+        .stat-card .card-header.bg-primary {
+            background-color: #6777ef !important; /* Primary color */
+        }
+        .stat-card .card-header.bg-secondary {
+            background-color: #6c757d !important; /* Secondary color */
+        }
+        .stat-card .card-header.bg-info {
+            background-color: #3abaf4 !important; /* Info color */
+        }
+        .stat-card .card-header.bg-warning {
+            background-color: #ffa426 !important; /* Warning color */
+        }
+        .stat-card .card-header.bg-success {
+            background-color: #47c363 !important; /* Success color */
+        }
+        .stat-card .card-header.bg-danger {
+            background-color: #fc544b !important; /* Danger color */
+        }
+
+        /* Other existing styles (keep if still relevant) */
         .card-dashboard {
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
@@ -140,6 +171,30 @@
             border-radius: 8px;
             overflow: hidden;
         }
+
+        /* Statistics table styling */
+        .table-borderless td {
+            border: none !important;
+        }
+
+        .border-bottom {
+            border-bottom: 1px solid #e9ecef !important;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .stat-card .card-body {
+                padding: 1rem !important;
+            }
+
+            .stat-card h2 {
+                font-size: 1.5rem !important;
+            }
+
+            .stat-card .fa-lg {
+                font-size: 1.2em !important;
+            }
+        }
     </style>
 @endpush
 
@@ -154,57 +209,218 @@
             </div>
 
             <!-- Main Statistics Cards -->
-            <div class="row mb-4">
-                <!-- Total Users Card -->
-                <div class="col-lg-3 col-md-6 col-sm-6 col-12 mb-4">
+            <div class="row mb-0">
+                <!-- Student Users Card -->
+                <div class="col-lg-3 col-md-6 col-sm-6 col-12 mb-0">
                     <a href="{{ route('users') }}" class="text-decoration-none">
-                        <div class="card stat-card h-100">
-                            <div class="card-header bg-primary text-white p-3 d-flex align-items-center justify-content-center">
-                                <h6 class="mb-0 text-center">Total Users</h6>
+                        <div class="card stat-card">
+                            <div class="card-header bg-primary">
+                                <h6 class="mb-0">Student Users</h6>
+                                <div class="header-right">
+                                    @if(($studentGrowth ?? 0) >= 0)
+                                        <i class="fas fa-arrow-up text-success-light"></i> <span class="text-success-light">+{{ $studentGrowth ?? 0 }}%</span>
+                                    @else
+                                        <i class="fas fa-arrow-down text-danger-light"></i> <span class="text-danger-light">{{ $studentGrowth ?? 0 }}%</span>
+                                    @endif
+                                </div>
                             </div>
-                            <div class="card-body p-4 d-flex align-items-center justify-content-center">
-                                <h2 class="font-weight-bold text-center mb-0">{{ number_format($totalUsers ?? 0) }}</h2>
+                            <div class="card-body">
+                                <h2 class="font-weight-bold">{{ number_format($totalStudents ?? 0) }}</h2>
+                                <small>Active learners</small>
+                                <small>Users registered this month</small>
                             </div>
                         </div>
                     </a>
                 </div>
-                
+
+                <!-- Staff Users Card -->
+                <div class="col-lg-3 col-md-6 col-sm-6 col-12 mb-0">
+                    <a href="{{ route('users') }}" class="text-decoration-none">
+                        <div class="card stat-card">
+                            <div class="card-header bg-secondary">
+                                <h6 class="mb-0">Staff Users</h6>
+                                <div class="header-right">
+                                    @if(($staffGrowth ?? 0) >= 0)
+                                        <i class="fas fa-arrow-up text-success-light"></i> <span class="text-success-light">+{{ $staffGrowth ?? 0 }}%</span>
+                                    @else
+                                        <i class="fas fa-arrow-down text-danger-light"></i> <span class="text-danger-light">{{ $staffGrowth ?? 0 }}%</span>
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <h2 class="font-weight-bold">{{ number_format($totalStaff ?? 0) }}</h2>
+                                <small>Administrative team</small>
+                                <small>Users registered this month</small>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Lecturer Users Card -->
+                <div class="col-lg-3 col-md-6 col-sm-6 col-12 mb-0">
+                    <a href="{{ route('users') }}" class="text-decoration-none">
+                        <div class="card stat-card">
+                            <div class="card-header bg-info">
+                                <h6 class="mb-0">Lecturer Users</h6>
+                                <div class="header-right">
+                                    @if(($lecturerGrowth ?? 0) >= 0)
+                                        <i class="fas fa-arrow-up text-success-light"></i> <span class="text-success-light">+{{ $lecturerGrowth ?? 0 }}%</span>
+                                    @else
+                                        <i class="fas fa-arrow-down text-danger-light"></i> <span class="text-danger-light">{{ $lecturerGrowth ?? 0 }}%</span>
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <h2 class="font-weight-bold">{{ number_format($totalLecturers ?? 0) }}</h2>
+                                <small>Teaching faculty</small>
+                                <small>Users registered this month</small>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Alumni Users Card -->
+                <div class="col-lg-3 col-md-6 col-sm-6 col-12 mb-0">
+                    <a href="{{ route('users') }}" class="text-decoration-none">
+                        <div class="card stat-card">
+                            <div class="card-header bg-warning">
+                                <h6 class="mb-0">Alumni Users</h6>
+                                <div class="header-right">
+                                    @if(($alumniGrowth ?? 0) >= 0)
+                                        <i class="fas fa-arrow-up text-success-light"></i> <span class="text-success-light">+{{ $alumniGrowth ?? 0 }}%</span>
+                                    @else
+                                        <i class="fas fa-arrow-down text-danger-light"></i> <span class="text-danger-light">{{ $alumniGrowth ?? 0 }}%</span>
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <h2 class="font-weight-bold">{{ number_format($totalAlumni ?? 0) }}</h2>
+                                <small>Graduate network</small>
+                                <small>Users registered this month</small>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Secondary Statistics Cards -->
+            <div class="row mb-0">
                 <!-- Users Taken TOEIC Card -->
-                <div class="col-lg-3 col-md-6 col-sm-6 col-12 mb-4">
+                <div class="col-lg-3 col-md-6 col-sm-6 col-12 mb-0">
                     <a href="{{ route('exam-results.index') }}" class="text-decoration-none">
-                        <div class="card stat-card h-100">
-                            <div class="card-header bg-success text-white p-3 d-flex align-items-center justify-content-center">
-                                <h6 class="mb-0 text-center">Taken TOEIC</h6>
+                        <div class="card stat-card">
+                            <div class="card-header bg-success">
+                                <h6 class="mb-0">Taken TOEIC</h6>
+                                <div class="header-right">
+                                    <i class="fas fa-check-circle text-success-light"></i> <span class="text-success-light">+12.5%</span>
+                                </div>
                             </div>
-                            <div class="card-body p-4 d-flex align-items-center justify-content-center">
-                                <h2 class="font-weight-bold text-center mb-0">{{ number_format($totalExamParticipants ?? 0) }}</h2>
+                            <div class="card-body">
+                                <h2 class="font-weight-bold">{{ number_format($totalExamParticipants ?? 0) }}</h2>
+                                <small>Completed exams</small>
+                                <small>Success rate tracking</small>
                             </div>
                         </div>
                     </a>
                 </div>
-                
+
                 <!-- Users Not Taken TOEIC Card -->
-                <div class="col-lg-3 col-md-6 col-sm-6 col-12 mb-4">
+                <div class="col-lg-3 col-md-6 col-sm-6 col-12 mb-0">
                     <a href="{{ route('users') }}" class="text-decoration-none">
-                        <div class="card stat-card h-100">
-                            <div class="card-header bg-info text-white p-3 d-flex align-items-center justify-content-center">
-                                <h6 class="mb-0 text-center">Not Taken TOEIC</h6>
+                        <div class="card stat-card">
+                            <div class="card-header bg-danger">
+                                <h6 class="mb-0">Not Taken TOEIC</h6>
+                                <div class="header-right">
+                                    <i class="fas fa-exclamation-triangle text-danger-light"></i> <span class="text-danger-light">-20%</span>
+                                </div>
                             </div>
-                            <div class="card-body p-4 d-flex align-items-center justify-content-center">
-                                <h2 class="font-weight-bold text-center mb-0">{{ number_format(($totalUsers ?? 0) - ($totalExamParticipants ?? 0)) }}</h2>
+                            <div class="card-body">
+                                <h2 class="font-weight-bold">{{ number_format(($totalUsers ?? 0) - ($totalExamParticipants ?? 0)) }}</h2>
+                                <small>Pending exams</small>
+                                <small>Needs attention</small>
                             </div>
                         </div>
                     </a>
                 </div>
-                
-                <!-- Average Score Card -->
-                <div class="col-lg-3 col-md-6 col-sm-6 col-12 mb-4">
-                    <div class="card stat-card h-100">
-                        <div class="card-header bg-warning text-white p-3 d-flex align-items-center justify-content-center">
-                            <h6 class="mb-0 text-center">Average Score</h6>
+
+                <!-- Basic Statistics Card -->
+                <div class="col-lg-6 col-md-12 col-sm-12 col-12 mb-0">
+                    <div class="card stat-card">
+                        <div class="card-header bg-primary">
+                            <h6 class="mb-0 font-weight-bold">Basic Stats</h6>
+                            <div class="header-right">
+                                <i class="fas fa-chart-bar text-info-light"></i> <span class="text-info-light">+5.0%</span>
+                            </div>
                         </div>
-                        <div class="card-body p-4 d-flex align-items-center justify-content-center">
-                            <h2 class="font-weight-bold text-center mb-0">{{ number_format($averageScore ?? 0, 1) }}</h2>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-0">
+                                    <div class="d-flex align-items-center">
+                                        <div class="mr-3 text-primary">
+                                            <i class="fas fa-chart-line fa-2x"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-muted small">Average Score (μ)</div>
+                                            <h5 class="mb-0 font-weight-bold">{{ number_format($averageScore ?? 0, 0) }}</h5>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-0">
+                                    <div class="d-flex align-items-center">
+                                        <div class="mr-3 text-info">
+                                            <i class="fas fa-ruler-combined fa-2x"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-muted small">Standard Deviation (σ)</div>
+                                            <h5 class="mb-0 font-weight-bold">{{ number_format($standardDeviation ?? 0, 0) }}</h5>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-1">
+                                    <div class="d-flex align-items-center">
+                                        <div class="mr-3 text-danger">
+                                            <i class="fas fa-arrow-down fa-2x"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-muted small">Lowest Score (min)</div>
+                                            <h5 class="mb-0 font-weight-bold">{{ number_format($lowestScore ?? 0, 0) }}</h5>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-1">
+                                    <div class="d-flex align-items-center">
+                                        <div class="mr-3 text-success">
+                                            <i class="fas fa-arrow-up fa-2x"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-muted small">Highest Score (max)</div>
+                                            <h5 class="mb-0 font-weight-bold">{{ number_format($highestScore ?? 0, 0) }}</h5>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-1">
+                                    <div class="d-flex align-items-center">
+                                        <div class="mr-3 text-warning">
+                                            <i class="fas fa-percent fa-2x"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-muted small">Median (M)</div>
+                                            <h5 class="mb-0 font-weight-bold">{{ number_format($median ?? 0, 0) }}</h5>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-1">
+                                    <div class="d-flex align-items-center">
+                                        <div class="mr-3 text-secondary">
+                                            <i class="fas fa-chart-bar fa-2x"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-muted small">Mode</div>
+                                            <h5 class="mb-0 font-weight-bold">{{ number_format($mode ?? 0, 0) }}</h5>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

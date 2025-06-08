@@ -229,7 +229,78 @@ Route::prefix('auth')->name('auth.')->group(function () {
 // Dashboard routes for each role (protected with auth & prevent-back-history middleware)
 Route::middleware(['auth', 'prevent-back-history'])->group(function () {
     Route::get('/dashboard-admin', function () {
-        return view('pages.dashboard-admin', ['type_menu' => 'dashboard']);
+        // Pass necessary data to the admin dashboard view
+        $totalStudents = App\Models\StudentModel::count();
+        $totalStaff = App\Models\StaffModel::count();
+        $totalLecturers = App\Models\LecturerModel::count();
+        $totalAlumni = App\Models\AlumniModel::count();
+        $totalUsers = App\Models\UserModel::count();
+        $totalExamParticipants = App\Models\ExamResultModel::distinct('user_id')->count();
+
+        // Calculate growth percentages (dummy data for now, replace with actual logic)
+        $studentGrowth = 10; // Example: 10% growth
+        $staffGrowth = 5;    // Example: 5% growth
+        $lecturerGrowth = 2; // Example: 2% growth
+        $alumniGrowth = 7;   // Example: 7% growth
+
+        // Basic Stats calculations (dummy data for now, replace with actual logic)
+        $allScores = App\Models\ExamResultModel::pluck('score')->toArray();
+        $averageScore = count($allScores) > 0 ? array_sum($allScores) / count($allScores) : 0;
+        $standardDeviation = 0; // Implement actual standard deviation calculation if needed
+        $lowestScore = count($allScores) > 0 ? min($allScores) : 0;
+        $highestScore = count($allScores) > 0 ? max($allScores) : 0;
+        $median = 0; // Implement actual median calculation if needed
+        $mode = 0;   // Implement actual mode calculation if needed
+
+        // Recent Exam Results (dummy data for now, replace with actual logic)
+        $recentExamResults = App\Models\ExamResultModel::with('user.student', 'user.staff', 'user.lecturer', 'user.alumni')
+                                ->orderBy('created_at', 'desc')
+                                ->take(5)
+                                ->get();
+
+        // Score Distribution (dummy data for now, replace with actual logic)
+        $scoreDistribution = collect([
+            ['grade' => 'Excellent', 'count' => 30],
+            ['grade' => 'Good', 'count' => 20],
+            ['grade' => 'Average', 'count' => 15],
+            ['grade' => 'Below Average', 'count' => 5],
+        ]);
+        $allExamResults = App\Models\ExamResultModel::all();
+
+        // Campus Distribution (dummy data for now, replace with actual logic)
+        $campusDistribution = collect([
+            ['campus' => 'campus_a', 'total' => 50],
+            ['campus' => 'campus_b', 'total' => 30],
+        ]);
+
+        // Recent Announcements (dummy data for now, replace with actual logic)
+        $recentAnnouncements = App\Models\AnnouncementModel::orderBy('announcement_date', 'desc')->take(3)->get();
+
+
+        return view('users-admin.dashboard.index', [
+            'type_menu' => 'dashboard',
+            'totalStudents' => $totalStudents,
+            'totalStaff' => $totalStaff,
+            'totalLecturers' => $totalLecturers,
+            'totalAlumni' => $totalAlumni,
+            'totalUsers' => $totalUsers,
+            'totalExamParticipants' => $totalExamParticipants,
+            'studentGrowth' => $studentGrowth,
+            'staffGrowth' => $staffGrowth,
+            'lecturerGrowth' => $lecturerGrowth,
+            'alumniGrowth' => $alumniGrowth,
+            'averageScore' => $averageScore,
+            'standardDeviation' => $standardDeviation,
+            'lowestScore' => $lowestScore,
+            'highestScore' => $highestScore,
+            'median' => $median,
+            'mode' => $mode,
+            'recentExamResults' => $recentExamResults,
+            'scoreDistribution' => $scoreDistribution,
+            'allExamResults' => $allExamResults,
+            'campusDistribution' => $campusDistribution,
+            'recentAnnouncements' => $recentAnnouncements,
+        ]);
     })->name('admin.dashboard');
 
     Route::get('/dashboard-lecturer', function () {
