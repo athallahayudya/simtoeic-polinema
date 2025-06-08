@@ -173,13 +173,14 @@
                                         </div>
                                         <div class="col-md-3">
                                             <div class="form-group">
-                                                <label>Score Range</label>
+                                                <label>TOEIC Band</label>
                                                 <select id="score-filter" class="form-control">
-                                                    <option value="">All</option>
-                                                    <option value="0-399">0-399</option>
-                                                    <option value="400-499">400-499</option>
-                                                    <option value="500-699">500-699</option>
-                                                    <option value="700-990">700-990</option>
+                                                    <option value="">All Levels</option>
+                                                    <option value="0-250">0-250 (Beginner)</option>
+                                                    <option value="255-500">255-500 (Elementary)</option>
+                                                    <option value="501-700">501-700 (Intermediate)</option>
+                                                    <option value="701-900">701-900 (Advanced)</option>
+                                                    <option value="901-990">901-990 (Proficient)</option>
                                                 </select>
                                             </div>
                                         </div>
