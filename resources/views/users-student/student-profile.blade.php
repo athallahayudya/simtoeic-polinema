@@ -23,16 +23,16 @@
         .section-header {
             margin-bottom: 0 !important;
         }
-        
+
         .section-body {
             padding-top: 0 !important;
         }
-        
+
         .section-title {
             margin-top: 0;
             margin-bottom: 10px;
         }
-        
+
         /* End of spacing adjustment */
 
         .profile-widget-picture {
@@ -255,33 +255,32 @@
                                     <div class="form-group">
                                         <label>Profile Photo</label>
                                         <input type="file" name="photo" class="form-control-file" id="profile-photo-input"
-                                            {{ $student->photo ? 'disabled' : '' }}>
-                                        @if($student->photo)
-                                            <div class="warning-text">
-                                                <i class="fas fa-exclamation-triangle"></i> Profile photo cannot be changed
-                                                once
-                                                uploaded.
+                                            accept="image/*">
+                                        <small class="form-text text-muted">
+                                            <i class="fas fa-info-circle"></i>
+                                            Supported formats: JPG, JPEG, PNG. Maximum size: 2MB.
+                                            <br>Please ensure the photo is clear and shows your face properly.
+                                        </small>
+
+                                        @if($student && $student->photo)
+                                            <div class="alert alert-info mt-2">
+                                                <i class="fas fa-check-circle"></i> Current photo uploaded. You can upload a new
+                                                one to replace it.
                                             </div>
-                                        @else
-                                            <div class="warning-text">
-                                                <i class="fas fa-exclamation-triangle"></i> Please upload your profile photo
-                                                carefully. It cannot be changed later.
+                                            <div class="document-preview mt-2">
+                                                <img src="{{ asset($student->photo) }}" alt="Current Profile Photo"
+                                                    class="img-fluid">
                                             </div>
                                         @endif
 
-                                        @if($student && $student->photo)
-                                            <div class="document-preview mt-2">
-                                                <img src="{{ asset($student->photo) }}" alt="Profile" class="img-fluid"
-                                                    id="profile-photo-preview">
-                                            </div>
-                                        @else
-                                            <div class="document-preview mt-2" id="profile-photo-container"
-                                                style="display:none">
-                                                <img src="" alt="Profile" class="img-fluid" id="profile-photo-preview">
-                                            </div>
-                                        @endif
+                                        <div class="document-preview mt-2" id="profile-photo-container"
+                                            style="display:none">
+                                            <strong>New Photo Preview:</strong>
+                                            <img src="" alt="Profile Preview" class="img-fluid" id="profile-photo-preview">
+                                        </div>
+
                                         @error('photo')
-                                            <div class="text-danger">{{ $message }}</div>
+                                            <div class="text-danger mt-1">{{ $message }}</div>
                                         @enderror
                                     </div>
 
@@ -290,28 +289,34 @@
                                             <div class="form-group">
                                                 <label>KTP Scan (ID Card)</label>
                                                 <input type="file" name="ktp_scan" class="form-control-file"
-                                                    accept="image/*" id="ktp-scan-input" {{ $student->ktp_scan ? 'disabled' : '' }}>
+                                                    accept="image/*" id="ktp-scan-input">
+                                                <small class="form-text text-muted">
+                                                    <i class="fas fa-info-circle"></i>
+                                                    Supported formats: JPG, JPEG, PNG. Maximum size: 5MB.
+                                                    <br>Please ensure the KTP is clear and all text is readable.
+                                                </small>
+
                                                 @if($student->ktp_scan)
-                                                    <div class="warning-text">
-                                                        <i class="fas fa-exclamation-triangle"></i> KTP document cannot be
-                                                        changed once uploaded.
+                                                    <div class="alert alert-info mt-2">
+                                                        <i class="fas fa-check-circle"></i> Current KTP uploaded. You can upload
+                                                        a new one to replace it.
                                                     </div>
                                                     <div class="mt-2">
                                                         <a href="{{ asset($student->ktp_scan) }}" target="_blank"
-                                                            class="btn btn-sm btn-info">View KTP Document</a>
-                                                    </div>
-                                                @else
-                                                    <div class="warning-text">
-                                                        <i class="fas fa-exclamation-triangle"></i> Please upload your KTP
-                                                        carefully. It cannot be changed later.
-                                                    </div>
-                                                    <div class="document-preview mt-2" id="ktp-scan-container"
-                                                        style="display:none">
-                                                        <img src="" alt="KTP Preview" class="img-fluid" id="ktp-scan-preview">
+                                                            class="btn btn-sm btn-info">
+                                                            <i class="fas fa-eye"></i> View Current KTP
+                                                        </a>
                                                     </div>
                                                 @endif
+
+                                                <div class="document-preview mt-2" id="ktp-scan-container"
+                                                    style="display:none">
+                                                    <strong>New KTP Preview:</strong>
+                                                    <img src="" alt="KTP Preview" class="img-fluid" id="ktp-scan-preview">
+                                                </div>
+
                                                 @error('ktp_scan')
-                                                    <div class="text-danger">{{ $message }}</div>
+                                                    <div class="text-danger mt-1">{{ $message }}</div>
                                                 @enderror
                                             </div>
                                         </div>
@@ -320,28 +325,34 @@
                                             <div class="form-group">
                                                 <label>KTM Scan (Student Card)</label>
                                                 <input type="file" name="ktm_scan" class="form-control-file"
-                                                    accept="image/*" id="ktm-scan-input" {{ $student->ktm_scan ? 'disabled' : '' }}>
+                                                    accept="image/*" id="ktm-scan-input">
+                                                <small class="form-text text-muted">
+                                                    <i class="fas fa-info-circle"></i>
+                                                    Supported formats: JPG, JPEG, PNG. Maximum size: 5MB.
+                                                    <br>Please ensure the KTM is clear and all text is readable.
+                                                </small>
+
                                                 @if($student->ktm_scan)
-                                                    <div class="warning-text">
-                                                        <i class="fas fa-exclamation-triangle"></i> KTM document cannot be
-                                                        changed once uploaded.
+                                                    <div class="alert alert-info mt-2">
+                                                        <i class="fas fa-check-circle"></i> Current KTM uploaded. You can upload
+                                                        a new one to replace it.
                                                     </div>
                                                     <div class="mt-2">
                                                         <a href="{{ asset($student->ktm_scan) }}" target="_blank"
-                                                            class="btn btn-sm btn-info">View KTM Document</a>
-                                                    </div>
-                                                @else
-                                                    <div class="warning-text">
-                                                        <i class="fas fa-exclamation-triangle"></i> Please upload your KTM
-                                                        carefully. It cannot be changed later.
-                                                    </div>
-                                                    <div class="document-preview mt-2" id="ktm-scan-container"
-                                                        style="display:none">
-                                                        <img src="" alt="KTM Preview" class="img-fluid" id="ktm-scan-preview">
+                                                            class="btn btn-sm btn-info">
+                                                            <i class="fas fa-eye"></i> View Current KTM
+                                                        </a>
                                                     </div>
                                                 @endif
+
+                                                <div class="document-preview mt-2" id="ktm-scan-container"
+                                                    style="display:none">
+                                                    <strong>New KTM Preview:</strong>
+                                                    <img src="" alt="KTM Preview" class="img-fluid" id="ktm-scan-preview">
+                                                </div>
+
                                                 @error('ktm_scan')
-                                                    <div class="text-danger">{{ $message }}</div>
+                                                    <div class="text-danger mt-1">{{ $message }}</div>
                                                 @enderror
                                             </div>
                                         </div>
@@ -364,10 +375,29 @@
 
     <!-- Page Specific JS File -->
     <script>
+        // File size validation function
+        function validateFileSize(file, maxSizeMB, inputElement) {
+            const maxSizeBytes = maxSizeMB * 1024 * 1024;
+            if (file.size > maxSizeBytes) {
+                alert(`File size too large! Maximum allowed size is ${maxSizeMB}MB. Your file is ${(file.size / 1024 / 1024).toFixed(2)}MB.`);
+                inputElement.value = '';
+                return false;
+            }
+            return true;
+        }
+
         // For profile photo preview
         document.getElementById('profile-photo-input')?.addEventListener('change', function (e) {
             const [file] = e.target.files;
-            if (file && file.type.match('image.*')) {
+            if (file) {
+                if (!file.type.match('image.*')) {
+                    alert('Please select a valid image file (JPG, JPEG, PNG).');
+                    this.value = '';
+                    return;
+                }
+
+                if (!validateFileSize(file, 2, this)) return;
+
                 const reader = new FileReader();
                 reader.onload = function (evt) {
                     const preview = document.getElementById('profile-photo-preview');
@@ -385,7 +415,15 @@
         // For KTP scan preview
         document.getElementById('ktp-scan-input')?.addEventListener('change', function (e) {
             const [file] = e.target.files;
-            if (file && file.type.match('image.*')) {
+            if (file) {
+                if (!file.type.match('image.*')) {
+                    alert('Please select a valid image file (JPG, JPEG, PNG).');
+                    this.value = '';
+                    return;
+                }
+
+                if (!validateFileSize(file, 5, this)) return;
+
                 const reader = new FileReader();
                 reader.onload = function (evt) {
                     const preview = document.getElementById('ktp-scan-preview');
@@ -403,7 +441,15 @@
         // For KTM scan preview
         document.getElementById('ktm-scan-input')?.addEventListener('change', function (e) {
             const [file] = e.target.files;
-            if (file && file.type.match('image.*')) {
+            if (file) {
+                if (!file.type.match('image.*')) {
+                    alert('Please select a valid image file (JPG, JPEG, PNG).');
+                    this.value = '';
+                    return;
+                }
+
+                if (!validateFileSize(file, 5, this)) return;
+
                 const reader = new FileReader();
                 reader.onload = function (evt) {
                     const preview = document.getElementById('ktm-scan-preview');

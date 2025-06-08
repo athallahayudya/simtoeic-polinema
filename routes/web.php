@@ -255,7 +255,6 @@ Route::middleware(['auth', 'prevent-back-history'])->group(function () {
     Route::get('/exam-results', [ExamResultController::class, 'index'])->name('exam-results.index');
     Route::get('/exam-results/data', [ExamResultController::class, 'getResults'])->name('exam-results.data');
     Route::post('/exam-results/import', [ExamResultController::class, 'import'])->name('exam-results.import.store');
-    Route::delete('/exam-results/delete-all', [ExamResultController::class, 'deleteAll'])->name('exam-results.delete-all');
     Route::get('/exam-results/{id}', [ExamResultController::class, 'show'])->name('exam-results.show');
     Route::put('/exam-results/{id}', [ExamResultController::class, 'update'])->name('exam-results.update');
     Route::delete('/exam-results/{id}', [ExamResultController::class, 'destroy'])->name('exam-results.destroy');

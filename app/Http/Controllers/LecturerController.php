@@ -270,8 +270,9 @@ class LecturerController extends Controller
             'phone_number' => 'required|string|min:10|max:15|regex:/^[0-9+\-\s]+$/',
             'home_address' => 'required|string',
             'current_address' => 'required|string',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'ktp_scan' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:2048',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',  // 2MB for profile photo
+            'ktp_scan' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',  // 5MB for KTP scan
+            'ktm_scan' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',  // 5MB for ID card scan
         ]);
 
         $lecturer->name = $request->input('name');
@@ -302,6 +303,15 @@ class LecturerController extends Controller
             }
             $ktpPath = $request->file('ktp_scan')->store('lecturer/ktp', 'public');
             $lecturer->ktp_scan = 'storage/' . $ktpPath;
+        }
+
+        // Handle KTM/ID card scan upload
+        if ($request->hasFile('ktm_scan')) {
+            if ($lecturer->ktm_scan && Storage::disk('public')->exists(str_replace('storage/', '', $lecturer->ktm_scan))) {
+                Storage::disk('public')->delete(str_replace('storage/', '', $lecturer->ktm_scan));
+            }
+            $ktmPath = $request->file('ktm_scan')->store('lecturer/id_card', 'public');
+            $lecturer->ktm_scan = 'storage/' . $ktmPath;
         }
 
         // Save lecturer data

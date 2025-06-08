@@ -23,16 +23,16 @@
         .section-header {
             margin-bottom: 0 !important;
         }
-        
+
         .section-body {
             padding-top: 0 !important;
         }
-        
+
         .section-title {
             margin-top: 0;
             margin-bottom: 10px;
         }
-        
+
         /* End of spacing adjustment */
 
         .profile-widget-picture {
@@ -196,70 +196,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="form-group">
-                                        <label>Profile Photo</label>
-                                        <input type="file" name="photo" class="form-control-file" id="profile-photo-input"
-                                            {{ $lecturer->photo ? 'disabled' : '' }}>
-                                        @if($lecturer->photo)
-                                            <div class="warning-text">
-                                                <i class="fas fa-exclamation-triangle"></i> Profile photo cannot be changed
-                                                once
-                                                uploaded.
-                                            </div>
-                                        @else
-                                            <div class="warning-text">
-                                                <i class="fas fa-exclamation-triangle"></i> Please upload your profile photo
-                                                carefully. It cannot be changed later.
-                                            </div>
-                                        @endif
-
-                                        @if($lecturer && $lecturer->photo)
-                                            <div class="document-preview mt-2">
-                                                <img src="{{ asset($lecturer->photo) }}" alt="Profile" class="img-fluid"
-                                                    id="profile-photo-preview">
-                                            </div>
-                                        @else
-                                            <div class="document-preview mt-2" id="profile-photo-container"
-                                                style="display:none">
-                                                <img src="" alt="Profile" class="img-fluid" id="profile-photo-preview">
-                                            </div>
-                                        @endif
-                                        @error('photo')
-                                            <div class="text-danger">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label>KTP Scan (ID Card)</label>
-                                                <input type="file" name="ktp_scan" class="form-control-file"
-                                                    accept="image/*" id="ktp-scan-input" {{ $lecturer->ktp_scan ? 'disabled' : '' }}>
-                                                @if($lecturer->ktp_scan)
-                                                    <div class="warning-text">
-                                                        <i class="fas fa-exclamation-triangle"></i> KTP document cannot be
-                                                        changed once uploaded.
-                                                    </div>
-                                                    <div class="mt-2">
-                                                        <a href="{{ asset($lecturer->ktp_scan) }}" target="_blank"
-                                                            class="btn btn-sm btn-info">View KTP Document</a>
-                                                    </div>
-                                                @else
-                                                    <div class="warning-text">
-                                                        <i class="fas fa-exclamation-triangle"></i> Please upload your KTP
-                                                        carefully. It cannot be changed later.
-                                                    </div>
-                                                    <div class="document-preview mt-2" id="ktp-scan-container"
-                                                        style="display:none">
-                                                        <img src="" alt="KTP Preview" class="img-fluid" id="ktp-scan-preview">
-                                                    </div>
-                                                @endif
-                                                @error('ktp_scan')
-                                                    <div class="text-danger">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                    </div>
+                                    @include('components.profile-upload-section', ['user' => $lecturer, 'userType' => 'lecturer'])
                                     <div class="card-footer text-right">
                                         <button type="submit" class="btn btn-primary">Save Changes</button>
                                     </div>
@@ -278,42 +215,6 @@
 
     <!-- Page Specific JS File -->
     <script>
-        // For profile photo preview
-        document.getElementById('profile-photo-input')?.addEventListener('change', function (e) {
-            const [file] = e.target.files;
-            if (file && file.type.match('image.*')) {
-                const reader = new FileReader();
-                reader.onload = function (evt) {
-                    const preview = document.getElementById('profile-photo-preview');
-                    const container = document.getElementById('profile-photo-container');
-
-                    if (preview) {
-                        preview.src = evt.target.result;
-                        if (container) container.style.display = 'block';
-                    }
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
-        // For KTP scan preview
-        document.getElementById('ktp-scan-input')?.addEventListener('change', function (e) {
-            const [file] = e.target.files;
-            if (file && file.type.match('image.*')) {
-                const reader = new FileReader();
-                reader.onload = function (evt) {
-                    const preview = document.getElementById('ktp-scan-preview');
-                    const container = document.getElementById('ktp-scan-container');
-
-                    if (preview) {
-                        preview.src = evt.target.result;
-                        if (container) container.style.display = 'block';
-                    }
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
         // Auto-hide alerts after 5 seconds
         setTimeout(function () {
             $('.alert').fadeOut('slow');

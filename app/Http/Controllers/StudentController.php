@@ -283,9 +283,9 @@ class StudentController extends Controller
             'phone_number' => 'required|string|min:10|max:15|regex:/^[0-9+\-\s]+$/',  // Improved validation
             'home_address' => 'required|string',
             'current_address' => 'required|string',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'ktp_scan' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:2048',
-            'ktm_scan' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:2048',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',  // 2MB for profile photo
+            'ktp_scan' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',  // 5MB for KTP scan
+            'ktm_scan' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',  // 5MB for KTM scan
         ]);
 
         // Update student data (exclude major and study_program)

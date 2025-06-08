@@ -249,11 +249,6 @@
                         <div class="card">
                             <div class="card-header">
                                 <h4><i class="fas fa-table mr-2"></i>Exam Results</h4>
-                                <div class="card-header-action">
-                                    <button id="deleteAllButton" class="btn btn-danger btn-sm">
-                                        <i class="fas fa-trash-alt"></i> Delete All
-                                    </button>
-                                </div>
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
@@ -592,44 +587,7 @@
                 }
             }
 
-            // Delete All Results handler
-            $('#deleteAllButton').on('click', function () {
-                if (confirm('Are you sure you want to delete ALL exam results? This action cannot be undone and will remove all data and associated files.')) {
 
-                    // Disable button to prevent multiple clicks
-                    $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Deleting...');
-
-                    $.ajax({
-                        url: '{{ route("exam-results.delete-all") }}',
-                        type: 'DELETE',
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
-                        success: function (response) {
-                            // Re-enable button
-                            $('#deleteAllButton').prop('disabled', false).html('<i class="fas fa-trash-alt"></i> Delete All');
-
-                            if (response.status) {
-                                showMessageModal('All exam results deleted successfully!', true);
-                            } else {
-                                showMessageModal(response.message || 'Error deleting exam results', false);
-                            }
-                        },
-                        error: function (xhr) {
-                            // Re-enable button
-                            $('#deleteAllButton').prop('disabled', false).html('<i class="fas fa-trash-alt"></i> Delete All');
-
-                            let errorMsg = 'Error deleting exam results';
-                            if (xhr.responseJSON && xhr.responseJSON.message) {
-                                errorMsg = xhr.responseJSON.message;
-                            } else if (xhr.responseText) {
-                                errorMsg = 'Server error: ' + xhr.status;
-                            }
-                            showMessageModal(errorMsg, false);
-                        }
-                    });
-                }
-            });
 
             // Delete single result handler
             $(document).on('click', '.delete-result', function () {
