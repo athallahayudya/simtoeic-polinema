@@ -1,75 +1,78 @@
 <p align="center">
-  <a href="https://laravel.com/">
-    <img src="https://laravel.com/img/logomark.min.svg" alt="laravel logo" width="75" height="75">
-  </a>
-  <a href="https://getstisla.com">
-    <img src="https://avatars2.githubusercontent.com/u/45754626?s=75&v=4" alt="Stisla logo" width="75" height="75">
-  </a>
+    <img src="public/img/logo-polinema.png" alt="polinema logo" width="75" height="75">
+    <img src="public/img/logo-simtoeic.png" alt="simtoeic logo" width="78" height="75">
 </p>
 
-<h1 align="center">Laravel Stisla</h1>
-
-<span align="center">
-
-**Laravel Stisla** is a Free Bootstrap Admin Template which will help you to speed up your project and design your own dashboard UI using Laravel blade templating engine.
-
-</span>
-
-<br>
+<h1 align="center">SIMTOEIC-POLINEMA</h1>
 
 <p align="center">
-  <a href="https://getstisla.com">Homepage</a>
-  •
-  <a href="https://github.com/edikurniawan-dev/laravel-stisla#quick-start">Getting Started</a>
-  •
-  <a href="https://demo.getstisla.com" target="_new">Demo</a>
-  •
-  <a href="https://getstisla.com/docs">Documentation</a>
-  •
-  <a href="https://getstisla.com/blog">Blog</a>
-  •
-  <a href="https://github.com/edikurniawan-dev/laravel-stisla/issues">Issue</a>
+  <i>TOEIC Test Registration and Management Information System for Staff, Lecturers, Alumni, and Students</i>
 </p>
-
-<br>
-
-[![Stisla Preview](https://camo.githubusercontent.com/2135e0f6544a7286a3412cdc3df32d47fc91b045/68747470733a2f2f692e6962622e636f2f3674646d6358302f323031382d31312d31312d31352d33352d676574737469736c612d636f6d2e706e67)](https://getstisla.com)
-
-## Table of Contents
-
-- [Table of Contents](#table-of-contents)
-- [Quick start](#quick-start)
-- [License](#license)
-- [Supports](#supports)
-
-## Quick start
-
-Several quick start options are available:
-
--   Clone the repo: `git clone https://github.com/edikurniawan-dev/laravel-stisla.git`
--   Run `cd` to the newly created `/laravel-stisla` directory
--   Run `composer install` command
--   Run `npm install` command
--   Run `npm run dev` command
--   Run `cp .env.example .env` command
--   Run `php artisan key:generate` command
--   Run `php artisan serve` command
--   Done
-
-Read the [documentation page](https://getstisla.com/docs) for more information on the framework contents, templates and examples, and more.
-
-## License
-
-**Stisla** is licensed under the [MIT License](LICENSE)
-
-## Supports
-
-Thanks to BrowserStack for their support on this open-source project!
-
-<a href="https://www.browserstack.com">
-  <img src="https://getstisla.com/svg/Browserstack-logo.svg" alt="BrowserStack" width="250">
-</a>
 
 ---
 
-Stisla is created by [Nauval](http://nauv.al) ([Twitter](https://twitter.com/mhdnauvalazhar)). You can support the author by donation [here](https://www.buymeacoffee.com/mhd).
+## 📘 Overview
+<span align="justify">
+
+**SIMTOEIC Polinema** is a web-based information system developed to support and streamline the implementation of the TOEIC test at **State Polytechnic of Malang**. It simplifies the processes of **registration, scheduling, and data management,** replacing the previous **semi-manual methods** with a **centralized digital platform.** The system also ensures accuracy, transparency, and accessibility, contributing to more effective administration of language proficiency standards.
+
+</span>
+
+---
+
+## 🧩 Features
+
+### 🔹 For User (Staff, Lecturers, Alumni, and Students)
+- Online registration form with complete biodata and document upload
+- View exam schedules and Zoom links
+- Get notifications for announcements, reminders, and results
+- View TOEIC exam history and score
+
+### 🔹 For Admin
+- Open and announce registration periods automatically
+- Manage student registration data (create/edit/delete)
+- Automatic filtering of students who already took the free exam
+- Upload and distribute exam results 
+- Schedule exam sessions and manage Zoom links
+
+---
+
+## 👥 User Roles
+
+- **Staff, Lecturers, Alumni, and Students**: Register, upload documents, view schedules and results
+- **Admin**: Manage data, verify eligibility, schedule exams, announce results
+  
+---
+
+## ⚙️ Technology Stack 
+- **Frontend**: HTML, CSS (Bootstrap), JavaScript, Stisla
+- **Backend**: PHP/Laravel
+- **Database**: MySQL
+
+---
+
+## 📄 License
+
+This project is licensed under the **Apache License 2.0** — see the [LICENSE](LICENSE) file for details.
+
+---
+## ✨ Hope
+<span align="justify">
+    
+With this system, it is expected that the implementation of the TOEIC exam can run more effectively and efficiently compared to the previous system which is still semi-manual. This system allows the entire process to be centralized in one digital platform, so as to minimize errors, speed up workflow, and improve data management accuracy.
+
+</span>
+
+
+## ⌨️ Authors
+
+- Athallah Ayudya Paramesti (2341760061)  
+- Kanaya Abdielaramadhani H. (2341760118)  
+- Mochammad Audric Andhika H. (2341760094)  
+- Muhammad Ircham (2341760115)  
+- Yonanda Mayla Rusdiaty (2341760184)  
+
+---
+
+> This project was developed as part of the Software Requirements Specification (SKPL) course in the Department of Information Technology, State Polytechnic of Malang.
+
