@@ -39,8 +39,15 @@
                                                 </select>
                                                 <small class="form-text text-muted">Announcement Status</small>
                                             </div>
-                                            <a href="{{ url('announcements/create') }}" class="btn btn-success">+ Add
-                                                Announcement</a>
+                                            <div>
+                                                <a href="{{ url('announcements/create') }}" class="btn btn-success mr-2">+
+                                                    Add
+                                                    Announcement</a>
+                                                <button type="button" class="btn btn-primary" data-toggle="modal"
+                                                    data-target="#uploadPdfModal">
+                                                    <i class="fas fa-file-pdf mr-1"></i> Upload PDF
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -65,6 +72,89 @@
                 </div>
             </div>
         </section>
+    </div>
+
+    <!-- Upload PDF Modal -->
+    <div class="modal fade" id="uploadPdfModal" tabindex="-1" role="dialog" aria-labelledby="uploadPdfModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="uploadPdfModalLabel">
+                        <i class="fas fa-file-pdf mr-2 text-danger"></i>Upload Announcement PDF
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="uploadPdfForm" enctype="multipart/form-data">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="title">Title <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="title" name="title" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="announcement_file">PDF File <span class="text-danger">*</span></label>
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="announcement_file" name="announcement_file"
+                                    accept=".pdf" required>
+                                <label class="custom-file-label" for="announcement_file">Choose PDF file...</label>
+                            </div>
+                            <small class="form-text text-muted">Maximum file size: 10MB. Only PDF files are allowed.</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="description">Description (Optional)</label>
+                            <textarea class="form-control" id="description" name="description" rows="3"
+                                placeholder="Brief description of the announcement..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Visible To</label>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" id="visible_student"
+                                            name="visible_to[]" value="student">
+                                        <label class="custom-control-label" for="visible_student">Students</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" id="visible_staff"
+                                            name="visible_to[]" value="staff">
+                                        <label class="custom-control-label" for="visible_staff">Staff</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" id="visible_alumni"
+                                            name="visible_to[]" value="alumni">
+                                        <label class="custom-control-label" for="visible_alumni">Alumni</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" id="visible_lecturer"
+                                            name="visible_to[]" value="lecturer">
+                                        <label class="custom-control-label" for="visible_lecturer">Lecturers</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <small class="form-text text-muted">Leave unchecked to make visible to all user types.</small>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-upload mr-1"></i> Upload PDF
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 
     <div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" aria-hidden="true"></div>
@@ -155,11 +245,11 @@
                     data: formData,
                     success: function (response) {
                         if (response.status) {
-                            swal('Success!', response.message, 'success');
+                            Swal.fire('Success!', response.message, 'success');
                             $('#myModal').modal('hide');
                             dataAnnouncement.ajax.reload(); // Reload DataTable
                         } else {
-                            swal('Error!', response.message, 'error');
+                            Swal.fire('Error!', response.message, 'error');
                         }
                     },
                     error: function (xhr) {
@@ -175,13 +265,138 @@
                                 input.addClass('is-invalid');
                                 input.after('<div class="invalid-feedback">' + value + '</div>');
                             });
-                            swal('Validation Error!', 'Please check the form for errors.', 'error');
+                            Swal.fire('Validation Error!', 'Please check the form for errors.', 'error');
                         } else {
-                            swal('Error!', 'An error occurred while updating the announcement.', 'error');
+                            Swal.fire('Error!', 'An error occurred while updating the announcement.', 'error');
                         }
                         console.error(xhr.responseText);
                     }
                 });
+            });
+
+            // Handle PDF upload form submission
+            $('#uploadPdfForm').on('submit', function (e) {
+                e.preventDefault();
+                console.log('Upload form submitted!');
+
+                var formData = new FormData(this);
+                var submitBtn = $(this).find('button[type="submit"]');
+                var originalText = submitBtn.html();
+                var fileInput = $('#announcement_file')[0];
+                var file = fileInput.files[0];
+
+                // Debug form data
+                console.log('Form data being sent:');
+                console.log('Title:', $('#title').val());
+                console.log('File:', file);
+                console.log('Description:', $('#description').val());
+
+                // Check if file exists
+                if (!file) {
+                    Swal.fire('No File Selected!', 'Please select a PDF file to upload.', 'error');
+                    return;
+                }
+
+                // Check file size before upload
+                if (file && file.size > 10 * 1024 * 1024) { // 10MB in bytes
+                    Swal.fire('File Too Large!', 'Please select a PDF file smaller than 10MB.', 'error');
+                    return;
+                }
+
+                // Show progress and disable submit button
+                submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i> Uploading...');
+
+                // Add progress indicator
+                var progressHtml = '<div class="progress mt-2" id="uploadProgress" style="height: 20px;"><div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div></div>';
+                if ($('#uploadProgress').length === 0) {
+                    $(progressHtml).insertAfter('#announcement_file').next('.form-text');
+                }
+
+                $.ajax({
+                    url: "{{ route('announcements.upload') }}",
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    xhr: function () {
+                        var xhr = new window.XMLHttpRequest();
+                        // Upload progress
+                        xhr.upload.addEventListener("progress", function (evt) {
+                            if (evt.lengthComputable) {
+                                var percentComplete = (evt.loaded / evt.total) * 100;
+                                $('#uploadProgress .progress-bar').css('width', percentComplete + '%');
+                            }
+                        }, false);
+                        return xhr;
+                    },
+                    success: function (response) {
+                        if (response.status) {
+                            $('#uploadProgress .progress-bar').css('width', '100%');
+                            setTimeout(function () {
+                                Swal.fire('Success!', response.message, 'success');
+                                $('#uploadPdfModal').modal('hide');
+                                $('#uploadPdfForm')[0].reset();
+                                $('.custom-file-label').text('Choose PDF file...');
+                                $('#uploadProgress').remove();
+                                dataAnnouncement.ajax.reload();
+                            }, 500);
+                        } else {
+                            Swal.fire('Error!', response.message, 'error');
+                        }
+                    },
+                    error: function (xhr) {
+                        console.log('Upload error:', xhr);
+                        console.log('Status:', xhr.status);
+                        console.log('Response:', xhr.responseText);
+
+                        var errors = xhr.responseJSON?.errors;
+                        if (errors) {
+                            var errorMessage = '';
+                            $.each(errors, function (key, value) {
+                                errorMessage += value[0] + '\n';
+                            });
+                            Swal.fire('Validation Error!', errorMessage, 'error');
+                        } else if (xhr.status === 413) {
+                            Swal.fire('File Too Large!', 'The file size exceeds the server limit. Please try a smaller file.', 'error');
+                        } else if (xhr.status === 422) {
+                            Swal.fire('Validation Error!', 'Please check your form data and try again.', 'error');
+                        } else if (xhr.status === 500) {
+                            Swal.fire('Server Error!', 'Internal server error occurred. Please try again later.', 'error');
+                        } else {
+                            Swal.fire('Error!', 'An error occurred while uploading the PDF. Status: ' + xhr.status, 'error');
+                        }
+                    },
+                    complete: function () {
+                        // Re-enable submit button and remove progress bar
+                        submitBtn.prop('disabled', false).html(originalText);
+                        setTimeout(function () {
+                            $('#uploadProgress').remove();
+                        }, 1000);
+                    }
+                });
+            });
+
+            // Handle file input change to show selected filename and validate size
+            $('.custom-file-input').on('change', function () {
+                var fileName = $(this).val().split('\\').pop();
+                var file = this.files[0];
+                var fileLabel = $(this).next('.custom-file-label');
+
+                if (file) {
+                    var fileSize = file.size;
+                    var maxSize = 10 * 1024 * 1024; // 10MB
+
+                    if (fileSize > maxSize) {
+                        fileLabel.text('File too large (max 10MB)').addClass('text-danger');
+                        $(this).val(''); // Clear the input
+                        Swal.fire('File Too Large!', 'Please select a PDF file smaller than 10MB.', 'error');
+                    } else {
+                        var fileSizeMB = (fileSize / (1024 * 1024)).toFixed(2);
+                        fileLabel.text(fileName + ' (' + fileSizeMB + ' MB)').removeClass('text-danger');
+                    }
+                } else {
+                    fileLabel.text('Choose PDF file...').removeClass('text-danger');
+                }
             });
         });
     </script>

@@ -145,6 +145,12 @@ class AnnouncementController extends Controller
      */
     public function upload(Request $request)
     {
+        Log::info('Upload request received', [
+            'title' => $request->title,
+            'has_file' => $request->hasFile('announcement_file'),
+            'file_size' => $request->hasFile('announcement_file') ? $request->file('announcement_file')->getSize() : 0
+        ]);
+
         $request->validate([
             'title' => 'required|string|max:255',
             'announcement_file' => 'required|file|mimes:pdf|max:10240',
@@ -179,7 +185,9 @@ class AnnouncementController extends Controller
                 'data' => $announcement
             ]);
         } catch (\Exception $e) {
-            Log::error('Error uploading announcement: ' . $e->getMessage());
+            Log::error('Error uploading announcement: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
 
             return response()->json([
                 'status' => false,

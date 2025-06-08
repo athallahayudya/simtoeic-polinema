@@ -279,6 +279,9 @@ Route::group(['prefix' => 'announcements', 'middleware' => ['auth', 'prevent-bac
     Route::get('/{id}/delete_ajax', [AnnouncementController::class, 'confirm_ajax']);
     Route::delete('/{id}', [AnnouncementController::class, 'destroy'])->name('announcements.destroy');
     Route::post('/upload', [AnnouncementController::class, 'upload'])->name('announcements.upload');
+    Route::get('/test-upload', function () {
+        return response()->json(['status' => true, 'message' => 'Upload route is working']);
+    });
 });
 
 // Admin Manage Users route
