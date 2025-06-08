@@ -103,19 +103,39 @@ class AdminDashboardController extends Controller
             ->orderBy('month')
             ->get();
 
-        // Exam scores distribution
+        // Exam scores distribution with TOEIC standards
         $scoreDistribution = ExamResultModel::select(
-            DB::raw('CASE 
-                WHEN score >= 90 THEN "Excellent (90-100)"
-                WHEN score >= 80 THEN "Good (80-89)"
-                WHEN score >= 70 THEN "Average (70-79)"
-                WHEN score >= 60 THEN "Below Average (60-69)"
-                ELSE "Poor (0-59)"
+            DB::raw('CASE
+                WHEN score >= 945 THEN "Proficient (945-990)"
+                WHEN score >= 785 THEN "Advanced (785-944)"
+                WHEN score >= 550 THEN "Intermediate (550-784)"
+                WHEN score >= 225 THEN "Elementary (225-549)"
+                ELSE "Beginner (10-224)"
             END as grade'),
             DB::raw('COUNT(*) as count')
         )
+            ->whereNotNull('score')
             ->groupBy('grade')
             ->get();
+
+        // If no data, create default structure
+        if ($scoreDistribution->isEmpty()) {
+            $scoreDistribution = collect([
+                (object)['grade' => 'Beginner (10-224)', 'count' => 0],
+                (object)['grade' => 'Elementary (225-549)', 'count' => 0],
+                (object)['grade' => 'Intermediate (550-784)', 'count' => 0],
+                (object)['grade' => 'Advanced (785-944)', 'count' => 0],
+                (object)['grade' => 'Proficient (945-990)', 'count' => 0],
+            ]);
+        }
+
+        // Additional score statistics for enhanced display
+        $totalParticipants = ExamResultModel::count();
+        $passRate = $totalParticipants > 0 ? ExamResultModel::where('score', '>=', 550)->count() / $totalParticipants * 100 : 0;
+        $excellentRate = $totalParticipants > 0 ? ExamResultModel::where('score', '>=', 785)->count() / $totalParticipants * 100 : 0;
+
+        // Get all exam results for detailed chart
+        $allExamResults = ExamResultModel::select('score')->get();
 
         // Recent announcements
         $recentAnnouncements = AnnouncementModel::where('announcement_status', 'published')
@@ -123,9 +143,18 @@ class AdminDashboardController extends Controller
             ->limit(5)
             ->get();
 
-        // Campus distribution
-        $campusDistribution = StudentModel::select('campus', DB::raw('count(*) as total'))
+        // Enhanced campus distribution with additional statistics
+        $campusDistribution = StudentModel::select(
+            'campus',
+            DB::raw('count(*) as total'),
+            DB::raw('ROUND(AVG(CASE WHEN exam_result.score IS NOT NULL THEN exam_result.score END), 1) as avg_score'),
+            DB::raw('COUNT(CASE WHEN exam_result.score IS NOT NULL THEN 1 END) as exam_taken'),
+            DB::raw('COUNT(CASE WHEN exam_result.score >= 550 THEN 1 END) as passed_count')
+        )
+            ->leftJoin('users', 'student.user_id', '=', 'users.user_id')
+            ->leftJoin('exam_result', 'users.user_id', '=', 'exam_result.user_id')
             ->groupBy('campus')
+            ->orderBy('total', 'desc')
             ->get();
 
         return view('users-admin.dashboard.index', compact(
@@ -153,7 +182,11 @@ class AdminDashboardController extends Controller
             'userRegistrationData',
             'scoreDistribution',
             'recentAnnouncements',
-            'campusDistribution'
+            'campusDistribution',
+            'totalParticipants',
+            'passRate',
+            'excellentRate',
+            'allExamResults'
         ));
     }
 
