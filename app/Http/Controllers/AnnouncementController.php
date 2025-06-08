@@ -52,7 +52,7 @@ class AnnouncementController extends Controller
         return view('users-admin.announcement.delete', ['announcements' => $announcements]);
     }
 
-    public function delete_ajax(string $id)
+    public function destroy(string $id)
     {
         $announcements = AnnouncementModel::find($id);
         if ($announcements) {
@@ -74,6 +74,12 @@ class AnnouncementController extends Controller
     {
         $announcements = AnnouncementModel::find($id);
         return view('users-admin.announcement.edit', ['announcements' => $announcements]);
+    }
+
+    public function edit_dashboard(string $id)
+    {
+        $announcements = AnnouncementModel::find($id);
+        return view('users-admin.announcement.edit_dashboard', ['announcements' => $announcements]);
     }
 
     public function update(Request $request, $id)

@@ -274,6 +274,7 @@ Route::group(['prefix' => 'announcements', 'middleware' => ['auth', 'prevent-bac
     Route::post('/store', [AnnouncementController::class, 'store'])->name('announcements.store');
     Route::get('/{id}/show_ajax', [AnnouncementController::class, 'show_ajax']);
     Route::get('/{id}/edit', [AnnouncementController::class, 'edit'])->name('announcements.edit');
+    Route::get('/{id}/edit_dashboard', [AnnouncementController::class, 'edit_dashboard'])->name('announcements.edit_dashboard');
     Route::put('/{id}/update', [AnnouncementController::class, 'update'])->name('announcements.update');
     Route::get('/{id}/delete_ajax', [AnnouncementController::class, 'confirm_ajax']);
     Route::delete('/{id}', [AnnouncementController::class, 'destroy'])->name('announcements.destroy');

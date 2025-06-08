@@ -15,15 +15,15 @@
                 <a href="{{ url('announcements/') }}" class="btn btn-warning">Back</a>
             </div>
         @else
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Announcement</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
             <form action="{{ url('announcements/' . $announcements->announcement_id . '/update') }}" method="POST">
                 @csrf
                 @method('PUT')
-                <div class="modal-header">
-                    <h5 class="modal-title">Edit Announcement</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
                 <div class="modal-body">
                     <div class="form-group">
                         <label>Title</label>
@@ -33,6 +33,7 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
+
                     <div class="form-group">
                         <label>Announcement Status</label>
                         <select class="form-control @error('announcement_status') is-invalid @enderror"
@@ -44,23 +45,26 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
+
                     <div class="form-group">
                         <label>Announcement Date</label>
                         <input type="date" class="form-control @error('announcement_date') is-invalid @enderror"
                             name="announcement_date"
-                            value="{{ old('announcement_date', $announcements->announcement_date) }}">
+                            value="{{ old('announcement_date', \Carbon\Carbon::parse($announcements->announcement_date)->format('Y-m-d')) }}">
                         @error('announcement_date')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
+
                     <div class="form-group">
                         <label>Content</label>
-                        <textarea class="form-control @error('content') is-invalid @enderror"
-                            name="content">{{ old('content', $announcements->content) }}</textarea>
+                        <textarea class="form-control @error('content') is-invalid @enderror" name="content"
+                            rows="4">{{ old('content', $announcements->content) }}</textarea>
                         @error('content')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
+
                     <div class="form-group">
                         <label>Visible To</label>
                         <div class="form-text text-muted mb-2">Select user types who can see this announcement. Leave empty

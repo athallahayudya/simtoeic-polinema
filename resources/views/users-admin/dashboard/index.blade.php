@@ -6,6 +6,12 @@
     <!-- CSS Libraries -->
     <link rel="stylesheet" href="{{ asset('library/chart.js/dist/Chart.min.css') }}">
     <style>
+        /* Custom style to make modal backdrop transparent */
+        .modal-backdrop.show {
+            opacity: 0 !important;
+            /* Make it completely transparent */
+        }
+
         /* General card styling for the new design */
         .stat-card {
             background-color: #ffffff;
@@ -411,7 +417,8 @@
                             </div>
                             <div class="card-body">
                                 <h2 class="font-weight-bold">
-                                    {{ number_format(($totalUsers ?? 0) - ($totalExamParticipants ?? 0)) }}</h2>
+                                    {{ number_format(($totalUsers ?? 0) - ($totalExamParticipants ?? 0)) }}
+                                </h2>
                                 <small>Pending exams</small>
                                 <small>Needs attention</small>
                             </div>
@@ -437,7 +444,8 @@
                                         </div>
                                         <div>
                                             <div class="text-muted small">Average Score (μ)</div>
-                                            <h6 class="mb-0 font-weight-bold">{{ number_format($averageScore ?? 0, 0) }}</h6>
+                                            <h6 class="mb-0 font-weight-bold">{{ number_format($averageScore ?? 0, 0) }}
+                                            </h6>
                                         </div>
                                     </div>
                                 </div>
@@ -448,7 +456,9 @@
                                         </div>
                                         <div>
                                             <div class="text-muted small">Standard Deviation (σ)</div>
-                                            <h6 class="mb-0 font-weight-bold">{{ number_format($standardDeviation ?? 0, 0) }}</h6>
+                                            <h6 class="mb-0 font-weight-bold">
+                                                {{ number_format($standardDeviation ?? 0, 0) }}
+                                            </h6>
                                         </div>
                                     </div>
                                 </div>
@@ -470,7 +480,8 @@
                                         </div>
                                         <div>
                                             <div class="text-muted small">Highest Score (max)</div>
-                                            <h6 class="mb-0 font-weight-bold">{{ number_format($highestScore ?? 0, 0) }}</h6>
+                                            <h6 class="mb-0 font-weight-bold">{{ number_format($highestScore ?? 0, 0) }}
+                                            </h6>
                                         </div>
                                     </div>
                                 </div>
@@ -551,25 +562,27 @@
                                             @foreach($recentAnnouncements as $announcement)
                                                 <tr>
                                                     <td>{{ Str::limit($announcement->title ?? 'No Title', 40) }}</td>
-                                                    <td>{{ Str::limit(strip_tags($announcement->content ?? ''), 70) }}</td>
+                                                    <td>
+                                                        <a href="#" class="text-primary view-announcement-content"
+                                                            data-id="{{ $announcement->announcement_id }}" data-toggle="tooltip"
+                                                            title="View/Edit Content">
+                                                            {{ Str::limit(strip_tags($announcement->content ?? ''), 70) }}
+                                                        </a>
+                                                    </td>
                                                     <td>{{ isset($announcement->announcement_date) ? \Carbon\Carbon::parse($announcement->announcement_date)->format('M d, Y') : 'N/A' }}
                                                     </td>
                                                     <td class="text-center">
-                                                        <a href="{{ route('announcements.edit', ['id' => $announcement->announcement_id]) }}"
-                                                            class="btn btn-sm btn-warning mr-1" data-toggle="tooltip" title="Edit">
+                                                        <button type="button"
+                                                            class="btn btn-sm btn-warning mr-1 edit-announcement-btn"
+                                                            data-id="{{ $announcement->announcement_id }}" data-toggle="tooltip"
+                                                            title="Edit">
                                                             <i class="fas fa-edit"></i>
-                                                        </a>
-                                                        <form
-                                                            action="{{ route('announcements.destroy', ['id' => $announcement->announcement_id]) }}"
-                                                            method="POST" class="d-inline delete-form">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button type="submit" class="btn btn-sm btn-danger"
-                                                                data-toggle="tooltip" title="Delete"
-                                                                onclick="return confirm('Are you sure you want to delete this announcement?');">
-                                                                <i class="fas fa-trash"></i>
-                                                            </button>
-                                                        </form>
+                                                        </button>
+                                                        <button type="button" class="btn btn-sm btn-danger delete-announcement-btn"
+                                                            data-id="{{ $announcement->announcement_id }}" data-toggle="tooltip"
+                                                            title="Delete">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
                                                     </td>
                                                 </tr>
                                             @endforeach
@@ -587,6 +600,33 @@
                 </div>
             </div>
 
+            <!-- Generic Modal for Edit/Add -->
+            <div class="modal fade" tabindex="-1" role="dialog" id="announcementModal">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Edit Announcement</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- Content will be loaded here via AJAX -->
+                            <div class="text-center">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                                <p class="mt-2">Loading announcement data...</p>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary" id="saveAnnouncementBtn">Save Changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
 
         </section>
     </div>
@@ -595,6 +635,7 @@
 @push('scripts')
     <!-- JS Libraries -->
     <script src="{{ asset('library/chart.js/dist/Chart.min.js') }}"></script>
+    <script src="{{ asset('library/sweetalert/dist/sweetalert.min.js') }}"></script>
 
     <script>
         // Score Distribution Chart - Exam Qualification
@@ -726,6 +767,173 @@
                     }
                 }
             }
+        });
+
+        // AJAX for deleting announcements
+        $(document).ready(function () {
+            $('.delete-announcement-btn').on('click', function (e) {
+                e.preventDefault();
+                var announcementId = $(this).data('id');
+                var row = $(this).closest('tr'); // Get the table row to remove it later
+
+                swal({
+                    title: 'Are you sure?',
+                    text: 'Once deleted, you will not be able to recover this announcement!',
+                    icon: 'warning',
+                    buttons: true,
+                    dangerMode: true,
+                })
+                    .then((willDelete) => {
+                        if (willDelete) {
+                            $.ajax({
+                                url: '/announcements/' + announcementId,
+                                type: 'DELETE',
+                                data: {
+                                    _token: '{{ csrf_token() }}'
+                                },
+                                success: function (response) {
+                                    if (response.status) {
+                                        swal('Success!', response.message, 'success');
+                                        row.remove(); // Remove the row from the table
+                                        // If no more announcements, show the "No announcements found" message
+                                        if ($('.table-striped tbody tr').length === 0) {
+                                            $('.card-body').append('<div class="text-center py-5 no-announcements-message"><i class="fas fa-bullhorn fa-3x text-muted mb-3"></i><p class="text-muted">No announcements found. Click "Add Announcement" to create one.</p></div>');
+                                        }
+                                    } else {
+                                        swal('Error!', response.message, 'error');
+                                    }
+                                },
+                                error: function (xhr) {
+                                    swal('Error!', 'An error occurred while deleting the announcement.', 'error');
+                                    console.error(xhr.responseText);
+                                }
+                            });
+                        }
+                    });
+            });
+        });
+
+        // AJAX for editing announcements (modal)
+        $(document).ready(function () {
+            // Load edit form into modal
+            $('.edit-announcement-btn, .view-announcement-content').on('click', function (e) {
+                e.preventDefault();
+                var announcementId = $(this).data('id');
+                var modalBody = $('#announcementModal .modal-body');
+
+                modalBody.html('<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="sr-only">Loading...</span></div><p class="mt-2">Loading announcement data...</p></div>');
+                $('#announcementModal').modal('show');
+
+                $.ajax({
+                    url: '/announcements/' + announcementId + '/edit_dashboard',
+                    type: 'GET',
+                    success: function (response) {
+                        modalBody.html(response);
+
+                        // Ensure form elements are interactive after loading
+                        setTimeout(function () {
+                            console.log('Dashboard modal form loaded');
+
+                            // Force enable all form elements
+                            $('#announcementEditForm input, #announcementEditForm select, #announcementEditForm textarea').each(function () {
+                                console.log('Enabling modal element:', this);
+                                $(this).prop('disabled', false);
+                                $(this).prop('readonly', false);
+                                $(this).removeAttr('disabled');
+                                $(this).removeAttr('readonly');
+                                $(this).css({
+                                    'pointer-events': 'auto !important',
+                                    'user-select': 'auto !important',
+                                    'position': 'relative !important',
+                                    'z-index': '1050 !important',
+                                    'background-color': 'white !important'
+                                });
+                            });
+
+                            // Enable checkboxes specifically
+                            $('#announcementEditForm input[type="checkbox"]').each(function () {
+                                console.log('Enabling modal checkbox:', this);
+                                $(this).prop('disabled', false);
+                                $(this).removeAttr('disabled');
+                                $(this).css({
+                                    'pointer-events': 'auto !important',
+                                    'position': 'relative !important',
+                                    'z-index': '1060 !important'
+                                });
+                            });
+
+                            // Enable labels
+                            $('#announcementEditForm label').css({
+                                'pointer-events': 'auto !important',
+                                'cursor': 'pointer !important'
+                            });
+
+                            // Remove any overlay or blocking elements
+                            $('.modal-backdrop.show').css('z-index', '1040');
+
+                            // Focus on first input to test
+                            var titleInput = $('#announcementEditForm input[name="title"]');
+                            console.log('Focusing on modal title input:', titleInput);
+                            titleInput.focus();
+                            titleInput.click();
+                        }, 500);
+                    },
+                    error: function (xhr) {
+                        modalBody.html('<div class="alert alert-danger">Failed to load announcement data.</div>');
+                        console.error(xhr.responseText);
+                    }
+                });
+            });
+
+            // Handle form submission within the modal via AJAX
+            $(document).on('submit', '#announcementEditForm', function (e) {
+                e.preventDefault();
+                var form = $(this);
+                var url = form.attr('action');
+                var method = form.find('input[name="_method"]').val() || form.attr('method');
+                var formData = form.serialize();
+
+                $.ajax({
+                    url: url,
+                    type: method,
+                    data: formData,
+                    success: function (response) {
+                        if (response.status) {
+                            swal('Success!', response.message, 'success');
+                            $('#announcementModal').modal('hide');
+                            // Reload the page or update the specific row in the table
+                            location.reload(); // Simple reload for now, can be optimized later
+                        } else {
+                            swal('Error!', response.message, 'error');
+                        }
+                    },
+                    error: function (xhr) {
+                        var errors = xhr.responseJSON.errors;
+                        if (errors) {
+                            // Clear previous errors
+                            form.find('.is-invalid').removeClass('is-invalid');
+                            form.find('.invalid-feedback').remove();
+
+                            // Display new errors
+                            $.each(errors, function (key, value) {
+                                var input = form.find('[name="' + key + '"]');
+                                input.addClass('is-invalid');
+                                input.after('<div class="invalid-feedback">' + value + '</div>');
+                            });
+                            swal('Validation Error!', 'Please check the form for errors.', 'error');
+                        } else {
+                            swal('Error!', 'An error occurred while updating the announcement.', 'error');
+                        }
+                        console.error(xhr.responseText);
+                    }
+                });
+            });
+
+            // Handle Save Changes button click (since it's outside the form)
+            $(document).on('click', '#saveAnnouncementBtn', function (e) {
+                e.preventDefault();
+                $('#announcementEditForm').submit();
+            });
         });
     </script>
 @endpush
