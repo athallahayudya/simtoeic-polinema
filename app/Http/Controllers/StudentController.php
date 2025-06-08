@@ -281,6 +281,7 @@ class StudentController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'phone_number' => 'required|string|min:10|max:15|regex:/^[0-9+\-\s]+$/',  // Improved validation
+            'telegram_chat_id' => 'nullable|string|regex:/^[0-9]+$/',  // Only numbers allowed
             'home_address' => 'required|string',
             'current_address' => 'required|string',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',  // 2MB for profile photo
@@ -294,10 +295,11 @@ class StudentController extends Controller
         $student->current_address = $request->input('current_address');
         // Major and study_program are intentionally not updated as they should be fixed values
 
-        // Update phone number in users table
+        // Update phone number and telegram_chat_id in users table
         $userModel = UserModel::find($user->user_id);
         if ($userModel) {
             $userModel->phone_number = $request->input('phone_number');
+            $userModel->telegram_chat_id = $request->input('telegram_chat_id');
             $userModel->save();
         }
 

@@ -173,6 +173,31 @@
                                             </div>
                                         </div>
                                     </div>
+
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label>Telegram Chat ID <span class="text-muted">(Optional)</span></label>
+                                                <input type="text" name="telegram_chat_id" class="form-control"
+                                                    value="{{ $lecturer->user->telegram_chat_id ?? '' }}"
+                                                    placeholder="Enter your Telegram Chat ID (numbers only)">
+                                                @error('telegram_chat_id')
+                                                    <div class="text-danger">{{ $message }}</div>
+                                                @enderror
+                                                <small class="text-muted">
+                                                    <i class="fas fa-info-circle"></i>
+                                                    <strong>How to get your Chat ID:</strong><br>
+                                                    1. Open Telegram and search for <code>@userinfobot</code><br>
+                                                    2. Click START and send any message<br>
+                                                    3. Copy the "Your chat ID" number<br>
+                                                    4. Make sure you've started <code>@simtopolinema_bot</code> first!<br>
+                                                    <strong>Note:</strong> This is required to receive announcement
+                                                    notifications via Telegram.
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group">

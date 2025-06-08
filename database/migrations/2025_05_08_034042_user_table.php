@@ -20,10 +20,10 @@ return new class extends Migration
             $table->string('password');
             $table->enum('exam_status', ['success', 'fail', 'not_yet'])->default('not_yet')->nullable();
             $table->string('phone_number', 15)->nullable();
+            $table->string('telegram_chat_id')->nullable();
             $table->rememberToken(); // Add remember_token column
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
-
         });
     }
 

@@ -25,6 +25,10 @@ return [
         'token' => env('POSTMARK_TOKEN'),
     ],
 
+    'telegram' => [
+        'bot_token' => env('TELEGRAM_BOT_TOKEN', '8011228342:AAGnogbt_r7ACok_CdwsQkfnuOxjwpZ3yxA'),
+    ],
+
     'ses' => [
         'key' => env('AWS_ACCESS_KEY_ID'),
         'secret' => env('AWS_SECRET_ACCESS_KEY'),

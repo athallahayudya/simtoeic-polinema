@@ -425,3 +425,11 @@ Route::group(['prefix' => 'faqs', 'middleware' => ['auth', 'prevent-back-history
 });
 
 Route::get('/faq', [FaqController::class, 'publicFaqList'])->name('public.faqs');
+
+// Admin Telegram Settings route
+Route::group(['prefix' => 'telegram', 'middleware' => ['auth', 'prevent-back-history']], function () {
+    Route::get('/', [App\Http\Controllers\TelegramController::class, 'index'])->name('telegram.index');
+    Route::post('/test', [App\Http\Controllers\TelegramController::class, 'testConnection'])->name('telegram.test');
+    Route::post('/update-token', [App\Http\Controllers\TelegramController::class, 'updateToken'])->name('telegram.update-token');
+    Route::post('/send-test', [App\Http\Controllers\TelegramController::class, 'sendTestMessage'])->name('telegram.send-test');
+});

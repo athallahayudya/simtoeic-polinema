@@ -268,6 +268,7 @@ class AlumniController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'phone_number' => 'required|string|min:10|max:15|regex:/^[0-9+\-\s]+$/',  // Improved validation
+            'telegram_chat_id' => 'nullable|string|regex:/^[0-9]+$/',  // Only numbers allowed
             'home_address' => 'required|string',
             'current_address' => 'required|string',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',  // 2MB for profile photo
@@ -279,10 +280,11 @@ class AlumniController extends Controller
         $alumni->home_address = $request->input('home_address');
         $alumni->current_address = $request->input('current_address');
 
-        // Update phone number
+        // Update phone number and telegram_chat_id
         $userModel = UserModel::find($user->user_id);
         if ($userModel) {
             $userModel->phone_number = $request->input('phone_number');
+            $userModel->telegram_chat_id = $request->input('telegram_chat_id');
             $userModel->save();
         }
 
