@@ -512,34 +512,6 @@
                             <small class="text-muted">TOEIC proficiency levels based on international standards</small>
                         </div>
                         <div class="card-body">
-                            <!-- Statistics Summary -->
-                            <div class="row mb-3">
-                                <div class="col-md-3">
-                                    <div class="text-center p-2 bg-light rounded">
-                                        <h5 class="mb-1 text-primary">{{ number_format($totalParticipants ?? 0) }}</h5>
-                                        <small class="text-muted">Total Participants</small>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="text-center p-2 bg-light rounded">
-                                        <h5 class="mb-1 text-success">{{ number_format($passRate ?? 0, 1) }}%</h5>
-                                        <small class="text-muted">Pass Rate (≥550)</small>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="text-center p-2 bg-light rounded">
-                                        <h5 class="mb-1 text-warning">{{ number_format($excellentRate ?? 0, 1) }}%</h5>
-                                        <small class="text-muted">Advanced (≥785)</small>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="text-center p-2 bg-light rounded">
-                                        <h5 class="mb-1 text-info">{{ number_format($averageScore ?? 0, 0) }}</h5>
-                                        <small class="text-muted">Average Score</small>
-                                    </div>
-                                </div>
-                            </div>
-
                             <div class="chart-container" style="position: relative; height:350px;">
                                 <canvas id="scoreDistributionChart"></canvas>
                             </div>
@@ -630,11 +602,11 @@
 
         // Prepare data for TOEIC proficiency levels
         var scoreRanges = {
-            'Beginner (10-224)': 0,
-            'Elementary (225-549)': 0,
-            'Intermediate (550-784)': 0,
-            'Advanced (785-944)': 0,
-            'Proficient (945-990)': 0
+            '0 - 250': 0,
+            '255 - 500': 0,
+            '501 - 700': 0,
+            '701 - 900': 0,
+            '901 - 990': 0
         };
 
         var allExamResults = @json($allExamResults ?? collect());
@@ -642,16 +614,16 @@
         if (allExamResults.length > 0) {
             allExamResults.forEach(function (result) {
                 var score = result.score;
-                if (score >= 10 && score <= 224) {
-                    scoreRanges['Beginner (10-224)']++;
-                } else if (score >= 225 && score <= 549) {
-                    scoreRanges['Elementary (225-549)']++;
-                } else if (score >= 550 && score <= 784) {
-                    scoreRanges['Intermediate (550-784)']++;
-                } else if (score >= 785 && score <= 944) {
-                    scoreRanges['Advanced (785-944)']++;
-                } else if (score >= 945 && score <= 990) {
-                    scoreRanges['Proficient (945-990)']++;
+                if (score >= 0 && score <= 250) {
+                    scoreRanges['0 - 250']++;
+                } else if (score >= 255 && score <= 500) {
+                    scoreRanges['255 - 500']++;
+                } else if (score >= 501 && score <= 700) {
+                    scoreRanges['501 - 700']++;
+                } else if (score >= 701 && score <= 900) {
+                    scoreRanges['701 - 900']++;
+                } else if (score >= 901 && score <= 990) {
+                    scoreRanges['901 - 990']++;
                 }
             });
         }
@@ -683,25 +655,48 @@
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                animation: {
+                    duration: 1000, // Animation duration in milliseconds
+                    easing: 'easeOutQuart' // Easing function for animation
+                },
                 scales: {
                     yAxes: [{
                         ticks: {
                             beginAtZero: true,
-                            precision: 0 // Ensure integer ticks
+                            precision: 0, // Ensure integer ticks
+                            fontColor: '#666', // Darker font color for y-axis ticks
+                            fontSize: 12 // Slightly larger font size
+                        },
+                        gridLines: {
+                            display: true,
+                            color: 'rgba(0, 0, 0, 0.05)' // Lighter grid lines
                         },
                         scaleLabel: {
                             display: true,
-                            labelString: 'Number of Participants'
+                            labelString: 'Number of Participants',
+                            fontColor: '#333', // Darker font color for label
+                            fontSize: 14, // Larger font size for label
+                            fontStyle: 'bold'
                         }
                     }],
                     xAxes: [{
-                        scaleLabel: {
-                            display: true,
-                            labelString: 'TOEIC Proficiency Level'
-                        },
+                        barPercentage: 0.7, // Adjust bar thickness
+                        categoryPercentage: 0.8, // Adjust spacing between categories
                         ticks: {
                             maxRotation: 45,
-                            minRotation: 45
+                            minRotation: 45,
+                            fontColor: '#666', // Darker font color for x-axis ticks
+                            fontSize: 12 // Slightly larger font size
+                        },
+                        gridLines: {
+                            display: false // Hide x-axis grid lines for cleaner look
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'TOEIC Proficiency Level',
+                            fontColor: '#333', // Darker font color for label
+                            fontSize: 14, // Larger font size for label
+                            fontStyle: 'bold'
                         }
                     }]
                 },
@@ -709,6 +704,11 @@
                     display: false // Hide legend as labels are self-explanatory
                 },
                 tooltips: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.7)', // Darker tooltip background
+                    titleFontColor: '#fff', // White title font
+                    bodyFontColor: '#fff', // White body font
+                    cornerRadius: 4, // Rounded tooltip corners
+                    displayColors: false, // Hide color box in tooltip
                     callbacks: {
                         label: function (tooltipItem, data) {
                             var label = data.labels[tooltipItem.index] || '';
@@ -718,6 +718,11 @@
                             label += tooltipItem.yLabel + ' participants';
                             return label;
                         }
+                    }
+                },
+                elements: {
+                    bar: {
+                        borderRadius: 5 // Rounded corners for bars
                     }
                 }
             }
