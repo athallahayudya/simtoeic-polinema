@@ -298,24 +298,34 @@ class StudentController extends Controller
             'name' => 'required|string|max:255|regex:/^[a-zA-Z\s\.]+$/',  // Only letters, spaces, and dots
             'phone_number' => 'required|string|min:10|max:15|regex:/^[0-9+\-\s]+$/',  // Improved validation
             'telegram_chat_id' => 'nullable|string|regex:/^[0-9]+$/',  // Only numbers allowed
-            'home_address' => 'required|string|max:500',  // Add max length
-            'current_address' => 'required|string|max:500',  // Add max length
+            'home_address' => [
+                'required',
+                'string',
+                'max:500',
+                'regex:/^[a-zA-Z0-9\s\.\,\-\/]+$/'  // Only alphanumeric, spaces, dots, commas, hyphens, slashes
+            ],
+            'current_address' => [
+                'required',
+                'string',
+                'max:500',
+                'regex:/^[a-zA-Z0-9\s\.\,\-\/]+$/'  // Only alphanumeric, spaces, dots, commas, hyphens, slashes
+            ],
             'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',  // 2MB for profile photo
             'ktp_scan' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',  // 5MB for KTP scan
             'ktm_scan' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',  // 5MB for KTM scan
         ]);
 
         // Update student data (exclude major and study_program) with sanitization
-        $student->name = strip_tags(trim($request->input('name')));
-        $student->home_address = strip_tags(trim($request->input('home_address')));
-        $student->current_address = strip_tags(trim($request->input('current_address')));
+        $student->name = htmlspecialchars(strip_tags(trim($request->input('name'))), ENT_QUOTES, 'UTF-8');
+        $student->home_address = htmlspecialchars(strip_tags(trim($request->input('home_address'))), ENT_QUOTES, 'UTF-8');
+        $student->current_address = htmlspecialchars(strip_tags(trim($request->input('current_address'))), ENT_QUOTES, 'UTF-8');
         // Major and study_program are intentionally not updated as they should be fixed values
 
         // Update phone number and telegram_chat_id in users table with sanitization
         $userModel = UserModel::find($user->user_id);
         if ($userModel) {
-            $userModel->phone_number = strip_tags(trim($request->input('phone_number')));
-            $userModel->telegram_chat_id = $request->input('telegram_chat_id') ? strip_tags(trim($request->input('telegram_chat_id'))) : null;
+            $userModel->phone_number = htmlspecialchars(strip_tags(trim($request->input('phone_number'))), ENT_QUOTES, 'UTF-8');
+            $userModel->telegram_chat_id = $request->input('telegram_chat_id') ? htmlspecialchars(strip_tags(trim($request->input('telegram_chat_id'))), ENT_QUOTES, 'UTF-8') : null;
             $userModel->save();
         }
 

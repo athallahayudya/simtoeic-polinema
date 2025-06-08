@@ -258,7 +258,7 @@
                                             <div class="form-group">
                                                 <label>Home Address</label>
                                                 <textarea name="home_address" class="form-control"
-                                                    required>{{ $student->home_address ?? '' }}</textarea>
+                                                    required>{{ e($student->home_address ?? '') }}</textarea>
                                                 @error('home_address')
                                                     <div class="text-danger">{{ $message }}</div>
                                                 @enderror
@@ -268,7 +268,7 @@
                                             <div class="form-group">
                                                 <label>Current Address</label>
                                                 <textarea name="current_address" class="form-control"
-                                                    required>{{ $student->current_address ?? '' }}</textarea>
+                                                    required>{{ e($student->current_address ?? '') }}</textarea>
                                                 @error('current_address')
                                                     <div class="text-danger">{{ $message }}</div>
                                                 @enderror
