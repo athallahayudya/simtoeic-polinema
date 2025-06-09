@@ -232,13 +232,19 @@ Route::prefix('auth')->name('auth.')->group(function () {
 Route::middleware(['auth', 'prevent-back-history'])->group(function () {
     Route::get('/dashboard-admin', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
 
-    Route::get('/dashboard-student', [StudentController::class, 'dashboard'])->name('student.dashboard');
-
-    Route::get('/dashboard-staff', [StaffController::class, 'dashboard'])->name('staff.dashboard');
-
-    Route::get('/dashboard-alumni', [AlumniController::class, 'dashboard'])->name('alumni.dashboard');
-
-    Route::get('/dashboard-lecturer', [LecturerController::class, 'dashboard'])->name('lecturer.dashboard');
+    // Backward compatibility redirects for old dashboard URLs
+    Route::get('/dashboard-student', function () {
+        return redirect()->route('student.dashboard');
+    });
+    Route::get('/dashboard-staff', function () {
+        return redirect()->route('staff.dashboard');
+    });
+    Route::get('/dashboard-alumni', function () {
+        return redirect()->route('alumni.dashboard');
+    });
+    Route::get('/dashboard-lecturer', function () {
+        return redirect()->route('lecturer.dashboard');
+    });
 
     // Admin profile
     Route::get('/admin/profile', [AdminProfileController::class, 'show'])->name('admin.profile');
@@ -275,7 +281,7 @@ Route::group(['prefix' => 'announcements', 'middleware' => ['auth', 'prevent-bac
 
 // Admin Manage Users route
 Route::group(['prefix' => 'users', 'middleware' => ['auth', 'prevent-back-history']], function () {
-    Route::get('/', function (){
+    Route::get('/', function () {
         return view('users-admin.manage-user.index', ['type_menu' => 'users']);
     })->name('users.index');
     Route::post('/list', [ManageUsersController::class, 'list']);
@@ -301,6 +307,7 @@ Route::post('/registration', [App\Http\Controllers\UserDataTableController::clas
 
 // Student routes
 Route::group(['prefix' => 'student', 'middleware' => ['auth', 'prevent-back-history']], function () {
+    Route::get('/dashboard', [StudentController::class, 'dashboard'])->name('student.dashboard');
     Route::get('/profile', [StudentController::class, 'profile'])->name('student.profile');
     Route::post('/profile/update', [StudentController::class, 'updateProfile'])->name('student.profile.update');
     Route::get('/registration', [StudentController::class, 'showRegistrationForm'])->name('student.registration.form');
@@ -309,6 +316,7 @@ Route::group(['prefix' => 'student', 'middleware' => ['auth', 'prevent-back-hist
 
 // Staff routes
 Route::group(['prefix' => 'staff', 'middleware' => ['auth', 'prevent-back-history']], function () {
+    Route::get('/dashboard', [StaffController::class, 'dashboard'])->name('staff.dashboard');
     Route::get('/profile', [StaffController::class, 'profile'])->name('staff.profile');
     Route::post('/profile/update', [StaffController::class, 'updateProfile'])->name('staff.profile.update');
     Route::get('/registration', [StaffController::class, 'showRegistrationForm'])->name('staff.registration.form');
@@ -316,6 +324,7 @@ Route::group(['prefix' => 'staff', 'middleware' => ['auth', 'prevent-back-histor
 
 // Alumni routes
 Route::group(['prefix' => 'alumni', 'middleware' => ['auth', 'prevent-back-history']], function () {
+    Route::get('/dashboard', [AlumniController::class, 'dashboard'])->name('alumni.dashboard');
     Route::get('/profile', [AlumniController::class, 'profile'])->name('alumni.profile');
     Route::post('/profile/update', [AlumniController::class, 'updateProfile'])->name('alumni.profile.update');
     Route::get('/registration', [AlumniController::class, 'showRegistrationForm'])->name('alumni.registration.form');
@@ -323,6 +332,7 @@ Route::group(['prefix' => 'alumni', 'middleware' => ['auth', 'prevent-back-histo
 
 // Lecturer routes
 Route::group(['prefix' => 'lecturer', 'middleware' => ['auth', 'prevent-back-history']], function () {
+    Route::get('/dashboard', [LecturerController::class, 'dashboard'])->name('lecturer.dashboard');
     Route::get('/profile', [LecturerController::class, 'profile'])->name('lecturer.profile');
     Route::post('/profile/update', [LecturerController::class, 'updateProfile'])->name('lecturer.profile.update');
     Route::get('/registration', [LecturerController::class, 'showRegistrationForm'])->name('lecturer.registration.form');
@@ -334,9 +344,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/admin/profile/update', [AdminProfileController::class, 'update'])->name('admin.profile.update');
 });
 
-// Student Exam Registration routes
-Route::get('/student/registration', [StudentController::class, 'showRegistrationForm'])->name('student.registration.form');
-Route::post('/student/register-exam', [StudentController::class, 'registerExam'])->name('student.register.exam');
+
 
 // Admin FAQs route
 Route::group(['prefix' => 'faqs', 'middleware' => ['auth', 'prevent-back-history']], function () {
