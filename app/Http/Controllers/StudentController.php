@@ -43,7 +43,7 @@ class StudentController extends Controller
                     ->orWhere('visible_to', '[]')
                     ->orWhere('visible_to', '');
             })
-            ->orderBy('announcement_date', 'desc')
+            ->orderBy('created_at', 'desc')
             ->first();
 
         // Enhanced profile completeness check

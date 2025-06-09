@@ -16,7 +16,8 @@ class AnnouncementController extends Controller
 {
     public function list(Request $request)
     {
-        $announcements = AnnouncementModel::select('announcement_id', 'title', 'content', 'announcement_status', 'announcement_date');
+        $announcements = AnnouncementModel::select('announcement_id', 'title', 'content', 'announcement_status', 'announcement_date')
+            ->orderBy('created_at', 'desc'); // Order by newest first
 
         if ($request->announcement_status) {
             $announcements->where('announcement_status', $request->announcement_status);

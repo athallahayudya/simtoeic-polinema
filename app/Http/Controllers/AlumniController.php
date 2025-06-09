@@ -37,7 +37,7 @@ class AlumniController extends Controller
                     ->orWhere('visible_to', '[]')
                     ->orWhere('visible_to', '');
             })
-            ->orderBy('announcement_date', 'desc')
+            ->orderBy('created_at', 'desc')
             ->first();
         // Get exam scores only for the current logged-in alumni
         $examScores = ExamResultModel::where('user_id', auth()->id())
