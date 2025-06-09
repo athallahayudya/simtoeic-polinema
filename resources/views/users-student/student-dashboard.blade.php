@@ -105,13 +105,13 @@
           @if ($announcements)
         <div class="announcement-container">
         <div class="d-flex justify-content-between align-items-center mb-2">
-          <h4 class="text-primary mb-0">{{ $announcements->title }}</h4>
+          <h4 class="text-primary mb-0" style="font-size: 20px;">{{ $announcements->title }}</h4>
           <span class="badge badge-primary">
           {{ isset($announcements->announcement_date) ? \Carbon\Carbon::parse($announcements->announcement_date)->format('d M Y') : '' }}
           </span>
         </div>
         <div class="announcement-content p-3 bg-light rounded">
-          <p class="mb-0">{{ $announcements->content }}</p>
+          <p class="mb-0" style="font-size: 19px; font-weight: bold;">{{ $announcements->content }}</p>
         </div>
 
         @if($announcements->announcement_file)
