@@ -1,4 +1,4 @@
-@empty($lecturer)
+@empty($user)
     <div id="modal-master" class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -12,18 +12,18 @@
                     <h5><i class="icon fas fa-ban"></i> Failed!!!</h5>
                     Data not found.
                 </div>
-                <a href="{{ url('/manage-users/lecturer/') }}" class="btn btn-warning">back</a>
+                <a href="{{ url('/users/') }}" class="btn btn-warning">Back</a>
             </div>
         </div>
     </div>
-    @else
-    <form action="{{ url('/manage-users/lecturer/' . $lecturer->lecturer_id . '/delete_ajax') }}" method="POST" id="form-delete" class="d-inline">
+@else
+    <form action="{{ url('/users/' . $user->user_id . '/delete_ajax') }}" method="POST" id="form-delete" class="d-inline">
         @csrf
-        @method('POST')
+        @method('DELETE')
         <div id="modal-master" class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Delete Lecturer Data</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Delete User Data</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -36,31 +36,23 @@
                     <table class="table table-sm table-bordered table-striped">
                         <tr>
                             <th class="text-right col-3">Name :</th>
-                            <td class="col-9">{{ $lecturer->name }}</td>
+                            <td class="col-9">{{ $profile->name ?? 'N/A' }}</td>
                         </tr>
                         <tr>
-                            <th class="text-right col-3">NIDN :</th>
-                            <td class="col-9">{{ $lecturer->nidn }}</td>
+                            <th class="text-right col-3">Identity Number :</th>
+                            <td class="col-9">{{ $user->identity_number ?? '-' }}</td>
                         </tr>
                         <tr>
-                            <th class="text-right col-3">Exam Status :</th>
-                            <td class="col-9">{{ $lecturer->user->exam_status }}</td>
-                        </tr>
-                        <tr>
-                            <th class="text-right col-3">KTP Scan :</th>
-                            <td class="col-9">{{ $lecturer->ktp_scan }}</td>
-                        </tr>
-                        <tr>
-                            <th class="text-right col-3">Photo :</th>
-                            <td class="col-9">{{ $lecturer->photo }}</td>
+                            <th class="text-right col-3">Role :</th>
+                            <td class="col-9">{{ $user->role ?? '-' }}</td>
                         </tr>
                         <tr>
                             <th class="text-right col-3">Home Address :</th>
-                            <td class="col-9">{{ $lecturer->home_address }}</td>
+                            <td class="col-9">{{ $profile->home_address ?? '-' }}</td>
                         </tr>
                         <tr>
                             <th class="text-right col-3">Current Address :</th>
-                            <td class="col-9">{{ $lecturer->current_address }}</td>
+                            <td class="col-9">{{ $profile->current_address ?? '-' }}</td>
                         </tr>
                     </table>
                 </div>
@@ -77,7 +69,7 @@
                 e.preventDefault();
                 $.ajax({
                     url: $(this).attr('action'),
-                    type: 'POST', 
+                    type: 'DELETE', 
                     data: $(this).serialize(),
                     success: function(response) {
                         if (response.status === true) {
@@ -89,8 +81,8 @@
                                 timer: 2000,
                                 showConfirmButton: false
                             }).then(() => {
-                                if (typeof dataLecturer !== 'undefined' && dataLecturer.ajax.reload) {
-                                    dataLecturer.ajax.reload(); 
+                                if (typeof dataUser !== 'undefined' && dataUser.ajax.reload) {
+                                    dataUser.ajax.reload(); 
                                 } else {
                                     location.reload(); 
                                 }

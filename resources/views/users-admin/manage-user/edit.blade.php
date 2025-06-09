@@ -1,4 +1,4 @@
-@empty($staff)
+@empty($user)
     <div id="modal-master" class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -9,21 +9,21 @@
             </div>
             <div class="modal-body">
                 <div class="alert alert-danger">
-                    <h5><i class="icon fas fa-ban"></i>Failed!!!</h5>
+                    <h5><i class="icon fas fa-ban"></i> Failed!!!</h5>
                     Data not found.
                 </div>
-                <a href="{{ url('/manage-users/staff') }}" class="btn btn-warning">Back</a>
+                <a href="{{ url('/users/') }}" class="btn btn-warning">Back</a>
             </div>
         </div>
     </div>
-    @else
-    <form action="{{ url('/manage-users/staff/' . $staff->staff_id.'/update_ajax') }}" method="POST" id="form-edit" enctype="multipart/form-data">
+@else
+    <form action="{{ url('/users/' . $user->user_id . '/update_ajax') }}" method="POST" id="form-edit" enctype="multipart/form-data">
         @csrf
         @method('PUT')
         <div id="modal-master" class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Edit Staff Data</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Edit User Data</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -31,7 +31,7 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label>Name</label>
-                        <input type="text" name="name" id="name" class="form-control" value="{{ $staff->name }}" required>
+                        <input type="text" name="name" id="name" class="form-control" value="{{ $profile->name ?? old('name') }}" required>
                         <small id="error-name" class="error-text form-text text-danger"></small>
                     </div>
                     <div class="form-group">
@@ -41,12 +41,12 @@
                     </div>
                     <div class="form-group">
                         <label>Home Address</label>
-                        <input type="text" name="home_address" id="home_address" class="form-control" value="{{ $staff->home_address }}" required>
+                        <input type="text" name="home_address" id="home_address" class="form-control" value="{{ $profile->home_address ?? old('home_address') }}" required>
                         <small id="error-home_address" class="error-text form-text text-danger"></small>
                     </div>
                     <div class="form-group">
                         <label>Current Address</label>
-                        <input type="text" name="current_address" id="current_address" class="form-control" value="{{ $staff->current_address }}" required>
+                        <input type="text" name="current_address" id="current_address" class="form-control" value="{{ $profile->current_address ?? old('current_address') }}" required>
                         <small id="error-current_address" class="error-text form-text text-danger"></small>
                     </div>
                 </div>
