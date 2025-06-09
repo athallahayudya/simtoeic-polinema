@@ -6,7 +6,7 @@
 <div class="main-content">
     <section class="section">
         <div class="section-header">
-            <h1>FAQs</h1>
+            <h1 style="font-size: 21px;">FAQs</h1>
             <div class="section-header-breadcrumb">
                 <div class="breadcrumb-item">FAQs</div>
             </div>

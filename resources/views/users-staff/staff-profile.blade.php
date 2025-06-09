@@ -72,7 +72,7 @@
     <div class="main-content">
         <section class="section">
             <div class="section-header">
-                <h1>Staff Profile</h1>
+                <h1 style="font-size: 21px;">Staff Profile</h1>
                 <div class="section-header-breadcrumb">
                     <div class="breadcrumb-item active"><a href="{{ route('staff.dashboard') }}">Dashboard</a></div>
                     <div class="breadcrumb-item">Profile</div>
