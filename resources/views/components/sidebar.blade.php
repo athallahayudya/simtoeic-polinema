@@ -38,7 +38,7 @@
 
                 <!-- Notices Dropdown -->
                 <li
-                    class="nav-item dropdown {{ in_array(Request::segment(1), ['announcements', 'faqs']) ? 'active' : '' }}">
+                    class="nav-item dropdown {{ in_array(Request::segment(1), ['announcements', 'faqs', 'telegram']) ? 'active' : '' }}">
                     <a href="#" class="nav-link has-dropdown">
                         <i class="fas fa-bullhorn"></i> <span>Notices</span>
                     </a>
@@ -48,6 +48,9 @@
                         </li>
                         <li class="{{ Request::is('faqs*') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('faqs') }}">FAQ</a>
+                        </li>
+                        <li class="{{ Request::is('telegram*') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ route('telegram.index') }}">Telegram Settings</a>
                         </li>
                     </ul>
                 </li>

@@ -126,22 +126,56 @@
                                     </form>
                                 </div>
 
-                                <div class="alert alert-info">
-                                    <div class="d-flex align-items-center">
-                                        <i class="fas fa-info-circle fa-2x mr-3"></i>
-                                        <div>
+                                <div class="alert alert-danger">
+                                    <div class="d-flex align-items-start">
+                                        <i class="fas fa-exclamation-triangle fa-lg mr-3 mt-1 text-white"></i>
+                                        <div class="text-white">
                                             <strong>Import Format Guide</strong>
+                                            <p class="mb-2">
+                                                Upload the official TOEIC results PDF. Make sure your PDF table contains
+                                                these columns:
+                                            </p>
+                                            <div class="row text-center mb-2">
+                                                <div class="col-2">
+                                                    <div class="border p-2 rounded mb-1 bg-white">
+                                                        <small class="text-dark"><strong>result</strong></small>
+                                                    </div>
+                                                    <small class="text-white"><strong>Exam ID</strong></small>
+                                                </div>
+                                                <div class="col-2">
+                                                    <div class="border p-2 rounded mb-1 bg-white">
+                                                        <small class="text-dark"><strong>name</strong></small>
+                                                    </div>
+                                                    <small class="text-white"><strong>Name</strong></small>
+                                                </div>
+                                                <div class="col-2">
+                                                    <div class="border p-2 rounded mb-1 bg-white">
+                                                        <small class="text-dark"><strong>id</strong></small>
+                                                    </div>
+                                                    <small class="text-white"><strong>NIM</strong></small>
+                                                </div>
+                                                <div class="col-2">
+                                                    <div class="border p-2 rounded mb-1 bg-white">
+                                                        <small class="text-dark"><strong>L</strong></small>
+                                                    </div>
+                                                    <small class="text-white"><strong>Listening</strong></small>
+                                                </div>
+                                                <div class="col-2">
+                                                    <div class="border p-2 rounded mb-1 bg-white">
+                                                        <small class="text-dark"><strong>R</strong></small>
+                                                    </div>
+                                                    <small class="text-white"><strong>Reading</strong></small>
+                                                </div>
+                                                <div class="col-2">
+                                                    <div class="border p-2 rounded mb-1 bg-white">
+                                                        <small class="text-dark"><strong>tot</strong></small>
+                                                    </div>
+                                                    <small class="text-white"><strong>Score</strong></small>
+                                                </div>
+                                            </div>
                                             <p class="mb-0">
-                                                Upload the official TOEIC results PDF. The system will automatically extract
-                                                table data and map the following columns:<br>
-                                                <code>result</code> → <code>exam_id</code> (Exam ID)<br>
-                                                <code>name</code> → <code>nama</code> (Student Name)<br>
-                                                <code>id</code> → <code>nim</code> (Student NIM - Required)<br>
-                                                <code>L</code> → <code>listening_score</code> (Listening Score)<br>
-                                                <code>R</code> → <code>reading_score</code> (Reading Score)<br>
-                                                <code>tot</code> → <code>total_score</code> (Total Score)<br><br>
-                                                <strong>Note:</strong> The system will automatically create student records
-                                                for new NIMs and calculate pass/fail status based on total score ≥ 500.
+                                                <small><strong>Note:</strong> System will automatically create student
+                                                    accounts and calculate pass/fail status.</small>
                                             </p>
                                         </div>
                                     </div>
@@ -173,13 +207,14 @@
                                         </div>
                                         <div class="col-md-3">
                                             <div class="form-group">
-                                                <label>Score Range</label>
+                                                <label>TOEIC Band</label>
                                                 <select id="score-filter" class="form-control">
-                                                    <option value="">All</option>
-                                                    <option value="0-399">0-399</option>
-                                                    <option value="400-499">400-499</option>
-                                                    <option value="500-699">500-699</option>
-                                                    <option value="700-990">700-990</option>
+                                                    <option value="">All Levels</option>
+                                                    <option value="0-250">0-250 (Beginner)</option>
+                                                    <option value="255-500">255-500 (Elementary)</option>
+                                                    <option value="501-700">501-700 (Intermediate)</option>
+                                                    <option value="701-900">701-900 (Advanced)</option>
+                                                    <option value="901-990">901-990 (Proficient)</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -214,11 +249,6 @@
                         <div class="card">
                             <div class="card-header">
                                 <h4><i class="fas fa-table mr-2"></i>Exam Results</h4>
-                                <div class="card-header-action">
-                                    <button id="deleteAllButton" class="btn btn-danger btn-sm">
-                                        <i class="fas fa-trash-alt"></i> Delete All
-                                    </button>
-                                </div>
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
@@ -557,44 +587,7 @@
                 }
             }
 
-            // Delete All Results handler
-            $('#deleteAllButton').on('click', function () {
-                if (confirm('Are you sure you want to delete ALL exam results? This action cannot be undone and will remove all data and associated files.')) {
 
-                    // Disable button to prevent multiple clicks
-                    $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Deleting...');
-
-                    $.ajax({
-                        url: '{{ route("exam-results.delete-all") }}',
-                        type: 'DELETE',
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
-                        success: function (response) {
-                            // Re-enable button
-                            $('#deleteAllButton').prop('disabled', false).html('<i class="fas fa-trash-alt"></i> Delete All');
-
-                            if (response.status) {
-                                showMessageModal('All exam results deleted successfully!', true);
-                            } else {
-                                showMessageModal(response.message || 'Error deleting exam results', false);
-                            }
-                        },
-                        error: function (xhr) {
-                            // Re-enable button
-                            $('#deleteAllButton').prop('disabled', false).html('<i class="fas fa-trash-alt"></i> Delete All');
-
-                            let errorMsg = 'Error deleting exam results';
-                            if (xhr.responseJSON && xhr.responseJSON.message) {
-                                errorMsg = xhr.responseJSON.message;
-                            } else if (xhr.responseText) {
-                                errorMsg = 'Server error: ' + xhr.status;
-                            }
-                            showMessageModal(errorMsg, false);
-                        }
-                    });
-                }
-            });
 
             // Delete single result handler
             $(document).on('click', '.delete-result', function () {

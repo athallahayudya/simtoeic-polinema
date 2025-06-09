@@ -129,39 +129,7 @@ class ExamResultController extends Controller
         }
     }
 
-    /**
-     * Delete all exam results from the database
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
 
-    public function deleteAll()
-    {
-        try {
-            Log::info('Delete all exam results request received');
-
-            $countBefore = ExamResultModel::count();
-            Log::info("Records before deletion: {$countBefore}");
-
-            // Delete all exam results using the custom method
-            ExamResultModel::deleteAllResults();
-
-            $countAfter = ExamResultModel::count();
-            Log::info("Records after deletion: {$countAfter}");
-
-            return response()->json([
-                'status' => true,
-                'message' => "All exam results have been deleted successfully. Deleted {$countBefore} records."
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Error deleting all exam results: ' . $e->getMessage());
-
-            return response()->json([
-                'status' => false,
-                'message' => 'An error occurred while deleting exam results: ' . $e->getMessage()
-            ], 500);
-        }
-    }
 
     /**
      * Remove the specified exam result from storage.

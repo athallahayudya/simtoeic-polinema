@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\AnnouncementModel;
+use App\Models\UserModel;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\AnnouncementNotification;
 
 class AnnouncementController extends Controller
 {
@@ -52,7 +55,7 @@ class AnnouncementController extends Controller
         return view('users-admin.announcement.delete', ['announcements' => $announcements]);
     }
 
-    public function delete_ajax(string $id)
+    public function destroy(string $id)
     {
         $announcements = AnnouncementModel::find($id);
         if ($announcements) {
@@ -74,6 +77,12 @@ class AnnouncementController extends Controller
     {
         $announcements = AnnouncementModel::find($id);
         return view('users-admin.announcement.edit', ['announcements' => $announcements]);
+    }
+
+    public function edit_dashboard(string $id)
+    {
+        $announcements = AnnouncementModel::find($id);
+        return view('users-admin.announcement.edit_dashboard', ['announcements' => $announcements]);
     }
 
     public function update(Request $request, $id)
@@ -119,7 +128,7 @@ class AnnouncementController extends Controller
         // If no specific roles selected, make visible to all by setting null
         $visibleTo = $request->visible_to && count($request->visible_to) > 0 ? $request->visible_to : null;
 
-        AnnouncementModel::create([
+        $announcement = AnnouncementModel::create([
             'title' => $request->title,
             'content' => $request->content,
             'announcement_status' => $request->announcement_status,
@@ -127,6 +136,11 @@ class AnnouncementController extends Controller
             'visible_to' => $visibleTo,
             'created_by' => auth()->id(),
         ]);
+
+        // Send Telegram notifications if announcement is published
+        if ($request->announcement_status === 'published') {
+            $this->sendTelegramNotifications($announcement);
+        }
 
         return redirect('/announcements/')->with('success', 'Announcement created successfully.');
     }
@@ -139,6 +153,12 @@ class AnnouncementController extends Controller
      */
     public function upload(Request $request)
     {
+        Log::info('Upload request received', [
+            'title' => $request->title,
+            'has_file' => $request->hasFile('announcement_file'),
+            'file_size' => $request->hasFile('announcement_file') ? $request->file('announcement_file')->getSize() : 0
+        ]);
+
         $request->validate([
             'title' => 'required|string|max:255',
             'announcement_file' => 'required|file|mimes:pdf|max:10240',
@@ -167,18 +187,66 @@ class AnnouncementController extends Controller
             $announcement->created_by = auth()->id();
             $announcement->save();
 
+            // Send Telegram notifications for PDF announcements (always published)
+            $this->sendTelegramNotifications($announcement);
+
             return response()->json([
                 'status' => true,
                 'message' => 'Announcement uploaded successfully',
                 'data' => $announcement
             ]);
         } catch (\Exception $e) {
-            Log::error('Error uploading announcement: ' . $e->getMessage());
+            Log::error('Error uploading announcement: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
 
             return response()->json([
                 'status' => false,
                 'message' => 'Error uploading announcement: ' . $e->getMessage()
             ], 500);
+        }
+    }
+
+    /**
+     * Send Telegram notifications to users based on announcement visibility
+     *
+     * @param AnnouncementModel $announcement
+     * @return void
+     */
+    private function sendTelegramNotifications(AnnouncementModel $announcement)
+    {
+        try {
+            // Get users based on announcement visibility
+            $query = UserModel::whereNotNull('telegram_chat_id');
+
+            // Filter by roles if specific roles are set
+            if (!empty($announcement->visible_to)) {
+                $query->whereIn('role', $announcement->visible_to);
+            }
+
+            $users = $query->get();
+
+            if ($users->count() > 0) {
+                // Send notification to each user
+                Notification::send($users, new AnnouncementNotification($announcement));
+
+                Log::info('Telegram notifications sent for announcement', [
+                    'announcement_id' => $announcement->announcement_id,
+                    'title' => $announcement->title,
+                    'users_count' => $users->count(),
+                    'visible_to' => $announcement->visible_to
+                ]);
+            } else {
+                Log::info('No users with Telegram chat_id found for notification', [
+                    'announcement_id' => $announcement->announcement_id,
+                    'visible_to' => $announcement->visible_to
+                ]);
+            }
+        } catch (\Exception $e) {
+            Log::error('Error sending Telegram notifications: ' . $e->getMessage(), [
+                'announcement_id' => $announcement->announcement_id,
+                'trace' => $e->getTraceAsString()
+            ]);
         }
     }
 }

@@ -6,100 +6,185 @@
     <!-- CSS Libraries -->
     <link rel="stylesheet" href="{{ asset('library/chart.js/dist/Chart.min.css') }}">
     <style>
-
-        
-        .stat-card .card-body {
-            display: flex;
-            align-items: center;
-            padding: 1.5rem;
+        /* Custom style to make modal backdrop transparent */
+        .modal-backdrop.show {
+            opacity: 0 !important;
+            /* Make it completely transparent */
         }
+
+        /* General card styling for the new design */
         .stat-card {
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            background-color: #ffffff;
+            /* White background for cards */
+            border-radius: 3px;
+            /* Same as default card border-radius */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            /* Lighter shadow */
             transition: all 0.3s ease;
             overflow: hidden;
-            height: 100%;
+            height: 180px;
+            /* Fixed height for alignment */
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+            /* Consistent margin between cards */
+            border: 1px solid #e0e0e0;
+            /* Subtle border */
         }
-        
+
         .stat-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+            /* Slightly stronger hover shadow */
         }
 
-        .stat-icon-container {
-            width: 70px;
+        .stat-card .card-header {
+            padding: 10px 20px;
+            /* Adjust padding for compact header */
             display: flex;
-            justify-content: center;
-            margin-right: 15px;
-            margin-left: 10px;
+            justify-content: space-between;
+            align-items: center;
+            /* Align items to center */
+            font-size: 0.9rem;
+            border-bottom: none;
+            /* No border below header */
+            border-top-left-radius: 3px;
+            /* Same as card border-radius */
+            border-top-right-radius: 3px;
+            /* Same as card border-radius */
         }
-        
-        .stat-icon {
-            height: 60px;
-            width: 60px;
+
+        .stat-card .card-header h6 {
+            margin-bottom: 0;
+            font-weight: 600;
+            /* Bolder header text */
+            color: #ffffff;
+            /* White text for highlighted header */
+            text-align: left;
+            /* Left align header text */
+            flex-grow: 1;
+            /* Allow title to take available space */
+        }
+
+        .stat-card .card-header .header-right {
             display: flex;
             align-items: center;
-            justify-content: center;
-            border-radius: 12px;
-            font-size: 24px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            position: relative;
-            overflow: hidden;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #ffffff;
+            /* White text for header right content */
         }
 
-        .stat-content {
-            flex: 1;
+        .stat-card .card-header .header-right i {
+            margin-right: 5px;
+            font-size: 0.75rem;
+            /* Smaller icon */
         }
-        
-        .stat-icon::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
-            z-index: 1;
+
+        .stat-card .card-body {
+            padding: 15px 20px;
+            /* Adjust padding for compact body */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            /* Center content vertically */
+            text-align: left;
+            /* Left align content in card body */
+            color: #333333;
+            /* Darker text for body content */
+            flex-grow: 1;
+            /* Allow body to grow and fill available space */
+            min-height: 120px;
+            /* Ensure consistent body height */
         }
-        
-        .stat-icon i {
-            position: relative;
-            z-index: 2;
+
+        .stat-card h2 {
+            font-size: 2.2rem;
+            /* Slightly smaller number */
+            font-weight: 700;
+            /* Bolder number */
+            line-height: 1.1;
+            margin-bottom: 5px;
+            /* Small margin below number */
+            color: #333333;
+            /* Darker color for the number */
         }
-        
-        .bg-primary {
-            background: linear-gradient(135deg, #6777ef 0%, #4a5fe4 100%) !important;
+
+        .stat-card small {
+            font-size: 0.8rem;
+            /* Smaller descriptive text */
+            line-height: 1.3;
+            color: #666666;
+            /* Slightly lighter color for descriptive text */
+            margin-bottom: 2px;
+            /* Small margin between small texts */
         }
-        
-        .bg-success {
-            background: linear-gradient(135deg, #47c363 0%, #2bb14a 100%) !important;
+
+        .stat-card small:last-child {
+            margin-bottom: 0;
+            /* No bottom margin for the last small text */
         }
-        
-        .bg-info {
-            background: linear-gradient(135deg, #3abaf4 0%, #1a9cdc 100%) !important;
+
+        /* Specific color adjustments for icons/percentages if needed */
+        .text-success-light {
+            color: #d4edda !important;
+            /* Lighter green for positive growth on dark background */
         }
-        
-        .bg-warning {
-            background: linear-gradient(135deg, #ffa426 0%, #f78c00 100%) !important;
+
+        .text-danger-light {
+            color: #f8d7da !important;
+            /* Lighter red for negative growth on dark background */
         }
-        
+
+        /* Highlight colors for card headers */
+        .stat-card .card-header.bg-primary {
+            background-color: #6777ef !important;
+            /* Primary color */
+        }
+
+        .stat-card .card-header.bg-secondary {
+            background-color: #6c757d !important;
+            /* Secondary color */
+        }
+
+        .stat-card .card-header.bg-info {
+            background-color: #3abaf4 !important;
+            /* Info color */
+        }
+
+        .stat-card .card-header.bg-warning {
+            background-color: #ffa426 !important;
+            /* Warning color */
+        }
+
+        .stat-card .card-header.bg-success {
+            background-color: #47c363 !important;
+            /* Success color */
+        }
+
+        .stat-card .card-header.bg-danger {
+            background-color: #fc544b !important;
+            /* Danger color */
+        }
+
+        /* Other existing styles (keep if still relevant) */
         .card-dashboard {
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
             transition: transform 0.2s;
             border: none;
         }
-        
+
         .card-dashboard:hover {
             transform: translateY(-5px);
         }
-        
+
         .card-dashboard .card-header {
             background-color: #fff;
             border-bottom: 1px solid rgba(0, 0, 0, 0.05);
             padding: 20px 25px;
         }
-        
+
         .announcement-item {
             padding: 15px;
             border-radius: 8px;
@@ -108,37 +193,78 @@
             transition: all 0.2s ease;
             border-left: 4px solid #6777ef;
         }
-        
+
         .announcement-item:hover {
             background-color: #eef0f8;
         }
-        
+
         .score-badge {
             padding: 5px 10px;
             border-radius: 20px;
             font-weight: 600;
         }
-        
+
         .campus-item {
-            padding: 12px 15px;
+            padding: 15px;
             border-radius: 8px;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             background-color: #f8f9fa;
             transition: all 0.2s ease;
+            border: 1px solid #e9ecef;
         }
-        
+
         .campus-item:hover {
             background-color: #eef0f8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
-        
+
+        /* Enhanced badge styling */
+        .badge-lg {
+            padding: 8px 12px;
+            font-size: 0.9rem;
+        }
+
+
+        /* Ensure equal height cards in rows */
+        .equal-height {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
         .table-results th {
             font-weight: 600;
             color: #6c757d;
         }
-        
+
         .table-results {
             border-radius: 8px;
             overflow: hidden;
+        }
+
+        /* Statistics table styling */
+        .table-borderless td {
+            border: none !important;
+        }
+
+        .border-bottom {
+            border-bottom: 1px solid #e9ecef !important;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .stat-card .card-body {
+                padding: 1rem !important;
+            }
+
+            .stat-card h2 {
+                font-size: 1.5rem !important;
+            }
+
+            .stat-card .fa-lg {
+                font-size: 1.2em !important;
+            }
         }
     </style>
 @endpush
@@ -154,279 +280,350 @@
             </div>
 
             <!-- Main Statistics Cards -->
-            <div class="row mb-4">
-                <!-- Total Users Card -->
-                <div class="col-lg-3 col-md-6 col-sm-6 col-12 mb-4">
-                    <a href="{{ route('users') }}" class="text-decoration-none">
-                        <div class="card stat-card h-100">
-                            <div class="card-header bg-primary text-white p-3 d-flex align-items-center justify-content-center">
-                                <h6 class="mb-0 text-center">Total Users</h6>
+            <div class="row mb-0">
+                <!-- Student Users Card -->
+                <div class="col-lg-3 col-md-6 col-sm-6 col-12 mb-0">
+                    <a href="{{ route('users.index') }}" class="text-decoration-none">
+                        <div class="card stat-card">
+                            <div class="card-header bg-primary">
+                                <h6 class="mb-0">Student Users</h6>
+                                <div class="header-right">
+                                    @if(($studentGrowth ?? 0) >= 0)
+                                        <i class="fas fa-arrow-up text-success-light"></i> <span
+                                            class="text-success-light">+{{ $studentGrowth ?? 0 }}%</span>
+                                    @else
+                                        <i class="fas fa-arrow-down text-danger-light"></i> <span
+                                            class="text-danger-light">{{ $studentGrowth ?? 0 }}%</span>
+                                    @endif
+                                </div>
                             </div>
-                            <div class="card-body p-4 d-flex align-items-center justify-content-center">
-                                <h2 class="font-weight-bold text-center mb-0">{{ number_format($totalUsers ?? 0) }}</h2>
+                            <div class="card-body">
+                                <h2 class="font-weight-bold">{{ number_format($totalStudents ?? 0) }}</h2>
+                                <small>Active learners</small>
+                                <small>Users registered this month</small>
                             </div>
                         </div>
                     </a>
                 </div>
-                
+
+                <!-- Staff Users Card -->
+                <div class="col-lg-3 col-md-6 col-sm-6 col-12 mb-0">
+                    <a href="{{ route('users.index') }}" class="text-decoration-none">
+                        <div class="card stat-card">
+                            <div class="card-header bg-secondary">
+                                <h6 class="mb-0">Staff Users</h6>
+                                <div class="header-right">
+                                    @if(($staffGrowth ?? 0) >= 0)
+                                        <i class="fas fa-arrow-up text-success-light"></i> <span
+                                            class="text-success-light">+{{ $staffGrowth ?? 0 }}%</span>
+                                    @else
+                                        <i class="fas fa-arrow-down text-danger-light"></i> <span
+                                            class="text-danger-light">{{ $staffGrowth ?? 0 }}%</span>
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <h2 class="font-weight-bold">{{ number_format($totalStaff ?? 0) }}</h2>
+                                <small>Administrative team</small>
+                                <small>Users registered this month</small>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Lecturer Users Card -->
+                <div class="col-lg-3 col-md-6 col-sm-6 col-12 mb-0">
+                    <a href="{{ route('users.index') }}" class="text-decoration-none">
+                        <div class="card stat-card">
+                            <div class="card-header bg-info">
+                                <h6 class="mb-0">Lecturer Users</h6>
+                                <div class="header-right">
+                                    @if(($lecturerGrowth ?? 0) >= 0)
+                                        <i class="fas fa-arrow-up text-success-light"></i> <span
+                                            class="text-success-light">+{{ $lecturerGrowth ?? 0 }}%</span>
+                                    @else
+                                        <i class="fas fa-arrow-down text-danger-light"></i> <span
+                                            class="text-danger-light">{{ $lecturerGrowth ?? 0 }}%</span>
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <h2 class="font-weight-bold">{{ number_format($totalLecturers ?? 0) }}</h2>
+                                <small>Teaching faculty</small>
+                                <small>Users registered this month</small>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Alumni Users Card -->
+                <div class="col-lg-3 col-md-6 col-sm-6 col-12 mb-0">
+                    <a href="{{ route('users.index') }}" class="text-decoration-none">
+                        <div class="card stat-card">
+                            <div class="card-header bg-warning">
+                                <h6 class="mb-0">Alumni Users</h6>
+                                <div class="header-right">
+                                    @if(($alumniGrowth ?? 0) >= 0)
+                                        <i class="fas fa-arrow-up text-success-light"></i> <span
+                                            class="text-success-light">+{{ $alumniGrowth ?? 0 }}%</span>
+                                    @else
+                                        <i class="fas fa-arrow-down text-danger-light"></i> <span
+                                            class="text-danger-light">{{ $alumniGrowth ?? 0 }}%</span>
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <h2 class="font-weight-bold">{{ number_format($totalAlumni ?? 0) }}</h2>
+                                <small>Graduate network</small>
+                                <small>Users registered this month</small>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Secondary Statistics Cards -->
+            <div class="row mb-0">
                 <!-- Users Taken TOEIC Card -->
-                <div class="col-lg-3 col-md-6 col-sm-6 col-12 mb-4">
+                <div class="col-lg-3 col-md-6 col-sm-6 col-12 mb-0">
                     <a href="{{ route('exam-results.index') }}" class="text-decoration-none">
-                        <div class="card stat-card h-100">
-                            <div class="card-header bg-success text-white p-3 d-flex align-items-center justify-content-center">
-                                <h6 class="mb-0 text-center">Taken TOEIC</h6>
+                        <div class="card stat-card">
+                            <div class="card-header bg-success">
+                                <h6 class="mb-0">Taken TOEIC</h6>
+                                <div class="header-right">
+                                    <i class="fas fa-check-circle text-success-light"></i> <span
+                                        class="text-success-light">+12.5%</span>
+                                </div>
                             </div>
-                            <div class="card-body p-4 d-flex align-items-center justify-content-center">
-                                <h2 class="font-weight-bold text-center mb-0">{{ number_format($totalExamParticipants ?? 0) }}</h2>
+                            <div class="card-body">
+                                <h2 class="font-weight-bold">{{ number_format($totalExamParticipants ?? 0) }}</h2>
+                                <small>Completed exams</small>
+                                <small>Success rate tracking</small>
                             </div>
                         </div>
                     </a>
                 </div>
-                
+
                 <!-- Users Not Taken TOEIC Card -->
-                <div class="col-lg-3 col-md-6 col-sm-6 col-12 mb-4">
-                    <a href="{{ route('users') }}" class="text-decoration-none">
-                        <div class="card stat-card h-100">
-                            <div class="card-header bg-info text-white p-3 d-flex align-items-center justify-content-center">
-                                <h6 class="mb-0 text-center">Not Taken TOEIC</h6>
+                <div class="col-lg-3 col-md-6 col-sm-6 col-12 mb-0">
+                    <a href="{{ route('users.index') }}" class="text-decoration-none">
+                        <div class="card stat-card">
+                            <div class="card-header bg-danger">
+                                <h6 class="mb-0">Not Taken TOEIC</h6>
+                                <div class="header-right">
+                                    <i class="fas fa-exclamation-triangle text-danger-light"></i> <span
+                                        class="text-danger-light">-20%</span>
+                                </div>
                             </div>
-                            <div class="card-body p-4 d-flex align-items-center justify-content-center">
-                                <h2 class="font-weight-bold text-center mb-0">{{ number_format(($totalUsers ?? 0) - ($totalExamParticipants ?? 0)) }}</h2>
+                            <div class="card-body">
+                                <h2 class="font-weight-bold">
+                                    {{ number_format(($totalUsers ?? 0) - ($totalExamParticipants ?? 0)) }}
+                                </h2>
+                                <small>Pending exams</small>
+                                <small>Needs attention</small>
                             </div>
                         </div>
                     </a>
                 </div>
-                
-                <!-- Average Score Card -->
-                <div class="col-lg-3 col-md-6 col-sm-6 col-12 mb-4">
-                    <div class="card stat-card h-100">
-                        <div class="card-header bg-warning text-white p-3 d-flex align-items-center justify-content-center">
-                            <h6 class="mb-0 text-center">Average Score</h6>
+
+                <!-- Basic Statistics Card -->
+                <div class="col-lg-6 col-md-12 col-sm-12 col-12 mb-0">
+                    <div class="card stat-card" style="height: auto;">
+                        <div class="card-header bg-primary">
+                            <h6 class="mb-0 font-weight-bold">Basic Stats</h6>
+                            <div class="header-right">
+                                <i class="fas fa-chart-bar text-info-light"></i> <span class="text-info-light">+5.0%</span>
+                            </div>
                         </div>
-                        <div class="card-body p-4 d-flex align-items-center justify-content-center">
-                            <h2 class="font-weight-bold text-center mb-0">{{ number_format($averageScore ?? 0, 1) }}</h2>
+                        <div class="card-body" style="padding: 10px;">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="mr-2 text-primary">
+                                            <i class="fas fa-chart-line fa-lg"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-muted small">Average Score (μ)</div>
+                                            <h6 class="mb-0 font-weight-bold">{{ number_format($averageScore ?? 0, 0) }}
+                                            </h6>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="mr-2 text-info">
+                                            <i class="fas fa-ruler-combined fa-lg"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-muted small">Standard Deviation (σ)</div>
+                                            <h6 class="mb-0 font-weight-bold">
+                                                {{ number_format($standardDeviation ?? 0, 0) }}
+                                            </h6>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="mr-2 text-danger">
+                                            <i class="fas fa-arrow-down fa-lg"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-muted small">Lowest Score (min)</div>
+                                            <h6 class="mb-0 font-weight-bold">{{ number_format($lowestScore ?? 0, 0) }}</h6>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="mr-2 text-success">
+                                            <i class="fas fa-arrow-up fa-lg"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-muted small">Highest Score (max)</div>
+                                            <h6 class="mb-0 font-weight-bold">{{ number_format($highestScore ?? 0, 0) }}
+                                            </h6>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="mr-2 text-warning">
+                                            <i class="fas fa-percent fa-lg"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-muted small">Median (M)</div>
+                                            <h6 class="mb-0 font-weight-bold">{{ number_format($median ?? 0, 0) }}</h6>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="mr-2 text-secondary">
+                                            <i class="fas fa-chart-bar fa-lg"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-muted small">Mode</div>
+                                            <h6 class="mb-0 font-weight-bold">{{ number_format($mode ?? 0, 0) }}</h6>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-                
+
             <!-- Charts and Results Row -->
-                <div class="row" style="margin-top: -20px;">
-                    <!-- Recent Exam Results -->
-                    <div class="col-lg-8 mb-4">
-                        <div class="card card-dashboard h-100">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h4 class="mb-0"><i class="fas fa-list-alt mr-2 text-primary"></i> Recent Exam Results</h4>
-                                    <small class="text-muted">Latest TOEIC exam performances</small>
-                                </div>
-                                @if(Route::has('exam-results.index'))
-                                <a href="{{ route('exam-results.index') }}" class="btn btn-primary btn-sm">
-                                    View All <i class="fas fa-arrow-right ml-1"></i>
-                                </a>
-                                @endif
+            <div class="row mb-0">
+                <!-- Score Distribution Chart - Full Width -->
+                <div class="col-lg-12 mb-4">
+                    <div class="card card-dashboard h-100">
+                        <div class="card-header">
+                            <h4 class="mb-0"><i class="fas fa-chart-bar mr-2 text-primary"></i> Exam Score Distribution</h4>
+                            <small class="text-muted">TOEIC proficiency levels based on international standards</small>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container" style="position: relative; height:350px;">
+                                <canvas id="scoreDistributionChart"></canvas>
                             </div>
-                            <div class="card-body px-0 py-0">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Announcements Section -->
+            <div class="row mb-4">
+                <div class="col-lg-12">
+                    <div class="card card-dashboard h-100">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <div>
+                                <h4 class="mb-0"><i class="fas fa-bullhorn mr-2 text-primary"></i> Announcements</h4>
+                                <small class="text-muted">Manage system announcements</small>
+                            </div>
+                            <div class="card-header-action">
+                                <a href="{{ route('announcements.create') }}" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-plus mr-1"></i> Add Announcement
+                                </a>
+                            </div>
+                        </div>
+                        <div class="card-body" style="max-height: 300px; overflow-y: auto;">
+                            @if(isset($recentAnnouncements) && $recentAnnouncements->count() > 0)
                                 <div class="table-responsive">
-                                    <table class="table table-striped table-results mb-0">
+                                    <table class="table table-striped table-md mb-0">
                                         <thead>
                                             <tr>
-                                                <th class="px-4 py-3">User</th>
-                                                <th class="py-3">Role</th>
-                                                <th class="py-3">Score</th>
-                                                <th class="py-3">Status</th>
-                                                <th class="py-3">Date</th>
+                                                <th>Title</th>
+                                                <th>Content</th>
+                                                <th>Date</th>
+                                                <th class="text-center">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @if(isset($recentExamResults) && $recentExamResults->count() > 0)
-                                                @foreach($recentExamResults as $result)
-                                                    <tr>
-                                                        <td class="px-4 py-3">
-                                                            @if(isset($result->user))
-                                                                @if(isset($result->user->student) && $result->user->student)
-                                                                    {{ $result->user->student->name ?? 'N/A' }}
-                                                                @elseif(isset($result->user->staff) && $result->user->staff)
-                                                                    {{ $result->user->staff->name ?? 'N/A' }}
-                                                                @elseif(isset($result->user->lecturer) && $result->user->lecturer)
-                                                                    {{ $result->user->lecturer->name ?? 'N/A' }}
-                                                                @elseif(isset($result->user->alumni) && $result->user->alumni)
-                                                                    {{ $result->user->alumni->name ?? 'N/A' }}
-                                                                @else
-                                                                    {{ $result->user->identity_number ?? 'Unknown' }}
-                                                                @endif
-                                                            @else
-                                                                Unknown User
-                                                            @endif
-                                                        </td>
-                                                        <td class="py-3">
-                                                            @if(isset($result->user) && isset($result->user->role))
-                                                                <span class="badge badge-{{ $result->user->role == 'student' ? 'primary' : ($result->user->role == 'lecturer' ? 'success' : 'secondary') }}">
-                                                                    {{ ucfirst($result->user->role) }}
-                                                                </span>
-                                                            @else
-                                                                <span class="badge badge-secondary">Unknown</span>
-                                                            @endif
-                                                        </td>
-                                                        <td class="py-3">
-                                                            <span class="score-badge {{ ($result->score ?? 0) >= 80 ? 'bg-success text-white' : (($result->score ?? 0) >= 60 ? 'bg-warning text-white' : 'bg-danger text-white') }}">
-                                                                {{ $result->score ?? 0 }}
-                                                            </span>
-                                                        </td>
-                                                        <td class="py-3">
-                                                            @if(($result->score ?? 0) >= 80)
-                                                                <span class="badge badge-success">Excellent</span>
-                                                            @elseif(($result->score ?? 0) >= 60)
-                                                                <span class="badge badge-warning">Good</span>
-                                                            @else
-                                                                <span class="badge badge-danger">Needs Improvement</span>
-                                                            @endif
-                                                        </td>
-                                                        <td class="py-3">{{ isset($result->created_at) ? $result->created_at->format('M d, Y') : 'N/A' }}</td>
-                                                    </tr>
-                                                @endforeach
-                                            @else
+                                            @foreach($recentAnnouncements as $announcement)
                                                 <tr>
-                                                    <td colspan="5" class="text-center py-4">
-                                                        <i class="fas fa-clipboard fa-2x text-muted mb-2"></i>
-                                                        <p class="mb-0 text-muted">No exam results found</p>
+                                                    <td>{{ Str::limit($announcement->title ?? 'No Title', 40) }}</td>
+                                                    <td>
+                                                        {{ Str::limit(strip_tags($announcement->content ?? ''), 70) }}
+                                                    </td>
+                                                    <td>{{ isset($announcement->announcement_date) ? \Carbon\Carbon::parse($announcement->announcement_date)->format('M d, Y') : 'N/A' }}
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <button type="button"
+                                                            class="btn btn-sm btn-warning mr-1 edit-announcement-btn"
+                                                            data-id="{{ $announcement->announcement_id }}" data-toggle="tooltip"
+                                                            title="Edit">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+                                                        <button type="button" class="btn btn-sm btn-danger delete-announcement-btn"
+                                                            data-id="{{ $announcement->announcement_id }}" data-toggle="tooltip"
+                                                            title="Delete">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
                                                     </td>
                                                 </tr>
-                                            @endif
+                                            @endforeach
                                         </tbody>
                                     </table>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Score Distribution Chart -->
-                    <div class="col-lg-4 mb-4">
-                        <div class="card card-dashboard h-70">
-                            <div class="card-header">
-                                <h4 class="mb-0"><i class="fas fa-chart-pie mr-2 text-primary"></i> Exam Qualification</h4>
-                            </div>
-                            <div class="card-body">
-                                <div class="chart-container" style="position: relative; height:250px;">
-                                    <canvas id="scoreDistributionChart"></canvas>
+                            @else
+                                <div class="text-center py-5">
+                                    <i class="fas fa-bullhorn fa-3x text-muted mb-3"></i>
+                                    <p class="text-muted">No announcements found. Click "Add Announcement" to create one.</p>
                                 </div>
-                                <div class="score-legend mt-4">
-                                    <div class="row">
-                                        <div class="col-6">
-                                            <div class="d-flex align-items-center">
-                                                <span class="badge bg-success text-white mr-2" style="width: 16px; height: 16px;">&nbsp;</span>
-                                                <div>
-                                                    <div class="font-weight-bold">Score ≥ 500</div>
-                                                    <small class="text-muted">Free Exam Qualification</small>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-6">
-                                            <div class="d-flex align-items-center">
-                                                <span class="badge bg-danger text-white mr-2" style="width: 16px; height: 16px;">&nbsp;</span>
-                                                <div>
-                                                    <div class="font-weight-bold">Score < 500</div>
-                                                    <small class="text-muted">Paid Exam Required</small>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                
-                    <!-- Campus Distribution and Announcements Row -->
-                    <div class="row ml-1 flex-row flex-lg-nowrap"> 
-                            <!-- Campus Distribution -->
-                            <div class="col-lg-8 mb-4">
-                                <div class="card card-dashboard h-100">
-                                    <div class="card-header d-flex flex-column align-items-start">
-                                        <h4 class="mb-0">
-                                            <i class="fas fa-university mr-2 text-primary"></i> 
-                                            Campus Distribution
-                                        </h4>
-                                        <medium class="text-muted">Student distribution</medium>
-                                    </div>
-                                <div class="card-body">
-                                    @if(isset($campusDistribution) && $campusDistribution->count() > 0)
-                                        @foreach($campusDistribution as $campus)
-                                            <div class="campus-item">
-                                                <div class="d-flex justify-content-between mb-2">
-                                                    <span>
-                                                        <i class="fas fa-map-marker-alt text-primary mr-1"></i>
-                                                        {{ ucfirst(str_replace('_', ' ', $campus->campus ?? 'Unknown')) }}
-                                                    </span>
-                                                    <span class="badge badge-primary">{{ $campus->total ?? 0 }}</span>
-                                                </div>
-                                                <div class="progress" style="height: 8px; border-radius: 4px;">
-                                                    <div class="progress-bar bg-primary" 
-                                                        style="width: {{ ($totalStudents ?? 1) > 0 ? (($campus->total ?? 0) / ($totalStudents ?? 1)) * 100 : 0 }}%"></div>
-                                                </div>
-                                            </div>
-                                        @endforeach
-                                    @else
-                                        <div class="text-center py-5">
-                                            <i class="fas fa-university fa-3x text-muted mb-3"></i>
-                                            <p class="text-muted">No campus data available</p>
-                                        </div>
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Announcements -->
-                        <div class="col-lg-8 mb-4">
-                            <div class="card card-dashboard h-100">
-                                <div class="card-header d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h4 class="mb-0"><i class="fas fa-bullhorn mr-2 text-primary"></i> Announcements</h4>
-                                        <medium class="text-muted">Latest system announcements</medium>
-                                    </div>
-                                    @if(Route::has('announcements.index'))
-                                    <a href="{{ route('announcements.index') }}" class="btn btn-primary btn-sm">
-                                        All Announcements <i class="fas fa-arrow-right ml-1"></i>
-                                    </a>
-                                    @endif
-                                </div>
-                                <div class="card-body" style="max-height: 300px; overflow-y: auto;">
-                                    @if(isset($recentAnnouncements) && $recentAnnouncements->count() > 0)
-                                        @foreach($recentAnnouncements->take(3) as $announcement)
-                                            <div class="announcement-item">
-                                                <div class="d-flex justify-content-between mb-2">
-                                                    <h6 class="mb-0 font-weight-bold">{{ Str::limit($announcement->title ?? 'No Title', 50) }}</h6>
-                                                    <span class="badge badge-light">
-                                                        {{ isset($announcement->announcement_date) ? \Carbon\Carbon::parse($announcement->announcement_date)->format('M d') : '' }}
-                                                    </span>
-                                                </div>
-                                                <p class="text-muted small mb-1">
-                                                    {{ Str::limit(strip_tags($announcement->content ?? ''), 100) }}
-                                                </p>
-                                                <div class="d-flex justify-content-between align-items-center">
-                                                    <small class="text-muted">
-                                                        <i class="fas fa-clock mr-1"></i>
-                                                        {{ isset($announcement->announcement_date) ? \Carbon\Carbon::parse($announcement->announcement_date)->diffForHumans() : 'Unknown date' }}
-                                                    </small>
-                                                    @if(Route::has('announcements.show'))
-                                                    <a href="{{ route('announcements.show', $announcement->id) }}" class="btn btn-sm btn-light">
-                                                        Read more
-                                                    </a>
-                                                    @endif
-                                                </div>
-                                            </div>
-                                        @endforeach
-                                    @else
-                                        <div class="text-center py-5">
-                                            <i class="fas fa-bullhorn fa-3x text-muted mb-3"></i>
-                                            <p class="text-muted">No announcements found</p>
-                                        </div>
-                                    @endif
-                                </div>
-                            </div>
+                            @endif
                         </div>
                     </div>
                 </div>
             </div>
+
+            <!-- Generic Modal for Edit/Add -->
+            <div class="modal fade" tabindex="-1" role="dialog" id="announcementModal">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Edit Announcement</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- Content will be loaded here via AJAX -->
+                            <div class="text-center">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                                <p class="mt-2">Loading announcement data...</p>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary" id="saveAnnouncementBtn">Save Changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
         </section>
     </div>
 @endsection
@@ -434,84 +631,305 @@
 @push('scripts')
     <!-- JS Libraries -->
     <script src="{{ asset('library/chart.js/dist/Chart.min.js') }}"></script>
+    <script src="{{ asset('library/sweetalert/dist/sweetalert.min.js') }}"></script>
 
     <script>
         // Score Distribution Chart - Exam Qualification
         var ctx2 = document.getElementById('scoreDistributionChart').getContext('2d');
-        
-        // Calculate counts for scores above and below 500
-        var scoreDistributionData = @json($scoreDistribution ?? collect());
-        var aboveThreshold = 0;
-        var belowThreshold = 0;
-        
-        // If we have actual score data, calculate the distribution
-        if(scoreDistributionData.length > 0) {
-            // Try to use the raw exam results if available
-            var examResults = @json($allExamResults ?? collect());
-            
-            if(examResults.length > 0) {
-                // Count directly from raw scores
-                examResults.forEach(function(result) {
-                    if(result.score >= 500) {
-                        aboveThreshold++;
-                    } else {
-                        belowThreshold++;
-                    }
-                });
-            } else {
-                // Estimate from the existing score distribution data
-                // This is just an approximation since we don't have the raw scores
-                scoreDistributionData.forEach(function(item) {
-                    // Parse the grade to get the score range
-                    var gradeText = item.grade || "";
-                    var count = item.count || 0;
-                    
-                    if(gradeText.includes("Excellent") || gradeText.includes("Good") || 
-                       (gradeText.includes("Average") && !gradeText.includes("Below"))) {
-                        // These are likely above 500
-                        aboveThreshold += count;
-                    } else {
-                        // These are likely below 500
-                        belowThreshold += count;
-                    }
-                });
-            }
+
+        // Prepare data for TOEIC proficiency levels
+        var scoreRanges = {
+            '0 - 250': 0,
+            '255 - 500': 0,
+            '501 - 700': 0,
+            '701 - 900': 0,
+            '901 - 990': 0
+        };
+
+        var allExamResults = @json($allExamResults ?? collect());
+
+        if (allExamResults.length > 0) {
+            allExamResults.forEach(function (result) {
+                var score = result.score;
+                if (score >= 0 && score <= 250) {
+                    scoreRanges['0 - 250']++;
+                } else if (score >= 255 && score <= 500) {
+                    scoreRanges['255 - 500']++;
+                } else if (score >= 501 && score <= 700) {
+                    scoreRanges['501 - 700']++;
+                } else if (score >= 701 && score <= 900) {
+                    scoreRanges['701 - 900']++;
+                } else if (score >= 901 && score <= 990) {
+                    scoreRanges['901 - 990']++;
+                }
+            });
         }
-        
+
         var scoreDistributionChart = new Chart(ctx2, {
-            type: 'doughnut',
+            type: 'bar', // Changed to bar chart
             data: {
-                labels: ['Score ≥ 500 (Free Exam)', 'Score < 500 (Paid Exam)'],
+                labels: Object.keys(scoreRanges),
                 datasets: [{
-                    data: [aboveThreshold, belowThreshold],
+                    label: 'Number of Participants',
+                    data: Object.values(scoreRanges),
                     backgroundColor: [
-                        '#28a745', // Green for qualifying scores (≥ 500)
-                        '#dc3545'  // Red for non-qualifying scores (< 500)
+                        'rgba(220, 53, 69, 0.8)',   // Red for Beginner
+                        'rgba(255, 193, 7, 0.8)',   // Yellow for Elementary
+                        'rgba(255, 159, 64, 0.8)',  // Orange for Intermediate
+                        'rgba(23, 162, 184, 0.8)',  // Blue for Advanced
+                        'rgba(40, 167, 69, 0.8)'    // Green for Proficient
                     ],
-                    borderWidth: 0
+                    borderColor: [
+                        'rgb(220, 53, 69)',
+                        'rgb(255, 193, 7)',
+                        'rgb(255, 159, 64)',
+                        'rgb(23, 162, 184)',
+                        'rgb(40, 167, 69)'
+                    ],
+                    borderWidth: 1
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                cutoutPercentage: 70,
+                animation: {
+                    duration: 1000, // Animation duration in milliseconds
+                    easing: 'easeOutQuart' // Easing function for animation
+                },
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            precision: 0, // Ensure integer ticks
+                            fontColor: '#666', // Darker font color for y-axis ticks
+                            fontSize: 12 // Slightly larger font size
+                        },
+                        gridLines: {
+                            display: true,
+                            color: 'rgba(0, 0, 0, 0.05)' // Lighter grid lines
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Number of Participants',
+                            fontColor: '#333', // Darker font color for label
+                            fontSize: 14, // Larger font size for label
+                            fontStyle: 'bold'
+                        }
+                    }],
+                    xAxes: [{
+                        barPercentage: 0.7, // Adjust bar thickness
+                        categoryPercentage: 0.8, // Adjust spacing between categories
+                        ticks: {
+                            maxRotation: 45,
+                            minRotation: 45,
+                            fontColor: '#666', // Darker font color for x-axis ticks
+                            fontSize: 12 // Slightly larger font size
+                        },
+                        gridLines: {
+                            display: false // Hide x-axis grid lines for cleaner look
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'TOEIC Proficiency Level',
+                            fontColor: '#333', // Darker font color for label
+                            fontSize: 14, // Larger font size for label
+                            fontStyle: 'bold'
+                        }
+                    }]
+                },
                 legend: {
-                    display: false
+                    display: false // Hide legend as labels are self-explanatory
                 },
                 tooltips: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.7)', // Darker tooltip background
+                    titleFontColor: '#fff', // White title font
+                    bodyFontColor: '#fff', // White body font
+                    cornerRadius: 4, // Rounded tooltip corners
+                    displayColors: false, // Hide color box in tooltip
                     callbacks: {
-                        label: function(tooltipItem, data) {
-                            var dataset = data.datasets[tooltipItem.datasetIndex];
-                            var total = dataset.data.reduce(function(previousValue, currentValue) {
-                                return previousValue + currentValue;
-                            }, 0);
-                            var currentValue = dataset.data[tooltipItem.index];
-                            var percentage = Math.floor(((currentValue/total) * 100)+0.5);        
-                            return data.labels[tooltipItem.index] + ': ' + currentValue + ' (' + percentage + '%)';
+                        label: function (tooltipItem, data) {
+                            var label = data.labels[tooltipItem.index] || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            label += tooltipItem.yLabel + ' participants';
+                            return label;
                         }
+                    }
+                },
+                elements: {
+                    bar: {
+                        borderRadius: 5 // Rounded corners for bars
                     }
                 }
             }
+        });
+
+        // AJAX for deleting announcements
+        $(document).ready(function () {
+            $('.delete-announcement-btn').on('click', function (e) {
+                e.preventDefault();
+                var announcementId = $(this).data('id');
+                var row = $(this).closest('tr'); // Get the table row to remove it later
+
+                swal({
+                    title: 'Are you sure?',
+                    text: 'Once deleted, you will not be able to recover this announcement!',
+                    icon: 'warning',
+                    buttons: true,
+                    dangerMode: true,
+                })
+                    .then((willDelete) => {
+                        if (willDelete) {
+                            $.ajax({
+                                url: '/announcements/' + announcementId,
+                                type: 'DELETE',
+                                data: {
+                                    _token: '{{ csrf_token() }}'
+                                },
+                                success: function (response) {
+                                    if (response.status) {
+                                        swal('Success!', response.message, 'success');
+                                        row.remove(); // Remove the row from the table
+                                        // If no more announcements, show the "No announcements found" message
+                                        if ($('.table-striped tbody tr').length === 0) {
+                                            $('.card-body').append('<div class="text-center py-5 no-announcements-message"><i class="fas fa-bullhorn fa-3x text-muted mb-3"></i><p class="text-muted">No announcements found. Click "Add Announcement" to create one.</p></div>');
+                                        }
+                                    } else {
+                                        swal('Error!', response.message, 'error');
+                                    }
+                                },
+                                error: function (xhr) {
+                                    swal('Error!', 'An error occurred while deleting the announcement.', 'error');
+                                    console.error(xhr.responseText);
+                                }
+                            });
+                        }
+                    });
+            });
+        });
+
+        // AJAX for editing announcements (modal)
+        $(document).ready(function () {
+            // Load edit form into modal (hanya untuk tombol edit, bukan content)
+            $('.edit-announcement-btn').on('click', function (e) {
+                e.preventDefault();
+                var announcementId = $(this).data('id');
+                var modalBody = $('#announcementModal .modal-body');
+
+                modalBody.html('<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="sr-only">Loading...</span></div><p class="mt-2">Loading announcement data...</p></div>');
+                $('#announcementModal').modal('show');
+
+                $.ajax({
+                    url: '/announcements/' + announcementId + '/edit_dashboard',
+                    type: 'GET',
+                    success: function (response) {
+                        modalBody.html(response);
+
+                        // Ensure form elements are interactive after loading
+                        setTimeout(function () {
+                            console.log('Dashboard modal form loaded');
+
+                            // Force enable all form elements
+                            $('#announcementEditForm input, #announcementEditForm select, #announcementEditForm textarea').each(function () {
+                                console.log('Enabling modal element:', this);
+                                $(this).prop('disabled', false);
+                                $(this).prop('readonly', false);
+                                $(this).removeAttr('disabled');
+                                $(this).removeAttr('readonly');
+                                $(this).css({
+                                    'pointer-events': 'auto !important',
+                                    'user-select': 'auto !important',
+                                    'position': 'relative !important',
+                                    'z-index': '1050 !important',
+                                    'background-color': 'white !important'
+                                });
+                            });
+
+                            // Enable checkboxes specifically
+                            $('#announcementEditForm input[type="checkbox"]').each(function () {
+                                console.log('Enabling modal checkbox:', this);
+                                $(this).prop('disabled', false);
+                                $(this).removeAttr('disabled');
+                                $(this).css({
+                                    'pointer-events': 'auto !important',
+                                    'position': 'relative !important',
+                                    'z-index': '1060 !important'
+                                });
+                            });
+
+                            // Enable labels
+                            $('#announcementEditForm label').css({
+                                'pointer-events': 'auto !important',
+                                'cursor': 'pointer !important'
+                            });
+
+                            // Remove any overlay or blocking elements
+                            $('.modal-backdrop.show').css('z-index', '1040');
+
+                            // Focus on first input to test
+                            var titleInput = $('#announcementEditForm input[name="title"]');
+                            console.log('Focusing on modal title input:', titleInput);
+                            titleInput.focus();
+                            titleInput.click();
+                        }, 500);
+                    },
+                    error: function (xhr) {
+                        modalBody.html('<div class="alert alert-danger">Failed to load announcement data.</div>');
+                        console.error(xhr.responseText);
+                    }
+                });
+            });
+
+            // Handle form submission within the modal via AJAX
+            $(document).on('submit', '#announcementEditForm', function (e) {
+                e.preventDefault();
+                var form = $(this);
+                var url = form.attr('action');
+                var method = form.find('input[name="_method"]').val() || form.attr('method');
+                var formData = form.serialize();
+
+                $.ajax({
+                    url: url,
+                    type: method,
+                    data: formData,
+                    success: function (response) {
+                        if (response.status) {
+                            swal('Success!', response.message, 'success');
+                            $('#announcementModal').modal('hide');
+                            // Reload the page or update the specific row in the table
+                            location.reload(); // Simple reload for now, can be optimized later
+                        } else {
+                            swal('Error!', response.message, 'error');
+                        }
+                    },
+                    error: function (xhr) {
+                        var errors = xhr.responseJSON.errors;
+                        if (errors) {
+                            // Clear previous errors
+                            form.find('.is-invalid').removeClass('is-invalid');
+                            form.find('.invalid-feedback').remove();
+
+                            // Display new errors
+                            $.each(errors, function (key, value) {
+                                var input = form.find('[name="' + key + '"]');
+                                input.addClass('is-invalid');
+                                input.after('<div class="invalid-feedback">' + value + '</div>');
+                            });
+                            swal('Validation Error!', 'Please check the form for errors.', 'error');
+                        } else {
+                            swal('Error!', 'An error occurred while updating the announcement.', 'error');
+                        }
+                        console.error(xhr.responseText);
+                    }
+                });
+            });
+
+            // Handle Save Changes button click (since it's outside the form)
+            $(document).on('click', '#saveAnnouncementBtn', function (e) {
+                e.preventDefault();
+                $('#announcementEditForm').submit();
+            });
         });
     </script>
 @endpush

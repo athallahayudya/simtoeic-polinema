@@ -23,16 +23,16 @@
         .section-header {
             margin-bottom: 0 !important;
         }
-        
+
         .section-body {
             padding-top: 0 !important;
         }
-        
+
         .section-title {
             margin-top: 0;
             margin-bottom: 10px;
         }
-        
+
         /* End of spacing adjustment */
 
         .profile-widget-picture {
@@ -173,6 +173,31 @@
                                             </div>
                                         </div>
                                     </div>
+
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label>Telegram Chat ID <span class="text-muted">(Optional)</span></label>
+                                                <input type="text" name="telegram_chat_id" class="form-control"
+                                                    value="{{ $staff->user->telegram_chat_id ?? '' }}"
+                                                    placeholder="Enter your Telegram Chat ID (numbers only)">
+                                                @error('telegram_chat_id')
+                                                    <div class="text-danger">{{ $message }}</div>
+                                                @enderror
+                                                <small class="text-muted">
+                                                    <i class="fas fa-info-circle"></i>
+                                                    <strong>How to get your Chat ID:</strong><br>
+                                                    1. Open Telegram and search for <code>@userinfobot</code><br>
+                                                    2. Click START and send any message<br>
+                                                    3. Copy the "Your chat ID" number<br>
+                                                    4. Make sure you've started <code>@simtopolinema_bot</code> first!<br>
+                                                    <strong>Note:</strong> This is required to receive announcement
+                                                    notifications via Telegram.
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group">
@@ -196,70 +221,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="form-group">
-                                        <label>Profile Photo</label>
-                                        <input type="file" name="photo" class="form-control-file" id="profile-photo-input"
-                                            {{ $staff->photo ? 'disabled' : '' }}>
-                                        @if($staff->photo)
-                                            <div class="warning-text">
-                                                <i class="fas fa-exclamation-triangle"></i> Profile photo cannot be changed
-                                                once
-                                                uploaded.
-                                            </div>
-                                        @else
-                                            <div class="warning-text">
-                                                <i class="fas fa-exclamation-triangle"></i> Please upload your profile photo
-                                                carefully. It cannot be changed later.
-                                            </div>
-                                        @endif
-
-                                        @if($staff && $staff->photo)
-                                            <div class="document-preview mt-2">
-                                                <img src="{{ asset($staff->photo) }}" alt="Profile" class="img-fluid"
-                                                    id="profile-photo-preview">
-                                            </div>
-                                        @else
-                                            <div class="document-preview mt-2" id="profile-photo-container"
-                                                style="display:none">
-                                                <img src="" alt="Profile" class="img-fluid" id="profile-photo-preview">
-                                            </div>
-                                        @endif
-                                        @error('photo')
-                                            <div class="text-danger">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label>KTP Scan (ID Card)</label>
-                                                <input type="file" name="ktp_scan" class="form-control-file"
-                                                    accept="image/*" id="ktp-scan-input" {{ $staff->ktp_scan ? 'disabled' : '' }}>
-                                                @if($staff->ktp_scan)
-                                                    <div class="warning-text">
-                                                        <i class="fas fa-exclamation-triangle"></i> KTP document cannot be
-                                                        changed once uploaded.
-                                                    </div>
-                                                    <div class="mt-2">
-                                                        <a href="{{ asset($staff->ktp_scan) }}" target="_blank"
-                                                            class="btn btn-sm btn-info">View KTP Document</a>
-                                                    </div>
-                                                @else
-                                                    <div class="warning-text">
-                                                        <i class="fas fa-exclamation-triangle"></i> Please upload your KTP
-                                                        carefully. It cannot be changed later.
-                                                    </div>
-                                                    <div class="document-preview mt-2" id="ktp-scan-container"
-                                                        style="display:none">
-                                                        <img src="" alt="KTP Preview" class="img-fluid" id="ktp-scan-preview">
-                                                    </div>
-                                                @endif
-                                                @error('ktp_scan')
-                                                    <div class="text-danger">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                    </div>
+                                    @include('components.profile-upload-section', ['user' => $staff, 'userType' => 'staff'])
                                     <div class="card-footer text-right">
                                         <button type="submit" class="btn btn-primary">Save Changes</button>
                                     </div>
@@ -278,42 +240,6 @@
 
     <!-- Page Specific JS File -->
     <script>
-        // For profile photo preview
-        document.getElementById('profile-photo-input')?.addEventListener('change', function (e) {
-            const [file] = e.target.files;
-            if (file && file.type.match('image.*')) {
-                const reader = new FileReader();
-                reader.onload = function (evt) {
-                    const preview = document.getElementById('profile-photo-preview');
-                    const container = document.getElementById('profile-photo-container');
-
-                    if (preview) {
-                        preview.src = evt.target.result;
-                        if (container) container.style.display = 'block';
-                    }
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
-        // For KTP scan preview
-        document.getElementById('ktp-scan-input')?.addEventListener('change', function (e) {
-            const [file] = e.target.files;
-            if (file && file.type.match('image.*')) {
-                const reader = new FileReader();
-                reader.onload = function (evt) {
-                    const preview = document.getElementById('ktp-scan-preview');
-                    const container = document.getElementById('ktp-scan-container');
-
-                    if (preview) {
-                        preview.src = evt.target.result;
-                        if (container) container.style.display = 'block';
-                    }
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
         // Auto-hide alerts after 5 seconds
         setTimeout(function () {
             $('.alert').fadeOut('slow');

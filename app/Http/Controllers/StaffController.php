@@ -17,128 +17,6 @@ use Illuminate\Support\Facades\Auth;
 
 class StaffController extends Controller
 {
-    public function list()
-    {
-        $staff = StaffModel::select('staff_id', 'user_id', 'name', 'nip', 'ktp_scan', 'photo', 'home_address', 'current_address')
-            ->with('user');
-
-        return DataTables::of($staff)
-            ->addIndexColumn()
-            ->editColumn('ktp_scan', function ($staff) {
-                return $staff->ktp_scan ? asset($staff->ktp_scan) : '-';
-            })
-            ->editColumn('photo', function ($staff) {
-                return $staff->photo ? asset($staff->photo) : '-';
-            })
-            ->addColumn('exam_status', function ($staff) {
-                $examStatus = $staff->user ? $staff->user->exam_status : '-';
-                $badgeClass = '';
-                switch (strtolower($examStatus)) {
-                    case 'success':
-                        $badgeClass = 'badge-success';
-                        break;
-                    case 'not_yet':
-                        $badgeClass = 'badge-warning';
-                        break;
-                    case 'fail':
-                        $badgeClass = 'badge-danger';
-                        break;
-                    default:
-                        $badgeClass = 'badge-secondary';
-                }
-                return '<span class="badge ' . $badgeClass . '">' . ucfirst($examStatus) . '</span>';
-            })
-            ->addColumn('action', function ($staff) {
-                $btn = '<button onclick="modalAction(\'' . url('/manage-users/staff/' . $staff->staff_id . '/show_ajax') . '\')" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></button> ';
-                $btn .= '<button onclick="modalAction(\'' . url('/manage-users/staff/' . $staff->staff_id . '/edit_ajax') . '\')" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></button> ';
-                $btn .= '<button onclick="modalAction(\'' . url('/manage-users/staff/' . $staff->staff_id . '/delete_ajax') . '\')" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button> ';
-                return $btn;
-            })
-            ->rawColumns(['action', 'ktp_scan', 'photo', 'exam_status'])
-            ->make(true);
-    }
-
-    public function edit_ajax(string $id)
-    {
-        $staff = StaffModel::find($id);
-        return view('users-admin.manage-user.staff.edit', ['staff' => $staff]);
-    }
-
-    public function update_ajax(Request $request, $id)
-    {
-        $rules = [
-            'name'            => 'required|string|max:100',
-            'photo'           => 'nullable|file|mimes:jpg,jpeg,png|max:2048',
-            'home_address'    => 'required|string|max:255',
-            'current_address' => 'required|string|max:255',
-        ];
-
-        $validator = Validator::make($request->all(), $rules);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'status'   => false,
-                'message'  => 'Validation failed.',
-                'msgField' => $validator->errors()
-            ]);
-        }
-
-        $staff = StaffModel::find($id);
-        if ($staff) {
-            $data = $request->only(['name', 'home_address', 'current_address']);
-
-            if ($request->hasFile('photo')) {
-                if ($staff->photo && Storage::disk('public')->exists(str_replace('storage/', '', $staff->photo))) {
-                    Storage::disk('public')->delete(str_replace('storage/', '', $staff->photo));
-                }
-                $path = $request->file('photo')->store('staff/photos', 'public');
-                $staff->photo = 'storage/' . $path;
-            }
-
-            $staff->update($data);
-
-            return response()->json([
-                'status'  => true,
-                'message' => 'Staff data successfully updated'
-            ]);
-        } else {
-            return response()->json([
-                'status'  => false,
-                'message' => 'Data not found.'
-            ]);
-        }
-    }
-
-    public function confirm_ajax(string $id)
-    {
-        $staff = StaffModel::find($id);
-        return view('users-admin.manage-user.staff.delete', ['staff' => $staff]);
-    }
-
-    public function delete_ajax(string $id)
-    {
-        $staff = StaffModel::find($id);
-        if ($staff) {
-            $staff->delete();
-
-            return response()->json([
-                'status' => true,
-                'message' => 'Staff data has been successfully deleted.'
-            ]);
-        } else {
-            return response()->json([
-                'status' => false,
-                'message' => 'Data not found.'
-            ]);
-        }
-    }
-
-    public function show_ajax(string $id)
-    {
-        $staff = StaffModel::find($id);
-        return view('users-admin.manage-user.staff.show', ['staff' => $staff]);
-    }
-
     // Dashboard
     public function dashboard()
     {
@@ -255,20 +133,23 @@ class StaffController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'phone_number' => 'required|string|min:10|max:15|regex:/^[0-9+\-\s]+$/',
+            'telegram_chat_id' => 'nullable|string|regex:/^[0-9]+$/',  // Only numbers allowed
             'home_address' => 'required|string',
             'current_address' => 'required|string',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'ktp_scan' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:2048',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',  // 2MB for profile photo
+            'ktp_scan' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',  // 5MB for KTP scan
+            'ktm_scan' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',  // 5MB for ID card scan
         ]);
 
         $staff->name = $request->input('name');
         $staff->home_address = $request->input('home_address');
         $staff->current_address = $request->input('current_address');
 
-        // Update phone number
+        // Update phone number and telegram_chat_id
         $userModel = UserModel::find($user->user_id);
         if ($userModel) {
             $userModel->phone_number = $request->input('phone_number');
+            $userModel->telegram_chat_id = $request->input('telegram_chat_id');
             $userModel->save();
         }
 
@@ -289,6 +170,15 @@ class StaffController extends Controller
             }
             $ktpPath = $request->file('ktp_scan')->store('staff/ktp', 'public');
             $staff->ktp_scan = 'storage/' . $ktpPath;
+        }
+
+        // Handle KTM/ID card scan upload
+        if ($request->hasFile('ktm_scan')) {
+            if ($staff->ktm_scan && Storage::disk('public')->exists(str_replace('storage/', '', $staff->ktm_scan))) {
+                Storage::disk('public')->delete(str_replace('storage/', '', $staff->ktm_scan));
+            }
+            $ktmPath = $request->file('ktm_scan')->store('staff/id_card', 'public');
+            $staff->ktm_scan = 'storage/' . $ktmPath;
         }
 
         // Save the staff model

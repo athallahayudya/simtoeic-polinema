@@ -10,6 +10,7 @@ use App\Models\StudentModel;
 use App\Models\UserModel;
 use App\Models\ExamRegistrationModel;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
@@ -132,143 +133,6 @@ class StudentController extends Controller
         ]);
     }
 
-    public function list(Request $request)
-    {
-        $students = StudentModel::select('student_id', 'user_id', 'name', 'nim', 'study_program', 'major', 'campus', 'ktp_scan', 'ktm_scan', 'photo', 'home_address', 'current_address')
-            ->with('user:user_id,exam_status');
-
-        if ($request->campus) {
-            $students->where('campus', $request->campus);
-        }
-
-        return DataTables::of($students)
-            ->addIndexColumn()
-            ->editColumn('ktp_scan', function ($student) {
-                return $student->ktp_scan ? asset($student->ktp_scan) : '-';
-            })
-            ->editColumn('ktm_scan', function ($student) {
-                return $student->ktm_scan ? asset($student->ktm_scan) : '-';
-            })
-            ->editColumn('photo', function ($student) {
-                return $student->photo ? asset($student->photo) : '-';
-            })
-            ->addColumn('exam_status', function ($student) {
-                $examStatus = $student->user ? $student->user->exam_status : '-';
-                $badgeClass = '';
-                switch (strtolower($examStatus)) {
-                    case 'success':
-                        $badgeClass = 'badge-success';
-                        break;
-                    case 'not_yet':
-                        $badgeClass = 'badge-warning';
-                        break;
-                    case 'fail':
-                        $badgeClass = 'badge-danger';
-                        break;
-                    default:
-                        $badgeClass = 'badge-secondary';
-                }
-                return '<span class="badge ' . $badgeClass . '">' . ucfirst($examStatus) . '</span>';
-            })
-            ->addColumn('action', function ($student) {
-                $btn = '<button onclick="modalAction(\'' . url('/manage-users/student/' . $student->student_id . '/show_ajax') . '\')" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></button> ';
-                $btn .= '<button onclick="modalAction(\'' . url('/manage-users/student/' . $student->student_id . '/edit_ajax') . '\')" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></button> ';
-                $btn .= '<button onclick="modalAction(\'' . url('/manage-users/student/' . $student->student_id . '/delete_ajax') . '\')" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button> ';
-                return $btn;
-            })
-            ->rawColumns(['action', 'ktp_scan', 'ktm_scan', 'photo', 'exam_status'])
-            ->make(true);
-    }
-
-    public function edit_ajax(string $id)
-    {
-        $student = StudentModel::find($id);
-
-        return view('users-admin.manage-user.student.edit', ['student' => $student]);
-    }
-
-    public function update_ajax(Request $request, $id)
-    {
-        $rules = [
-            'name' => 'required|string|max:100',
-            'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'home_address' => 'required|string',
-            'current_address' => 'required|string',
-        ];
-
-        $validator = Validator::make($request->all(), $rules);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Validasi gagal.',
-                'msgField' => $validator->errors()
-            ]);
-        }
-
-        $student = StudentModel::find($id);
-        if ($student) {
-            $data = $request->only([
-                'name',
-                'home_address',
-                'current_address'
-            ]);
-
-            if ($request->hasFile('photo')) {
-                if ($student->photo && Storage::disk('public')->exists(str_replace('storage/', '', $student->photo))) {
-                    Storage::disk('public')->delete(str_replace('storage/', '', $student->photo));
-                }
-                $path = $request->file('photo')->store('student/photos', 'public');
-                $student->photo = 'storage/' . $path;
-            }
-
-            $student->update($data);
-            return response()->json([
-                'status' => true,
-                'message' => 'Student data has been successfully updated.'
-            ]);
-        } else {
-            return response()->json([
-                'status' => false,
-                'message' => 'Data not found.'
-            ]);
-        }
-    }
-
-    public function confirm_ajax(string $id)
-    {
-        $student = StudentModel::find($id);
-
-        return view('users-admin.manage-user.student.delete', ['student' => $student]);
-    }
-
-    public function delete_ajax(string $id)
-    {
-        $student = StudentModel::find($id);
-        if ($student) {
-            $student->delete();
-
-            return response()->json([
-                'status' => true,
-                'message' => 'Student data has been successfully deleted.'
-            ]);
-        } else {
-            return response()->json([
-                'status' => false,
-                'message' => 'Data not found.'
-            ]);
-        }
-    }
-
-    public function show_ajax(string $id)
-    {
-        $student = StudentModel::with('user')->find($id);
-
-        return view('users-admin.manage-user.student.show', [
-            'student' => $student
-        ]);
-    }
-
     public function updateProfile(Request $request)
     {
         $user = Auth::guard('web')->user();
@@ -279,25 +143,37 @@ class StudentController extends Controller
         $student = StudentModel::where('user_id', $user->user_id)->firstOrFail();
 
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|regex:/^[a-zA-Z\s\.]+$/',  // Only letters, spaces, and dots
             'phone_number' => 'required|string|min:10|max:15|regex:/^[0-9+\-\s]+$/',  // Improved validation
-            'home_address' => 'required|string',
-            'current_address' => 'required|string',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'ktp_scan' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:2048',
-            'ktm_scan' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:2048',
+            'telegram_chat_id' => 'nullable|string|regex:/^[0-9]+$/',  // Only numbers allowed
+            'home_address' => [
+                'required',
+                'string',
+                'max:500',
+                'regex:/^[a-zA-Z0-9\s\.\,\-\/]+$/'  // Only alphanumeric, spaces, dots, commas, hyphens, slashes
+            ],
+            'current_address' => [
+                'required',
+                'string',
+                'max:500',
+                'regex:/^[a-zA-Z0-9\s\.\,\-\/]+$/'  // Only alphanumeric, spaces, dots, commas, hyphens, slashes
+            ],
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',  // 2MB for profile photo
+            'ktp_scan' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',  // 5MB for KTP scan
+            'ktm_scan' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',  // 5MB for KTM scan
         ]);
 
-        // Update student data (exclude major and study_program)
-        $student->name = $request->input('name');
-        $student->home_address = $request->input('home_address');
-        $student->current_address = $request->input('current_address');
+        // Update student data (exclude major and study_program) with sanitization
+        $student->name = htmlspecialchars(strip_tags(trim($request->input('name'))), ENT_QUOTES, 'UTF-8');
+        $student->home_address = htmlspecialchars(strip_tags(trim($request->input('home_address'))), ENT_QUOTES, 'UTF-8');
+        $student->current_address = htmlspecialchars(strip_tags(trim($request->input('current_address'))), ENT_QUOTES, 'UTF-8');
         // Major and study_program are intentionally not updated as they should be fixed values
 
-        // Update phone number in users table
+        // Update phone number and telegram_chat_id in users table with sanitization
         $userModel = UserModel::find($user->user_id);
         if ($userModel) {
-            $userModel->phone_number = $request->input('phone_number');
+            $userModel->phone_number = htmlspecialchars(strip_tags(trim($request->input('phone_number'))), ENT_QUOTES, 'UTF-8');
+            $userModel->telegram_chat_id = $request->input('telegram_chat_id') ? htmlspecialchars(strip_tags(trim($request->input('telegram_chat_id'))), ENT_QUOTES, 'UTF-8') : null;
             $userModel->save();
         }
 

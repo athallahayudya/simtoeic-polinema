@@ -53,13 +53,19 @@
         .text-danger {
             color: #dc3545 !important;
         }
+
+        .validation-message i {
+            transition: all 0.3s ease;
+        }
+        .validation-message.text-success i {
+            content: "\f00c"; 
+        }
     </style>
 @endpush
 
 @section('main')
     <div class="main-content">
         <section class="section">
-            <!-- Add proper section header with breadcrumb -->
             <div class="section-header">
                 <h1>Registration</h1>
                 <div class="section-header-breadcrumb">
@@ -71,14 +77,12 @@
             <div class="section-body">
                 <h2 class="section-title">Registration Account</h2>
 
-                <!-- Add User Button -->
                 <div class="mb-4">
                     <button type="button" class="btn btn-primary" id="addUserBtn">
                         <i class="fas fa-plus"></i> Add User
                     </button>
                 </div>
 
-                <!-- Registration Form Card -->
                 <div class="card" id="registrationForm">
                     <div class="card-header">
                         <h4>Add New User</h4>
@@ -127,7 +131,6 @@
                                 </small>
                             </div>
 
-                            <!-- Student-specific fields - will be shown/hidden based on role selection -->
                             <div id="studentFieldsContainer">
                                 <div id="studentFields" style="display: none;">
                                     <h6><i class="fas fa-user-graduate mr-2"></i>Student Information</h6>
@@ -146,8 +149,7 @@
                                                     <option value="Administrasi Niaga">Administrasi Niaga</option>
                                                     <option value="Teknologi Informasi">Teknologi Informasi</option>
                                                 </select>
-                                                <small class="form-text text-muted validation-message"
-                                                    id="major-validation">
+                                                <small class="form-text validation-message" id="major-validation">
                                                     <i class="fas fa-info-circle mr-1"></i> Required for students
                                                 </small>
                                             </div>
@@ -159,8 +161,7 @@
                                                     name="study_program" data-validation="required">
                                                     <option value="">Select Study Program</option>
                                                 </select>
-                                                <small class="form-text text-muted validation-message"
-                                                    id="study_program-validation">
+                                                <small class="form-text validation-message" id="study_program-validation">
                                                     <i class="fas fa-info-circle mr-1"></i> Will appear after selecting a
                                                     major
                                                 </small>
@@ -177,8 +178,7 @@
                                                     <option value="psdku_lumajang">PSDKU Lumajang</option>
                                                     <option value="psdku_pamekasan">PSDKU Pamekasan</option>
                                                 </select>
-                                                <small class="form-text text-muted validation-message"
-                                                    id="campus-validation">
+                                                <small class="form-text validation-message" id="campus-validation">
                                                     <i class="fas fa-info-circle mr-1"></i> Required for students
                                                 </small>
                                             </div>
@@ -212,13 +212,9 @@
                     </div>
                 </div>
 
-                <!-- Users DataTable Card -->
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h4>Registered Users</h4>
-                        <button type="button" class="btn btn-danger" id="deleteAllBtn">
-                            <i class="fas fa-trash"></i> Delete All
-                        </button>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -234,7 +230,6 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <!-- Table data will be loaded via AJAX -->
                                 </tbody>
                             </table>
                         </div>
@@ -244,7 +239,6 @@
         </section>
     </div>
 
-    <!-- Modal for displaying user details, editing, and deletion -->
     <div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" data-backdrop="static"
         data-keyboard="false" aria-hidden="true"></div>
 @endsection
@@ -253,16 +247,13 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
     <script>
-        // Function to load modal content
         function modalAction(url = '') {
             $('#myModal').load(url, function () {
                 $('#myModal').modal('show');
-                // Initialize validation on modal forms after they're loaded
                 initializeValidation();
             });
         }
 
-        // Simplified validation functions
         function validateName(value) {
             return value.length >= 3;
         }
@@ -279,15 +270,14 @@
             return value !== "" && value !== null;
         }
 
-        // Apply validation to a specific field
         function validateField(field) {
             const value = field.val();
             const validationType = field.data('validation');
             let isValid = false;
 
-            // Don't validate empty fields immediately (except on form submit)
             if (value === "" && !field.hasClass('form-submitted')) {
                 field.removeClass('is-valid is-invalid');
+                updateValidationMessage(field, 'info');
                 return true;
             }
 
@@ -311,53 +301,51 @@
                     isValid = true;
             }
 
-            // Apply visual feedback
             if (isValid) {
                 field.removeClass('is-invalid').addClass('is-valid');
-                const feedbackId = field.attr('id') + '-validation';
-                const feedbackElement = $('#' + feedbackId);
-
-                if (feedbackElement.length) {
-                    feedbackElement.removeClass('text-danger text-muted').addClass('text-success');
-                    const icon = feedbackElement.find('i');
-                    if (icon.length) {
-                        icon.removeClass('fa-info-circle fa-times-circle').addClass('fa-check-circle');
-                    }
-                }
+                updateValidationMessage(field, 'success');
             } else {
                 field.removeClass('is-valid').addClass('is-invalid');
-                const feedbackId = field.attr('id') + '-validation';
-                const feedbackElement = $('#' + feedbackId);
-
-                if (feedbackElement.length) {
-                    feedbackElement.removeClass('text-success text-muted').addClass('text-danger');
-                    const icon = feedbackElement.find('i');
-                    if (icon.length) {
-                        icon.removeClass('fa-info-circle fa-check-circle').addClass('fa-times-circle');
-                    }
-                }
+                updateValidationMessage(field, 'danger');
             }
 
             return isValid;
         }
 
-        // Initialize validation for all fields in the form
+        function updateValidationMessage(field, status) {
+            const feedbackId = field.attr('id') + '-validation';
+            const feedbackElement = $('#' + feedbackId);
+            const icon = feedbackElement.find('i');
+
+            if (feedbackElement.length) {
+                feedbackElement.removeClass('text-success text-danger text-muted');
+                icon.removeClass('fa-check-circle fa-times-circle fa-info-circle');
+
+                if (status === 'success') {
+                    feedbackElement.addClass('text-success');
+                    icon.addClass('fa-check-circle');
+                } else if (status === 'danger') {
+                    feedbackElement.addClass('text-danger');
+                    icon.addClass('fa-times-circle');
+                } else {
+                    feedbackElement.addClass('text-muted');
+                    icon.addClass('fa-info-circle');
+                }
+            }
+        }
+
         function initializeValidation() {
-            // Add event listeners for real-time validation
             $('.validation-field').off('input change').on('input change', function () {
                 validateField($(this));
             });
 
-            // Special case for password + confirmation
             $('#password').off('input change').on('input change', function () {
                 validateField($(this));
-                // Re-validate confirmation if it's not empty
                 if ($('#password_confirmation').val() !== '') {
                     validateField($('#password_confirmation'));
                 }
             });
 
-            // Clear validation styling when a form is reset
             $('form').off('reset').on('reset', function () {
                 $(this).find('.validation-field').removeClass('is-valid is-invalid');
                 $(this).find('.validation-message')
@@ -368,7 +356,6 @@
                     .addClass('fa-info-circle');
             });
 
-            // Validate all fields on form submission
             $('form').off('submit').on('submit', function (e) {
                 const form = $(this);
                 const role = $('#role').val();
@@ -377,10 +364,8 @@
                     $('#studentFieldsContainer').empty();
                 }
 
-                // Mark all fields as submitted for validation
                 form.find('.validation-field').addClass('form-submitted');
 
-                // Validate all fields
                 let isValid = true;
                 let errorMessages = [];
 
@@ -406,10 +391,8 @@
         }
 
         $(document).ready(function () {
-            // Initialize validation on page load
             initializeValidation();
 
-            // Initialize DataTable with custom search field
             var dataTable = $('#usersTable').DataTable({
                 processing: true,
                 serverSide: true,
@@ -426,7 +409,6 @@
                 searching: true,
                 responsive: true,
                 lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
-                // Remove the default search box
                 dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"<"float-right"f>>>' +
                     '<"row"<"col-sm-12"tr>>' +
                     '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
@@ -435,12 +417,11 @@
                     searchPlaceholder: "Enter name..."
                 }
             });
-            // Add custom search if needed
+
             $('#searchInput').on('keyup', function () {
                 dataTable.search($(this).val()).draw();
             });
 
-            // Define study programs for each major
             const studyPrograms = {
                 'Teknik Elektro': [
                     'D-III Teknik Elektronika (Akreditasi Unggul)',
@@ -477,12 +458,10 @@
                 ]
             };
 
-            // Toggle form visibility
             $('#addUserBtn').on('click', function () {
                 $('#registrationForm').show();
                 $(this).hide();
 
-                // Reset form when showing
                 $('form')[0].reset();
                 $('.validation-field').removeClass('is-valid is-invalid form-submitted');
                 $('.validation-message')
@@ -502,13 +481,10 @@
                 }
             });
 
-            // Cancel button
             $('#cancelBtn').on('click', function () {
                 $('#registrationForm').hide();
                 $('#addUserBtn').show();
-                // Clear form inputs
                 $('form')[0].reset();
-                // Clear validation classes
                 $('.validation-field').removeClass('is-valid is-invalid form-submitted');
                 $('.validation-message')
                     .removeClass('text-success text-danger')
@@ -516,18 +492,15 @@
                 $('.validation-message i')
                     .removeClass('fa-check-circle fa-times-circle')
                     .addClass('fa-info-circle');
-                // Hide student fields
                 $('#studentFields').hide();
             });
 
-            // Show/hide student fields based on role selection
             const studentFieldsTemplate = $('#studentFields').clone();
 
             $('#role').on('change', function () {
                 const studentFieldsContainer = $('#studentFieldsContainer');
 
                 if ($(this).val() === 'student') {
-                    // Add studentFields back to the DOM
                     studentFieldsContainer.empty().append(studentFieldsTemplate.clone());
                     const studentFields = $('#studentFields');
                     studentFields.show();
@@ -542,46 +515,40 @@
                         });
                     }, 10);
                 } else {
-                    // Delete studentFields to DOM
                     studentFieldsContainer.empty();
                 }
             });
 
-            // Populate study program dropdown based on selected major
             function bindStudentFieldsEvents() {
                 $('#major').off('change').on('change', function () {
                     const studyProgramSelect = $('#study_program');
                     const selectedMajor = $(this).val();
 
-                    // Clear existing options
                     studyProgramSelect.html('<option value="">Select Study Program</option>');
 
-                    // If a major is selected, populate its study programs
                     if (selectedMajor && studyPrograms[selectedMajor]) {
                         studyPrograms[selectedMajor].forEach(program => {
                             studyProgramSelect.append(`<option value="${program}">${program}</option>`);
                         });
                     }
 
-                    // Revalidate the field if it was already validated
-                    if ($(this).hasClass('is-valid') || $(this).hasClass('is-invalid')) {
-                        validateField($(this));
-                    }
+                    validateField($(this)); // Validate major on change
+                });
+
+                // Validate study program and campus on change
+                $('#study_program, #campus').off('change').on('change', function () {
+                    validateField($(this));
                 });
             }
 
-            // Event handler for form submissions in modal
             $(document).on('submit', '#form-edit, #form-delete', function (e) {
                 e.preventDefault();
 
-                // For edit forms, validate fields before submission
                 if ($(this).attr('id') === 'form-edit') {
                     let isValid = true;
 
-                    // Mark all fields as submitted for validation
                     $(this).find('.validation-field').addClass('form-submitted');
 
-                    // Validate all fields
                     $(this).find('.validation-field').each(function () {
                         if (!validateField($(this))) {
                             isValid = false;
@@ -615,17 +582,14 @@
                                 timer: 2000,
                                 showConfirmButton: false
                             }).then(() => {
-                                // Refresh the DataTable
                                 dataTable.ajax.reload();
                             });
                         } else {
                             if (response.msgField) {
-                                // Apply error classes to fields with errors
                                 $.each(response.msgField, function (key, value) {
                                     const errorField = $('#' + key);
                                     errorField.removeClass('is-valid').addClass('is-invalid');
 
-                                    // Update validation message if it exists
                                     const feedbackId = key + '-validation';
                                     const feedbackElement = $('#' + feedbackId);
 
@@ -633,7 +597,6 @@
                                         feedbackElement.removeClass('text-success text-muted').addClass('text-danger');
                                         feedbackElement.html(`<i class="fas fa-times-circle mr-1"></i> ${value[0]}`);
                                     } else {
-                                        // If no validation message container exists, create error message element
                                         const errorMsg = $(`<div id="error-${key}" class="text-danger mt-1"><i class="fas fa-times-circle mr-1"></i> ${value[0]}</div>`);
                                         errorField.after(errorMsg);
                                     }
@@ -657,110 +620,24 @@
                     }
                 });
             });
+
+            @if (session('success'))
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: '{{ session('success') }}',
+                    confirmButtonText: 'OK'
+                });
+            @endif
+
+            @if (session('error'))
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: '{{ session('error') }}',
+                    confirmButtonText: 'OK'
+                });
+            @endif
         });
-
-        // Delete All Users functionality
-        $('#deleteAllBtn').on('click', function () {
-            Swal.fire({
-                title: 'Delete All Users?',
-                text: "This will permanently delete ALL registered users and their data (except admin accounts). This action cannot be undone!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, delete all!',
-                cancelButtonText: 'Cancel'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Show loading state
-                    Swal.fire({
-                        title: 'Deleting...',
-                        text: 'Please wait while we delete all users.',
-                        allowOutsideClick: false,
-                        allowEscapeKey: false,
-                        showConfirmButton: false,
-                        didOpen: () => {
-                            Swal.showLoading();
-                        }
-                    });
-
-                    // Make AJAX request to delete all users
-                    $.ajax({
-                        url: '{{ route('registration.delete-all') }}',
-                        type: 'DELETE',
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
-                        success: function (response) {
-                            console.log('Delete all response:', response);
-                            if (response.status) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Success!',
-                                    text: response.message,
-                                    confirmButtonText: 'OK'
-                                }).then(() => {
-                                    console.log('Reloading DataTable...');
-                                    // Force reload the DataTable and reset to first page
-                                    try {
-                                        dataTable.ajax.reload(function () {
-                                            console.log('DataTable reloaded successfully');
-                                            // Additional check to ensure table is updated
-                                            console.log('Current row count:', dataTable.rows().count());
-                                        }, true); // true = reset pagination to first page
-                                    } catch (error) {
-                                        console.error('DataTable reload failed:', error);
-                                        // Fallback: refresh the entire page
-                                        console.log('Falling back to page refresh...');
-                                        window.location.reload();
-                                    }
-                                });
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Error!',
-                                    text: response.message || 'Failed to delete users',
-                                    confirmButtonText: 'OK'
-                                });
-                            }
-                        },
-                        error: function (xhr) {
-                            console.error('Delete all error:', xhr.responseText);
-                            let errorMessage = 'An error occurred while deleting users';
-
-                            if (xhr.responseJSON && xhr.responseJSON.message) {
-                                errorMessage = xhr.responseJSON.message;
-                            }
-
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error!',
-                                text: errorMessage,
-                                confirmButtonText: 'OK'
-                            });
-                        }
-                    });
-                }
-            });
-        });
-
-        // SweetAlert notifications for server-side responses
-        @if (session('success'))
-            Swal.fire({
-                icon: 'success',
-                title: 'Success!',
-                text: '{{ session('success') }}',
-                confirmButtonText: 'OK'
-            });
-        @endif
-
-        @if (session('error'))
-            Swal.fire({
-                icon: 'error',
-                title: 'Error!',
-                text: '{{ session('error') }}',
-                confirmButtonText: 'OK'
-            });
-        @endif
     </script>
 @endpush

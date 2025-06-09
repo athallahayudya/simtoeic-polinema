@@ -39,6 +39,20 @@
                     <th>Name</th>
                     <td>{{ $profile->name ?? 'N/A' }}</td>
                 </tr>
+                @if($user->role === 'student')
+                    <tr>
+                        <th>Study Program</th>
+                        <td>{{ $profile->study_program ?? 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Major</th>
+                        <td>{{ $profile->major ?? 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Campus</th>
+                        <td>{{ $profile->campus ?? 'N/A' }}</td>
+                    </tr>
+                @endif
                 <tr>
                     <th>Exam Status</th>
                     <td>
