@@ -6,7 +6,7 @@
     <div class="main-content">
         <section class="section">
             <div class="section-header">
-                <h1>Telegram Notification Settings</h1>
+                <h1 style="font-size: 21px;">Telegram Notification Settings</h1>
             </div>
 
             <div class="section-body">

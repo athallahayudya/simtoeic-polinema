@@ -288,7 +288,7 @@
             <div class="section-header">
                 <div class="d-flex align-items-center">
                     <div>
-                        <h1>Admin Profile</h1>
+                        <h1 style="font-size: 21px;">Admin Profile</h1>
                     </div>
                 </div>
             </div>

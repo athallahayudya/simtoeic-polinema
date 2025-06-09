@@ -72,7 +72,7 @@
     <div class="main-content">
         <section class="section">
             <div class="section-header">
-                <h1>Lecturer Profile</h1>
+                <h1 style="font-size: 21px;">Lecturer Profile</h1>
                 <div class="section-header-breadcrumb">
                     <div class="breadcrumb-item active"><a href="{{ route('lecturer.dashboard') }}">Dashboard</a></div>
                     <div class="breadcrumb-item">Profile</div>
