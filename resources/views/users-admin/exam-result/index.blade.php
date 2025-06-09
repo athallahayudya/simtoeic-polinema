@@ -6,8 +6,6 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.bootstrap4.min.css">
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
     <style>
         .btn {
             cursor: pointer;
@@ -54,17 +52,6 @@
             color: white;
         }
 
-        .filter-card {
-            margin-bottom: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-        }
-
-        .filter-card .card-header {
-            background-color: #f8f9fa;
-            border-bottom: 1px solid #e9ecef;
-        }
-
         .import-section {
             border: 2px dashed #e9ecef;
             padding: 20px;
@@ -75,6 +62,10 @@
 
         .import-section:hover {
             border-color: #6777ef;
+        }
+
+        .filter-group {
+            margin-bottom: 10px;
         }
     </style>
 @endpush
@@ -93,219 +84,180 @@
             <div class="section-body">
                 <h2 class="section-title">TOEIC Exam Results Management</h2>
 
-                <div class="row">
-                    <div class="col-12">
-                        <!-- Import Section -->
-                        <div class="card">
-                            <div class="card-header">
-                                <h4><i class="fas fa-file-import mr-2"></i>Import Exam Results</h4>
-                            </div>
-                            <div class="card-body">
-                                <div class="import-section">
-                                    <form id="importForm" action="{{ route('exam-results.import.store') }}" method="POST"
-                                        enctype="multipart/form-data">
-                                        @csrf
-                                        <div class="form-group">
-                                            <label>Upload TOEIC Results PDF</label>
-                                            <div class="custom-file">
-                                                <input type="file" class="custom-file-input" id="importFile" name="file"
-                                                    accept=".pdf" required>
-                                                <label class="custom-file-label" for="importFile">Choose PDF file...</label>
-                                                <small class="form-text text-muted">Supported format: .pdf (max
-                                                    10MB)</small>
-                                            </div>
-                                            @error('file')
-                                                <span class="text-danger">{{ $message }}</span>
-                                            @enderror
-                                        </div>
-                                        <div class="text-center">
-                                            <button type="submit" class="btn btn-primary" id="importButton">
-                                                <i class="fas fa-upload mr-1"></i> Import Results
-                                            </button>
-                                        </div>
-                                    </form>
+                <!-- Import Section -->
+                <div class="card">
+                    <div class="card-header">
+                        <h4><i class="fas fa-file-import mr-2"></i>Import Exam Results</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="import-section">
+                            <form id="importForm" action="{{ route('exam-results.import.store') }}" method="POST"
+                                enctype="multipart/form-data">
+                                @csrf
+                                <div class="form-group">
+                                    <label>Upload TOEIC Results PDF</label>
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" id="importFile" name="file"
+                                            accept=".pdf" required>
+                                        <label class="custom-file-label" for="importFile">Choose PDF file...</label>
+                                        <small class="form-text text-muted">Supported format: .pdf (max
+                                            10MB)</small>
+                                    </div>
+                                    @error('file')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
                                 </div>
+                                <div class="text-center">
+                                    <button type="submit" class="btn btn-primary" id="importButton">
+                                        <i class="fas fa-upload mr-1"></i> Import Results
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
 
-                                <div class="alert alert-danger">
-                                    <div class="d-flex align-items-start">
-                                        <i class="fas fa-exclamation-triangle fa-lg mr-3 mt-1 text-white"></i>
-                                        <div class="text-white">
-                                            <strong>Import Format Guide</strong>
-                                            <p class="mb-2">
-                                                Upload the official TOEIC results PDF. Make sure your PDF table contains
-                                                these columns:
-                                            </p>
-                                            <div class="row text-center mb-2">
-                                                <div class="col-2">
-                                                    <div class="border p-2 rounded mb-1 bg-white">
-                                                        <small class="text-dark"><strong>result</strong></small>
-                                                    </div>
-                                                    <small class="text-white"><strong>Exam ID</strong></small>
-                                                </div>
-                                                <div class="col-2">
-                                                    <div class="border p-2 rounded mb-1 bg-white">
-                                                        <small class="text-dark"><strong>name</strong></small>
-                                                    </div>
-                                                    <small class="text-white"><strong>Name</strong></small>
-                                                </div>
-                                                <div class="col-2">
-                                                    <div class="border p-2 rounded mb-1 bg-white">
-                                                        <small class="text-dark"><strong>id</strong></small>
-                                                    </div>
-                                                    <small class="text-white"><strong>NIM</strong></small>
-                                                </div>
-                                                <div class="col-2">
-                                                    <div class="border p-2 rounded mb-1 bg-white">
-                                                        <small class="text-dark"><strong>L</strong></small>
-                                                    </div>
-                                                    <small class="text-white"><strong>Listening</strong></small>
-                                                </div>
-                                                <div class="col-2">
-                                                    <div class="border p-2 rounded mb-1 bg-white">
-                                                        <small class="text-dark"><strong>R</strong></small>
-                                                    </div>
-                                                    <small class="text-white"><strong>Reading</strong></small>
-                                                </div>
-                                                <div class="col-2">
-                                                    <div class="border p-2 rounded mb-1 bg-white">
-                                                        <small class="text-dark"><strong>tot</strong></small>
-                                                    </div>
-                                                    <small class="text-white"><strong>Score</strong></small>
-                                                </div>
+                        <div class="alert alert-danger">
+                            <div class="d-flex align-items-start">
+                                <i class="fas fa-exclamation-triangle fa-lg mr-3 mt-1 text-white"></i>
+                                <div class="text-white">
+                                    <strong>Import Format Guide</strong>
+                                    <p class="mb-2">
+                                        Upload the official TOEIC results PDF. Make sure your PDF table contains
+                                        these columns:
+                                    </p>
+                                    <div class="row text-center mb-2">
+                                        <div class="col-2">
+                                            <div class="border p-2 rounded mb-1 bg-white">
+                                                <small class="text-dark"><strong>result</strong></small>
                                             </div>
-                                            <p class="mb-0">
-                                                <small><strong>Note:</strong> System will automatically create student
-                                                    accounts and calculate pass/fail status.</small>
-                                            </p>
+                                            <small class="text-white"><strong>Exam ID</strong></small>
+                                        </div>
+                                        <div class="col-2">
+                                            <div class="border p-2 rounded mb-1 bg-white">
+                                                <small class="text-dark"><strong>name</strong></small>
+                                            </div>
+                                            <small class="text-white"><strong>Name</strong></small>
+                                        </div>
+                                        <div class="col-2">
+                                            <div class="border p-2 rounded mb-1 bg-white">
+                                                <small class="text-dark"><strong>id</strong></small>
+                                            </div>
+                                            <small class="text-white"><strong>NIM</strong></small>
+                                        </div>
+                                        <div class="col-2">
+                                            <div class="border p-2 rounded mb-1 bg-white">
+                                                <small class="text-dark"><strong>L</strong></small>
+                                            </div>
+                                            <small class="text-white"><strong>Listening</strong></small>
+                                        </div>
+                                        <div class="col-2">
+                                            <div class="border p-2 rounded mb-1 bg-white">
+                                                <small class="text-dark"><strong>R</strong></small>
+                                            </div>
+                                            <small class="text-white"><strong>Reading</strong></small>
+                                        </div>
+                                        <div class="col-2">
+                                            <div class="border p-2 rounded mb-1 bg-white">
+                                                <small class="text-dark"><strong>tot</strong></small>
+                                            </div>
+                                            <small class="text-white"><strong>Score</strong></small>
                                         </div>
                                     </div>
+                                    <p class="mb-0">
+                                        <small><strong>Note:</strong> System will automatically create student
+                                            accounts and calculate pass/fail status.</small>
+                                    </p>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
 
-                        <!-- Filters Card -->
-                        <div class="card filter-card">
-                            <div class="card-header">
-                                <h4><i class="fas fa-filter mr-2"></i>Filter Results</h4>
-                                <div class="card-header-action">
-                                    <a data-collapse="#filter-collapse" class="btn btn-icon btn-info" href="#"><i
-                                            class="fas fa-minus"></i></a>
+                <!-- Exam Results and Filter Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h4><i class="fas fa-table mr-2"></i>Exam Results</h4>
+                    </div>
+                    <div class="card-body">
+                        <!-- Filter Section -->
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <div class="filter-group">
+                                    <label>Status</label>
+                                    <select id="status-filter" class="form-control">
+                                        <option value="">All</option>
+                                        <option value="pass">Pass</option>
+                                        <option value="fail">Fail</option>
+                                    </select>
                                 </div>
                             </div>
-                            <div class="collapse show" id="filter-collapse">
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-md-3">
-                                            <div class="form-group">
-                                                <label>Status</label>
-                                                <select id="status-filter" class="form-control">
-                                                    <option value="">All</option>
-                                                    <option value="pass">Pass</option>
-                                                    <option value="fail">Fail</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="form-group">
-                                                <label>TOEIC Band</label>
-                                                <select id="score-filter" class="form-control">
-                                                    <option value="">All Levels</option>
-                                                    <option value="0-250">0-250 (Beginner)</option>
-                                                    <option value="255-500">255-500 (Elementary)</option>
-                                                    <option value="501-700">501-700 (Intermediate)</option>
-                                                    <option value="701-900">701-900 (Advanced)</option>
-                                                    <option value="901-990">901-990 (Proficient)</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="form-group">
-                                                <label>From Date</label>
-                                                <input type="text" id="date-from" class="form-control datepicker"
-                                                    placeholder="YYYY-MM-DD">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="form-group">
-                                                <label>To Date</label>
-                                                <input type="text" id="date-to" class="form-control datepicker"
-                                                    placeholder="YYYY-MM-DD">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="text-center">
-                                        <button id="apply-filters" class="btn btn-primary mr-2">
-                                            <i class="fas fa-check mr-1"></i> Apply Filters
-                                        </button>
-                                        <button id="reset-filters" class="btn btn-light">
-                                            <i class="fas fa-redo mr-1"></i> Reset
-                                        </button>
-                                    </div>
+                            <div class="col-md-3">
+                                <div class="filter-group">
+                                    <label>TOEIC Band</label>
+                                    <select id="score-filter" class="form-control">
+                                        <option value="">All Levels</option>
+                                        <option value="0-250">0-250 (Beginner)</option>
+                                        <option value="255-500">255-500 (Elementary)</option>
+                                        <option value="501-700">501-700 (Intermediate)</option>
+                                        <option value="701-900">701-900 (Advanced)</option>
+                                        <option value="901-990">901-990 (Proficient)</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Results Card -->
-                        <div class="card">
-                            <div class="card-header">
-                                <h4><i class="fas fa-table mr-2"></i>Exam Results</h4>
-                            </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table id="exam-results-table"
-                                        class="table table-striped table-bordered dt-responsive nowrap">
-                                        <thead>
-                                            <tr>
-                                                <th>ID Exam</th>
-                                                <th>NIM</th>
-                                                <th>Name</th>
-                                                <th>Listening Score</th>
-                                                <th>Reading Score</th>
-                                                <th>Total Score</th>
-                                                <th>Exam Date</th>
-                                                <th>Status</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach($examResults as $result)
-                                                <tr>
-                                                    <td>{{ $result->id_exam }}</td>
-                                                    <td>{{ $result->nim }}</td>
-                                                    <td>{{ $result->name }}</td>
-                                                    <td>{{ $result->listening_score }}</td>
-                                                    <td>{{ $result->reading_score }}</td>
-                                                    <td>
-                                                        <span
-                                                            class="score-badge {{ $result->total_score < 500 ? 'score-low' : 'score-high' }}">
-                                                            {{ $result->total_score }}
-                                                        </span>
-                                                    </td>
-                                                    <td>{{ $result->exam_date ? $result->exam_date->format('Y-m-d') : ($result->created_at ? $result->created_at->format('Y-m-d') : 'N/A') }}
-                                                    </td>
-                                                    <td>
-                                                        @if($result->status == 'pass')
-                                                            <span class="badge badge-success">Pass</span>
-                                                        @else
-                                                            <span class="badge badge-danger">Fail</span>
-                                                        @endif
-                                                    </td>
-                                                    <td>
-                                                        <button class="btn btn-sm btn-info view-details"
-                                                            data-id="{{ $result->result_id }}">
-                                                            <i class="fas fa-eye"></i>
-                                                        </button>
-                                                        <button class="btn btn-sm btn-danger delete-result"
-                                                            data-id="{{ $result->result_id }}">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
+                        <!-- Table Section -->
+                        <div class="table-responsive">
+                            <table id="exam-results-table"
+                                class="table table-striped table-bordered dt-responsive nowrap" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th>ID Exam</th>
+                                        <th>NIM</th>
+                                        <th>Name</th>
+                                        <th>Listening Score</th>
+                                        <th>Reading Score</th>
+                                        <th>Total Score</th>
+                                        <th>Exam Date</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($examResults as $result)
+                                        <tr>
+                                            <td>{{ $result->id_exam }}</td>
+                                            <td>{{ $result->nim }}</td>
+                                            <td>{{ $result->name }}</td>
+                                            <td>{{ $result->listening_score }}</td>
+                                            <td>{{ $result->reading_score }}</td>
+                                            <td>
+                                                <span
+                                                    class="score-badge {{ $result->total_score < 500 ? 'score-low' : 'score-high' }}">
+                                                    {{ $result->total_score }}
+                                                </span>
+                                            </td>
+                                            <td>{{ $result->exam_date ? $result->exam_date->format('Y-m-d') : ($result->created_at ? $result->created_at->format('Y-m-d') : 'N/A') }}
+                                            </td>
+                                            <td>
+                                                @if($result->status == 'pass')
+                                                    <span class="badge badge-success">Pass</span>
+                                                @else
+                                                    <span class="badge badge-danger">Fail</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-info view-details"
+                                                    data-id="{{ $result->result_id }}">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-danger delete-result"
+                                                    data-id="{{ $result->result_id }}">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -463,17 +415,11 @@
                     }
                 });
             });
+
             // Initialize custom file input
             $('.custom-file-input').on('change', function () {
                 let fileName = $(this).val().split('\\').pop();
                 $(this).next('.custom-file-label').addClass("selected").html(fileName);
-            });
-
-            // Initialize datepicker
-            $('.datepicker').datepicker({
-                format: 'yyyy-mm-dd',
-                autoclose: true,
-                todayHighlight: true
             });
 
             // Initialize DataTable
@@ -481,24 +427,44 @@
                 responsive: true,
                 dom: 'Bfrtip',
                 buttons: [
-                    'copy', 'csv', 'excel', 'pdf', 'print'
+                    {
+                        extend: 'copy',
+                        exportOptions: {
+                            columns: ':not(:last-child)' 
+                        }
+                    },
+                    {
+                        extend: 'csv',
+                        exportOptions: {
+                            columns: ':not(:last-child)' 
+                        }
+                    },
+                    {
+                        extend: 'excel',
+                        exportOptions: {
+                            columns: ':not(:last-child)' 
+                        }
+                    },
+                    {
+                        extend: 'pdf',
+                        exportOptions: {
+                            columns: ':not(:last-child)' 
+                        }
+                    },
+                    {
+                        extend: 'print',
+                        exportOptions: {
+                            columns: ':not(:last-child)' 
+                        }
+                    }
                 ],
                 order: [[6, 'desc']], // Sort by exam date descending
                 lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]]
             });
 
-            // Apply filters
-            $('#apply-filters').on('click', function () {
+            // Apply filters on change
+            $('#status-filter, #score-filter').on('change', function () {
                 applyFilters();
-            });
-
-            // Reset filters
-            $('#reset-filters').on('click', function () {
-                $('#status-filter').val('');
-                $('#score-filter').val('');
-                $('#date-from').val('');
-                $('#date-to').val('');
-                table.search('').columns().search('').draw();
             });
 
             // View details handler
@@ -514,13 +480,13 @@
                 var reading = row.find('td:eq(4)').text();
                 var total = row.find('td:eq(5)').text().trim();
                 var examDate = row.find('td:eq(6)').text();
-                var status = row.find('td:eq(7)').text().trim();
+                var status = row.find('td:eq(7)').text().trim().toLowerCase();
 
                 // Populate modal with data
                 $('#modal-nim').text(nim);
                 $('#modal-name').text(name);
                 $('#modal-exam-date').text(examDate);
-                $('#modal-status').html(status.includes('Pass') ?
+                $('#modal-status').html(status === 'pass' ?
                     '<span class="badge badge-success">Pass</span>' :
                     '<span class="badge badge-danger">Fail</span>');
                 $('#modal-imported-at').text('N/A');
@@ -536,20 +502,11 @@
 
             // Function to apply filters
             function applyFilters() {
-                var statusFilter = $('#status-filter').val();
+                var statusFilter = $('#status-filter').val().toLowerCase();
                 var scoreFilter = $('#score-filter').val();
-                var dateFrom = $('#date-from').val();
-                var dateTo = $('#date-to').val();
 
-                // Clear existing filters
-                table.search('').columns().search('').draw();
+                table.column(7).search(statusFilter ? statusFilter : '', true, false).draw();
 
-                // Apply status filter
-                if (statusFilter) {
-                    table.column(7).search(statusFilter, true, false).draw(); // Status is column 7
-                }
-
-                // Apply score filter
                 if (scoreFilter) {
                     var scoreRange = scoreFilter.split('-');
                     var minScore = parseInt(scoreRange[0]);
@@ -558,36 +515,15 @@
                     $.fn.dataTable.ext.search.push(
                         function (settings, data, dataIndex) {
                             var score = parseFloat(data[5].replace(/[^\d.-]/g, '')) || 0; // Total score is column 5
-                            if (minScore <= score && score <= maxScore) {
-                                return true;
-                            }
-                            return false;
+                            return minScore <= score && score <= maxScore;
                         }
                     );
                     table.draw();
                     $.fn.dataTable.ext.search.pop();
-                }
-
-                // Apply date range filter
-                if (dateFrom || dateTo) {
-                    $.fn.dataTable.ext.search.push(
-                        function (settings, data, dataIndex) {
-                            var examDate = new Date(data[6]); // Exam date is column 6
-                            var fromDate = dateFrom ? new Date(dateFrom) : new Date(0);
-                            var toDate = dateTo ? new Date(dateTo) : new Date(9999, 11, 31);
-
-                            if ((fromDate <= examDate) && (examDate <= toDate)) {
-                                return true;
-                            }
-                            return false;
-                        }
-                    );
-                    table.draw();
-                    $.fn.dataTable.ext.search.pop();
+                } else {
+                    table.draw(); // Redraw without score filter if not applied
                 }
             }
-
-
 
             // Delete single result handler
             $(document).on('click', '.delete-result', function () {
@@ -612,8 +548,6 @@
                     });
                 }
             });
-
-
         });
     </script>
 @endpush
