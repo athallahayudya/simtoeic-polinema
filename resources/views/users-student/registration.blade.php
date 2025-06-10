@@ -188,6 +188,8 @@
                                     <span class="font-weight-bold">
                                         @if($user->exam_status == 'not_yet')
                                             <span class="badge badge-info">Not Taken</span>
+                                        @elseif($user->exam_status == 'on_process')
+                                            <span class="badge badge-warning">On Process</span>
                                         @elseif($user->exam_status == 'fail')
                                             <span class="badge badge-danger">Failed</span>
                                         @elseif($user->exam_status == 'success')
@@ -286,7 +288,42 @@
                                     </div>
                                 </div>
 
-                        @else
+                        @elseif($user->exam_status == 'on_process')
+                                <!-- On Process Status Card -->
+                                <div class="card status-card" style="border-left: 5px solid #17a2b8;">
+                                    <div class="status-header d-flex align-items-center">
+                                        <div class="status-icon"
+                                            style="background-color: rgba(23, 162, 184, 0.15); color: #17a2b8;">
+                                            <i class="fas fa-clock"></i>
+                                        </div>
+                                        <div>
+                                            <h4>Exam Registration In Process</h4>
+                                            <p class="mb-0">Your exam registration is currently being processed</p>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="alert alert-info">
+                                            <i class="fas fa-info-circle mr-2"></i>
+                                            <strong>Status: On Process</strong><br>
+                                            You have successfully registered for the TOEIC exam. Please wait for the exam
+                                            results to be uploaded by the administrator.
+                                        </div>
+
+                                        <div class="exam-info">
+                                            <h6><i class="fas fa-info-circle mr-2"></i>What's Next:</h6>
+                                            <ul class="list-unstyled">
+                                                <li class="mb-2"><i class="fas fa-check text-success mr-2"></i> Registration
+                                                    completed</li>
+                                                <li class="mb-2"><i class="fas fa-clock text-warning mr-2"></i> Waiting for exam
+                                                    results</li>
+                                                <li class="mb-2"><i class="fas fa-envelope text-info mr-2"></i> You will be
+                                                    notified via Telegram when results are available</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            @else
                                 <!-- Paid Exam Registration Card -->
                                 <div class="card status-card card-paid">
                                     <div class="status-header d-flex align-items-center">

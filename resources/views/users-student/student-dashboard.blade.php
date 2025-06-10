@@ -15,6 +15,18 @@
     </div>
 
     <div class="section-body">
+      <!-- TOEIC Status Alert -->
+      @if($user->exam_status == 'on_process')
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <i class="fas fa-exclamation-triangle mr-2"></i>
+      <strong>TOEIC Status:</strong> Your exam registration is currently being processed. You will be notified when
+      results are available.
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+      </button>
+      </div>
+    @endif
+
       <!-- Profile Completeness Alert -->
       <div class="row mb-3">
       <div class="col-12">
@@ -159,6 +171,7 @@
 
       <!-- Latest TOEIC Result Summary -->
       @if($examResults)
+      <!-- Show actual exam results -->
       <div class="row mb-3">
       <div class="col-12">
       <div
@@ -377,6 +390,8 @@
     // Dashboard ready
     $(document).ready(function () {
     console.log('Student dashboard loaded successfully');
+
+
     });
   </script>
 @endpush

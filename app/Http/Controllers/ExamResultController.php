@@ -50,12 +50,13 @@ class ExamResultController extends Controller
                         // Create new student and user if not found
                         Log::info("Student with NIM {$data['nim']} not found. Creating new student record.");
 
-                        // Create new user
+                        // Create new user with exam status based on score
+                        $examStatus = $data['total_score'] >= 500 ? 'success' : 'fail';
                         $user = \App\Models\UserModel::create([
                             'role' => 'student',
                             'identity_number' => $data['nim'],
                             'password' => bcrypt('password123'), // Use 'password123' as default password
-                            'exam_status' => 'success', // Set to 'success' since they have exam results
+                            'exam_status' => $examStatus, // Set based on exam score
                             'phone_number' => null
                         ]);
 
@@ -103,8 +104,10 @@ class ExamResultController extends Controller
                         ]
                     );
 
-                    // Update user exam status to 'success' since they have exam results
-                    $user->update(['exam_status' => 'success']);
+                    // Update user exam status based on score
+                    // If score >= 500, set to 'success', otherwise set to 'fail'
+                    $examStatus = $data['total_score'] >= 500 ? 'success' : 'fail';
+                    $user->update(['exam_status' => $examStatus]);
 
                     Log::info("Created/Updated exam result ID: {$examResult->result_id} for user {$user->user_id}");
 

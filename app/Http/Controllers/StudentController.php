@@ -20,16 +20,22 @@ class StudentController extends Controller
     public function dashboard()
     {
         $type_menu = 'dashboard';
+        $user = auth()->user();
+
         $schedules = ExamScheduleModel::join('exam_result', 'exam_schedule.schedule_id', '=', 'exam_result.schedule_id')
             ->where('exam_result.user_id', auth()->id())
             ->select('exam_schedule.*')
             ->paginate(10);
 
-        // Get all exam results for the current student (not just the latest one)
-        $examResults = ExamResultModel::where('user_id', auth()->id())->latest()->first();
+        // Get exam results only if user has actual results (not just registration with score 0)
+        $examResults = ExamResultModel::where('user_id', auth()->id())
+            ->where('total_score', '>', 0) // Only get actual exam results, not registration placeholders
+            ->latest()
+            ->first();
 
         // Get all exam results for the current student to display in the scores table
         $examScores = ExamResultModel::where('user_id', auth()->id())
+            ->where('total_score', '>', 0) // Only show actual results in the table
             ->with(['user.student', 'schedule'])
             ->orderBy('created_at', 'desc')
             ->get();
@@ -118,7 +124,8 @@ class StudentController extends Controller
             'completedItems',
             'totalItems',
             'completionPercentage',
-            'examScores'
+            'examScores',
+            'user'
         ));
     }
 
@@ -268,8 +275,12 @@ class StudentController extends Controller
 
         // Check if the student is eligible for free registration
         if ($user->exam_status !== 'not_yet') {
+            $errorMessage = $user->exam_status === 'on_process'
+                ? 'You have already registered for an exam. Please wait for the results to be uploaded.'
+                : 'You are not eligible for free exam registration. Please use the paid option.';
+
             return redirect()->route('student.registration.form')
-                ->with('error', 'You are not eligible for free exam registration. Please use the paid option.');
+                ->with('error', $errorMessage);
         }
 
         // Check if student is already registered
@@ -301,6 +312,9 @@ class StudentController extends Controller
             'score' => 0,  // Use 0 as placeholder for "not taken yet"
             'cerfificate_url' => ''  // Include with empty value
         ]);
+
+        // Update user exam status to 'on_process' after successful registration
+        $user->update(['exam_status' => 'on_process']);
 
         // Redirect with success message
         return redirect()->route('student.registration.form')

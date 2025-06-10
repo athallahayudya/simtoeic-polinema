@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 
-class UserDataTableController extends Controller 
+class UserDataTableController extends Controller
 {
     /**
      * Display the registration index page.
@@ -87,6 +87,7 @@ class UserDataTableController extends Controller
                 ->editColumn('exam_status', function ($user) {
                     $statusMap = [
                         'not_yet' => '<span class="badge badge-warning">Not Yet</span>',
+                        'on_process' => '<span class="badge badge-info">On Process</span>',
                         'success' => '<span class="badge badge-success">Success</span>',
                         'fail' => '<span class="badge badge-danger">Failed</span>'
                     ];

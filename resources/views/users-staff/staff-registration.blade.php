@@ -165,6 +165,8 @@
                                     <span class="font-weight-bold">
                                         @if($user->exam_status == 'not_yet')
                                             <span class="badge badge-info">Not Taken</span>
+                                        @elseif($user->exam_status == 'on_process')
+                                            <span class="badge badge-warning">On Process</span>
                                         @elseif($user->exam_status == 'fail')
                                             <span class="badge badge-danger">Failed</span>
                                         @elseif($user->exam_status == 'success')

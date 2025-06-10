@@ -22,12 +22,17 @@ class LecturerController extends Controller
     public function dashboard()
     {
         $type_menu = 'dashboard';
+        $user = auth()->user();
+
         $schedules = ExamScheduleModel::join('exam_result', 'exam_schedule.schedule_id', '=', 'exam_result.schedule_id')
             ->where('exam_result.user_id', auth()->id())
             ->select('exam_schedule.*')
             ->paginate(10);
 
-        $examResults = ExamResultModel::where('user_id', auth()->id())->latest()->first();
+        $examResults = ExamResultModel::where('user_id', auth()->id())
+            ->where('total_score', '>', 0) // Only get actual exam results, not registration placeholders
+            ->latest()
+            ->first();
         // Get the latest published announcements that are visible to lecturers
         $announcements = AnnouncementModel::where('announcement_status', 'published')
             ->where(function ($query) {
@@ -40,6 +45,7 @@ class LecturerController extends Controller
             ->first();
         // Get exam scores only for the current logged-in lecturer
         $examScores = ExamResultModel::where('user_id', auth()->id())
+            ->where('total_score', '>', 0) // Only show actual results in the table
             ->with(['user.lecturer', 'schedule'])
             ->orderBy('created_at', 'desc')
             ->get();
@@ -109,7 +115,8 @@ class LecturerController extends Controller
             'completedItems',
             'totalItems',
             'completionPercentage',
-            'examScores'
+            'examScores',
+            'user'
         ));
     }
 

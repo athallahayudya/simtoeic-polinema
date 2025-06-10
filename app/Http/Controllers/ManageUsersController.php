@@ -123,13 +123,16 @@ class ManageUsersController extends Controller
                     case 'not_yet':
                         $badgeClass = 'badge-warning';
                         break;
+                    case 'on_process':
+                        $badgeClass = 'badge-info';
+                        break;
                     case 'fail':
                         $badgeClass = 'badge-danger';
                         break;
                     default:
                         $badgeClass = 'badge-secondary';
                 }
-                return '<span class="badge ' . $badgeClass . '">' . ucfirst($examStatus) . '</span>';
+                return '<span class="badge ' . $badgeClass . '">' . ucfirst(str_replace('_', ' ', $examStatus)) . '</span>';
             })
             ->addColumn('action', function ($user) {
                 $btn = '<button onclick="modalAction(\'' . url('users/' . $user->user_id . '/show_ajax') . '\')" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></button> ';
