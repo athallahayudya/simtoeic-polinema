@@ -2,6 +2,22 @@
 
 @section('title', 'FAQs')
 
+@push('styles')
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
+    <style>
+        /* Make search input width match button width */
+        .dataTables_filter input {
+            width: 120px !important;
+            display: inline-block;
+        }
+
+        /* Ensure button and search input have consistent styling */
+        .dt-buttons .btn {
+            width: 120px;
+        }
+    </style>
+@endpush
+
 @section('main')
     <div class="main-content">
         <section class="section">
@@ -26,13 +42,6 @@
                                 @if (session('error'))
                                     <div class="alert alert-danger">{{ session('error') }}</div>
                                 @endif
-                                <div class="row mb-3">
-                                    <div class="col-md-12">
-                                        <div class="d-flex justify-content-end">
-                                            <a href="{{ url('faqs/create') }}" class="btn btn-success">+ Add FAQ</a>
-                                        </div>
-                                    </div>
-                                </div>
                                 <div class="table-responsive">
                                     <table class="table table-bordered table-striped table-hover table-sm" id="table_faq"
                                         style="width: 100%;">
@@ -58,6 +67,7 @@
 @endsection
 
 @push('scripts')
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
     <script>
         function modalAction(url = '') {
             $('#myModal').load(url, function () {
@@ -76,6 +86,16 @@
                         d._token = $('meta[name="csrf-token"]').attr('content');
                     }
                 },
+                dom: '<"row"<"col-md-6"l><"col-md-6"<"d-flex justify-content-end"B<"ml-2"f>>>>rtip',
+                buttons: [
+                    {
+                        text: '+ Add FAQ',
+                        className: 'btn btn-success',
+                        action: function (e, dt, node, config) {
+                            window.location.href = "{{ url('faqs/create') }}";
+                        }
+                    }
+                ],
                 columns: [{
                     data: "faq_id",
                     className: "text-center",
@@ -107,7 +127,8 @@
                 ],
                 order: [[0, 'desc']], // Sort by first column (faq_id) in descending order
                 language: {
-                    search: "Search by question: "
+                    search: "",
+                    searchPlaceholder: "Search by question..."
                 }
             });
         });
