@@ -2,6 +2,48 @@
 
 @section('title', 'Announcement History')
 
+@push('styles')
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
+    <style>
+        /* Make search input width match button width */
+        .dataTables_filter input {
+            width: 150px !important;
+            display: inline-block;
+        }
+
+        /* Ensure buttons have consistent styling */
+        .dt-buttons .btn {
+            width: 120px;
+            margin-right: 5px;
+        }
+
+        /* Custom styling for filter dropdown */
+        #announcement_status {
+            width: 150px;
+        }
+
+        /* Add spacing between filter and datatable */
+        .table-responsive {
+            margin-top: 20px;
+        }
+
+        /* Add spacing for datatable wrapper */
+        .dataTables_wrapper {
+            margin-top: 15px;
+        }
+
+        /* Add spacing between datatable controls and table content */
+        .dataTables_wrapper .row:first-child {
+            margin-bottom: 20px;
+        }
+
+        /* Additional spacing for table */
+        .dataTables_wrapper table {
+            margin-top: 15px;
+        }
+    </style>
+@endpush
+
 @section('main')
     <div class="main-content">
         <section class="section">
@@ -27,27 +69,16 @@
                                     <div class="alert alert-danger">{{ session('error') }}</div>
                                 @endif
                                 <div class="row mb-3">
-                                    <div class="col-md-12">
-                                        <div class="d-flex justify-content-between align-items-end">
-                                            <div class="form-group mb-0">
-                                                <label class="control-label">Filter:</label>
-                                                <select class="form-control" id="announcement_status"
-                                                    name="announcement_status">
-                                                    <option value="">- Semua</option>
-                                                    <option value="published">Published</option>
-                                                    <option value="draft">Draft</option>
-                                                </select>
-                                                <small class="form-text text-muted">Announcement Status</small>
-                                            </div>
-                                            <div>
-                                                <a href="{{ url('announcements/create') }}" class="btn btn-success mr-2">+
-                                                    Add
-                                                    Announcement</a>
-                                                <button type="button" class="btn btn-primary" data-toggle="modal"
-                                                    data-target="#uploadPdfModal">
-                                                    <i class="fas fa-file-pdf mr-1"></i> Upload PDF
-                                                </button>
-                                            </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group mb-0">
+                                            <label class="control-label">Filter:</label>
+                                            <select class="form-control" id="announcement_status"
+                                                name="announcement_status">
+                                                <option value="">- Semua</option>
+                                                <option value="published">Published</option>
+                                                <option value="draft">Draft</option>
+                                            </select>
+                                            <small class="form-text text-muted">Announcement Status</small>
                                         </div>
                                     </div>
                                 </div>
@@ -161,6 +192,7 @@
 @endsection
 
 @push('scripts')
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
     <script>
 
         function modalAction(url = '') {
@@ -180,6 +212,27 @@
                         d._token = $('meta[name="csrf-token"]').attr('content');
                         d.announcement_status = $('#announcement_status').val();
                     }
+                },
+                dom: '<"row"<"col-md-6"l><"col-md-6"<"d-flex justify-content-end"B<"ml-2"f>>>>rtip',
+                buttons: [
+                    {
+                        text: '+ Add Announcement',
+                        className: 'btn btn-success',
+                        action: function (e, dt, node, config) {
+                            window.location.href = "{{ url('announcements/create') }}";
+                        }
+                    },
+                    {
+                        text: '<i class="fas fa-file-pdf mr-1"></i> Upload PDF',
+                        className: 'btn btn-primary',
+                        action: function (e, dt, node, config) {
+                            $('#uploadPdfModal').modal('show');
+                        }
+                    }
+                ],
+                language: {
+                    search: "",
+                    searchPlaceholder: "Search announcements..."
                 },
                 columns: [
                     {
