@@ -3,32 +3,30 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no"
-        name="viewport">
-    <title>@yield('title') &mdash; Stisla</title>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
+    <title>@yield('title') — SIMTOEIC</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('img/logo-simtoeic.png') }}">
+    <link rel="shortcut icon" type="image/png" href="{{ asset('img/logo-simtoeic.png') }}">
+
     <!-- General CSS Files -->
-    <link rel="stylesheet"
-        href="{{ asset('library/bootstrap/dist/css/bootstrap.min.css') }}">
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+    <link rel="stylesheet" href="{{ asset('library/bootstrap/dist/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
         integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
-        crossorigin="anonymous"
-        referrerpolicy="no-referrer" />
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="{{ asset('css/footer.css') }}">
 
     @stack('style')
 
     <!-- Template CSS -->
-    <link rel="stylesheet"
-        href="{{ asset('css/style.css') }}">
-    <link rel="stylesheet"
-        href="{{ asset('css/components.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/components.css') }}">
 
     <!-- Start GA -->
-    <script async
-        src="https://www.googletagmanager.com/gtag/js?id=UA-94034622-3"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-94034622-3"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
 
