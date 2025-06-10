@@ -187,6 +187,7 @@
                                         <option value="">All</option>
                                         <option value="pass">Pass</option>
                                         <option value="fail">Fail</option>
+                                        <option value="on_process">On Process</option>
                                     </select>
                                 </div>
                             </div>
@@ -206,8 +207,8 @@
                         </div>
                         <!-- Table Section -->
                         <div class="table-responsive">
-                            <table id="exam-results-table"
-                                class="table table-striped table-bordered dt-responsive nowrap" style="width:100%">
+                            <table id="exam-results-table" class="table table-striped table-bordered dt-responsive nowrap"
+                                style="width:100%">
                                 <thead>
                                     <tr>
                                         <th>ID Exam</th>
@@ -238,7 +239,9 @@
                                             <td>{{ $result->exam_date ? $result->exam_date->format('Y-m-d') : ($result->created_at ? $result->created_at->format('Y-m-d') : 'N/A') }}
                                             </td>
                                             <td>
-                                                @if($result->status == 'pass')
+                                                @if($result->total_score == 0)
+                                                    <span class="badge badge-warning">On Process</span>
+                                                @elseif($result->status == 'pass' || $result->total_score >= 500)
                                                     <span class="badge badge-success">Pass</span>
                                                 @else
                                                     <span class="badge badge-danger">Fail</span>
@@ -430,31 +433,31 @@
                     {
                         extend: 'copy',
                         exportOptions: {
-                            columns: ':not(:last-child)' 
+                            columns: ':not(:last-child)'
                         }
                     },
                     {
                         extend: 'csv',
                         exportOptions: {
-                            columns: ':not(:last-child)' 
+                            columns: ':not(:last-child)'
                         }
                     },
                     {
                         extend: 'excel',
                         exportOptions: {
-                            columns: ':not(:last-child)' 
+                            columns: ':not(:last-child)'
                         }
                     },
                     {
                         extend: 'pdf',
                         exportOptions: {
-                            columns: ':not(:last-child)' 
+                            columns: ':not(:last-child)'
                         }
                     },
                     {
                         extend: 'print',
                         exportOptions: {
-                            columns: ':not(:last-child)' 
+                            columns: ':not(:last-child)'
                         }
                     }
                 ],
@@ -486,9 +489,17 @@
                 $('#modal-nim').text(nim);
                 $('#modal-name').text(name);
                 $('#modal-exam-date').text(examDate);
-                $('#modal-status').html(status === 'pass' ?
-                    '<span class="badge badge-success">Pass</span>' :
-                    '<span class="badge badge-danger">Fail</span>');
+                // Determine status based on total score
+                var scoreValue = total.replace(/[^\d]/g, '');
+                var statusHtml;
+                if (parseInt(scoreValue) == 0) {
+                    statusHtml = '<span class="badge badge-warning">On Process</span>';
+                } else if (status === 'pass' || parseInt(scoreValue) >= 500) {
+                    statusHtml = '<span class="badge badge-success">Pass</span>';
+                } else {
+                    statusHtml = '<span class="badge badge-danger">Fail</span>';
+                }
+                $('#modal-status').html(statusHtml);
                 $('#modal-imported-at').text('N/A');
                 $('#modal-imported-by').text('System');
 
@@ -505,7 +516,27 @@
                 var statusFilter = $('#status-filter').val().toLowerCase();
                 var scoreFilter = $('#score-filter').val();
 
-                table.column(7).search(statusFilter ? statusFilter : '', true, false).draw();
+                // Custom status filter for ON PROCESS
+                if (statusFilter) {
+                    $.fn.dataTable.ext.search.push(
+                        function (settings, data, dataIndex) {
+                            var statusText = data[7].toLowerCase(); // Status column
+                            var score = parseFloat(data[5].replace(/[^\d.-]/g, '')) || 0; // Total score
+
+                            if (statusFilter === 'on_process') {
+                                return score === 0 || statusText.includes('on process');
+                            } else if (statusFilter === 'pass') {
+                                return statusText.includes('pass');
+                            } else if (statusFilter === 'fail') {
+                                return statusText.includes('fail');
+                            }
+                            return true;
+                        }
+                    );
+                } else {
+                    // Clear status filter
+                    table.column(7).search('', true, false);
+                }
 
                 if (scoreFilter) {
                     var scoreRange = scoreFilter.split('-');
@@ -518,10 +549,13 @@
                             return minScore <= score && score <= maxScore;
                         }
                     );
-                    table.draw();
+                }
+
+                table.draw();
+
+                // Clear all custom filters
+                while ($.fn.dataTable.ext.search.length > 0) {
                     $.fn.dataTable.ext.search.pop();
-                } else {
-                    table.draw(); // Redraw without score filter if not applied
                 }
             }
 
