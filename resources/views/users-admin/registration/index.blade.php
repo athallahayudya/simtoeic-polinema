@@ -57,8 +57,9 @@
         .validation-message i {
             transition: all 0.3s ease;
         }
+
         .validation-message.text-success i {
-            content: "\f00c"; 
+            content: "\f00c";
         }
     </style>
 @endpush
@@ -246,6 +247,7 @@
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="{{ asset('js/numeric-input-validation.js') }}"></script>
     <script>
         function modalAction(url = '') {
             $('#myModal').load(url, function () {
@@ -638,6 +640,6 @@
                     confirmButtonText: 'OK'
                 });
             @endif
-        });
+            });
     </script>
 @endpush

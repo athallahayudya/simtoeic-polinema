@@ -181,11 +181,11 @@
                                             <div class="form-group">
                                                 <label>Phone Number</label>
                                                 <input type="tel" name="phone_number" class="form-control"
-                                                    value="{{ $student->user->phone_number ?? '' }}" required>
+                                                    value="{{ $student->user->phone_number ?? '' }}"
+                                                    placeholder="Please enter your active phone number" required>
                                                 @error('phone_number')
                                                     <div class="text-danger">{{ $message }}</div>
                                                 @enderror
-                                                <small class="text-muted">Please enter your active phone number</small>
                                             </div>
                                         </div>
                                     </div>
@@ -396,6 +396,7 @@
 @push('scripts')
     <!-- JS Libraries -->
     <script src="{{ asset('library/summernote/dist/summernote-bs4.js') }}"></script>
+    <script src="{{ asset('js/numeric-input-validation.js') }}"></script>
 
     <!-- Page Specific JS File -->
     <script>
