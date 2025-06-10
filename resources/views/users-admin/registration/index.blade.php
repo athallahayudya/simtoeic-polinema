@@ -104,9 +104,11 @@
                             <div class="form-group">
                                 <label for="name">Full Name</label>
                                 <input type="text" class="form-control validation-field" id="name" name="name" required
-                                    data-validation="name">
+                                    data-validation="name" pattern="[A-Za-z\s]+"
+                                    title="Only letters and spaces are allowed">
                                 <small class="form-text text-muted validation-message" id="name-validation">
-                                    <i class="fas fa-info-circle mr-1"></i> Must be at least 3 characters long
+                                    <i class="fas fa-info-circle mr-1"></i> Only letters and spaces allowed, minimum 3
+                                    characters
                                 </small>
                             </div>
                             <div class="form-group">
@@ -257,7 +259,9 @@
         }
 
         function validateName(value) {
-            return value.length >= 3;
+            // Check if length is at least 3 and contains only letters and spaces
+            const nameRegex = /^[A-Za-z\s]+$/;
+            return value.length >= 3 && nameRegex.test(value);
         }
 
         function validateIdentity(value) {
@@ -339,6 +343,29 @@
         function initializeValidation() {
             $('.validation-field').off('input change').on('input change', function () {
                 validateField($(this));
+            });
+
+            // Prevent numbers in name field
+            $('#name').off('keypress').on('keypress', function (e) {
+                const char = String.fromCharCode(e.which);
+                const nameRegex = /^[A-Za-z\s]+$/;
+                if (!nameRegex.test(char)) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+
+            // Also handle paste events for name field
+            $('#name').off('paste').on('paste', function (e) {
+                setTimeout(() => {
+                    const value = $(this).val();
+                    const nameRegex = /^[A-Za-z\s]*$/;
+                    if (!nameRegex.test(value)) {
+                        // Remove any non-letter characters
+                        $(this).val(value.replace(/[^A-Za-z\s]/g, ''));
+                        validateField($(this));
+                    }
+                }, 10);
             });
 
             $('#password').off('input change').on('input change', function () {
@@ -640,6 +667,6 @@
                     confirmButtonText: 'OK'
                 });
             @endif
-            });
+                        });
     </script>
 @endpush
