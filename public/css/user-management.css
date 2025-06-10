@@ -69,8 +69,53 @@
 .stats-number.updated {
     color: #28a745;
 }
-
-.badge {
+.badge-success {
+    background-color: #28a745;
+    color: white;
+    padding: 5px 1opx;
+    font-size: 12px;
+    line-height: 1;
+    border-radius: 12px;
+    display: inline-block;
+    text-align: center;
+    min-width: 87px;
+}
+.badge-warning {
+    background-color: #ffc107;
+    color: white;
+    padding: 5px 10px;
+    font-size: 12px;
+    line-height: 1;
+    border-radius: 12px;
+    display: inline-block;
+    text-align: center;
+    min-width: 87px;
+}
+.badge-danger {
+    background-color: #dc3545;
+    color: white;
+    padding: 5px 15px;
+    font-size: 12px;
+    line-height: 1;
+    border-radius: 12px;
+    display: inline-block;
+    text-align: center;
+    min-width: 87px;
+}
+.badge-secondary {
+    background-color: #6c757d;
+    color: white;
+    padding: 5px 20px;
+    font-size: 12px;
+    line-height: 1;
+    border-radius: 12px;
+    display: inline-block;
+    text-align: center;
+    min-width: 87px;
+}
+.badge-info {
+    background-color: #00e5ff;
+    color: white;
     padding: 5px 10px;
     font-size: 12px;
     line-height: 1;
@@ -78,20 +123,4 @@
     display: inline-block;
     text-align: center;
     min-width: 80px;
-}
-.badge-success {
-    background-color: #28a745;
-    color: white;
-}
-.badge-warning {
-    background-color: #ffc107;
-    color: white;
-}
-.badge-danger {
-    background-color: #dc3545;
-    color: white;
-}
-.badge-secondary {
-    background-color: #6c757d;
-    color: white;
 }

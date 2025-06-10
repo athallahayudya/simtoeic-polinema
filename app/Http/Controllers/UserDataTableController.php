@@ -84,14 +84,26 @@ class UserDataTableController extends Controller
                 ->editColumn('role', function ($user) {
                     return ucfirst($user->role);
                 })
-                ->editColumn('exam_status', function ($user) {
-                    $statusMap = [
-                        'not_yet' => '<span class="badge badge-warning">Not Yet</span>',
-                        'on_process' => '<span class="badge badge-info">On Process</span>',
-                        'success' => '<span class="badge badge-success">Success</span>',
-                        'fail' => '<span class="badge badge-danger">Failed</span>'
-                    ];
-                    return $statusMap[$user->exam_status] ?? '<span class="badge badge-secondary">Unknown</span>';
+                ->addColumn('exam_status', function ($user) {
+                    $examStatus = $user->exam_status ?? '-';
+                    $badgeClass = '';
+                    switch (strtolower($examStatus)) {
+                        case 'success':
+                            $badgeClass = 'badge-success';
+                            break;
+                        case 'not_yet':
+                            $badgeClass = 'badge-warning';
+                            break;
+                        case 'on_process':
+                            $badgeClass = 'badge-info';
+                            break;
+                        case 'fail':
+                            $badgeClass = 'badge-danger';
+                            break;
+                        default:
+                            $badgeClass = 'badge-secondary';
+                    }
+                    return '<span class="badge ' . $badgeClass . '">' . ucfirst(str_replace('_', ' ', $examStatus)) . '</span>';
                 })
                 ->addColumn('actions', function ($user) {
                     // Changed to use modalAction approach like staff management page
