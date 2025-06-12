@@ -93,9 +93,12 @@
       </div>
       </div>
 
-      <!-- Announcements -->
+
+
+      <!-- Announcements and My TOEIC Results -->
       <div class="row mb-3">
-      <div class="col-12">
+      <!-- Announcements -->
+      <div class="col-md-6">
         <div class="card shadow-sm border-0">
         <div class="card-header bg-primary text-white d-flex align-items-center">
           <i class="fas fa-bullhorn mr-2"></i>
@@ -105,28 +108,28 @@
           @if ($announcements)
         <div class="announcement-container">
         <div class="d-flex justify-content-between align-items-center mb-2">
-          <h4 class="text-primary mb-0" style="font-size: 20px;">{{ $announcements->title }}</h4>
+          <h4 class="text-primary mb-0" style="font-size: 18px;">{{ $announcements->title }}</h4>
           <span class="badge badge-primary">
           {{ isset($announcements->announcement_date) ? \Carbon\Carbon::parse($announcements->announcement_date)->format('d M Y') : '' }}
           </span>
         </div>
         <div class="announcement-content p-3 bg-light rounded">
-          <p class="mb-0" style="font-size: 19px; font-weight: bold;">{{ $announcements->content }}</p>
+          <p class="mb-0" style="font-size: 16px;">{{ $announcements->content }}</p>
         </div>
 
         @if($announcements->announcement_file)
-        <div class="pdf-attachment mt-3 p-3 border rounded bg-white">
+        <div class="pdf-attachment mt-3 p-2 border rounded bg-white">
         <div class="d-flex align-items-center justify-content-between">
         <div class="d-flex align-items-center">
-        <i class="fas fa-file-pdf text-danger mr-3" style="font-size: 2rem;"></i>
+        <i class="fas fa-file-pdf text-danger mr-2" style="font-size: 1.5rem;"></i>
         <div>
         <h6 class="mb-1">PDF Attachment</h6>
-        <small class="text-muted">Click to view or download the PDF document</small>
+        <small class="text-muted">Click to view or download</small>
         </div>
         </div>
         <div class="btn-group">
         <a href="{{ $announcements->announcement_file }}" class="btn btn-primary btn-sm" target="_blank">
-        <i class="fas fa-eye mr-1"></i> View PDF
+        <i class="fas fa-eye mr-1"></i> View
         </a>
         <a href="{{ $announcements->announcement_file }}" class="btn btn-outline-primary btn-sm" download>
         <i class="fas fa-download mr-1"></i> Download
@@ -149,82 +152,6 @@
         <h5 class="text-muted">No Announcements</h5>
         <p class="text-muted mb-0">
         There are no announcements at this time. Check back later!
-        </p>
-        </div>
-      @endif
-        </div>
-        </div>
-      </div>
-      </div>
-
-      <!-- Row: Exam Schedule & Exam Scores -->
-      <div class="row mb-3">
-      <!-- Exam Schedule -->
-      <div class="col-md-6">
-        <div class="card shadow-sm border-0">
-        <div class="card-header bg-light d-flex align-items-center justify-content-between py-3">
-          <div>
-          <i class="fas fa-calendar-alt text-primary mr-2"></i>
-          <strong style="font-size:16px;">Exam Schedule</strong>
-          </div>
-          @if(count($schedules) > 0)
-        <span class="badge badge-primary">{{ count($schedules) }} Upcoming</span>
-      @endif
-        </div>
-        <div class="card-body p-0">
-          @if(count($schedules) > 0)
-        <div class="table-responsive">
-        <table class="table table-hover mb-0">
-          <thead class="thead-light">
-          <tr>
-          <th class="px-4 py-3">No</th>
-          <th class="px-4 py-3">
-          <i class="far fa-calendar mr-1 text-muted"></i> Date
-          </th>
-          <th class="px-4 py-3">
-          <i class="far fa-clock mr-1 text-muted"></i> Time
-          </th>
-          <th class="px-4 py-3">Action</th>
-          </tr>
-          </thead>
-          <tbody>
-          @foreach($schedules as $i => $schedule)
-          @php
-        $examDate = $schedule->exam_date ?? \Carbon\Carbon::parse($schedule->exam_time)->format('Y-m-d');
-        $examTime = \Carbon\Carbon::parse($schedule->exam_time)->format('H:i');
-        $isToday = \Carbon\Carbon::parse($examDate)->isToday();
-        @endphp
-          <tr class="{{ $isToday ? 'bg-light-success' : '' }}">
-          <td class="px-4 py-3">{{ $schedules->firstItem() + $i }}</td>
-          <td class="px-4 py-3">
-          <strong>{{ \Carbon\Carbon::parse($examDate)->format('d M Y') }}</strong>
-          @if($isToday)
-        <span class="badge badge-success ml-2">Today</span>
-        @endif
-          </td>
-          <td class="px-4 py-3">
-          <span class="text-primary">{{ $examTime }}</span>
-          </td>
-          <td class="px-4 py-3">
-          <a href="{{ $schedule->zoom_link }}" target="_blank"
-          class="btn btn-primary btn-sm rounded-pill px-3">
-          <i class="fas fa-video mr-1"></i> Join Zoom
-          </a>
-          </td>
-          </tr>
-        @endforeach
-          </tbody>
-        </table>
-        </div>
-        <div class="px-4 py-3 border-top">
-        {{ $schedules->links() }}
-        </div>
-      @else
-        <div class="text-center py-5">
-        <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
-        <h5 class="text-muted">No Exams Scheduled</h5>
-        <p class="text-muted mb-0">
-        There are no upcoming exams scheduled at this time.
         </p>
         </div>
       @endif
