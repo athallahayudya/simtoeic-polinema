@@ -104,279 +104,151 @@
       </div>
       </div>
 
-      <!-- Announcements -->
+      <!-- Announcements and My TOEIC Results -->
       <div class="row mb-3">
-      <div class="col-12">
-        <div class="card shadow-sm border-0">
-        <div class="card-header bg-primary text-white d-flex align-items-center">
-          <i class="fas fa-bullhorn mr-2"></i>
-          <strong style="font-size:16px;">Announcements</strong>
+        <div class="col-md-6">
+          <div class="card shadow-sm border-0">
+            <div class="card-header bg-primary text-white d-flex align-items-center">
+              <i class="fas fa-bullhorn mr-2"></i>
+              <strong style="font-size:16px;">Announcements</strong>
+            </div>
+
+            <div class="card-body py-3">
+              @if ($announcements)
+                <div class="announcement-container">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h4 class="text-primary mb-0" style="font-size: 20px;">{{ $announcements->title }}</h4>
+                    <span class="badge badge-primary">
+                      {{ isset($announcements->announcement_date) ? \Carbon\Carbon::parse($announcements->announcement_date)->format('d M Y') : '' }}
+                    </span>
+                  </div>
+                  <div class="announcement-content p-3 bg-light rounded">
+                    <p class="mb-0" style="font-size: 19px; font-weight: bold;">{{ $announcements->content }}</p>
+                  </div>
+
+                  @if($announcements->announcement_file)
+                    <div class="pdf-attachment mt-3 p-3 border rounded bg-white">
+                      <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center">
+                          <i class="fas fa-file-pdf text-danger mr-3" style="font-size: 2rem;"></i>
+                          <div>
+                            <h6 class="mb-1">PDF Attachment</h6>
+                            <small class="text-muted">Click to view or download the PDF document</small>
+                          </div>
+                        </div>
+                        <div class="btn-group">
+                          <a href="{{ $announcements->announcement_file }}" class="btn btn-primary btn-sm" target="_blank">
+                            <i class="fas fa-eye mr-1"></i> View PDF
+                          </a>
+                          <a href="{{ $announcements->announcement_file }}" class="btn btn-outline-primary btn-sm" download>
+                            <i class="fas fa-download mr-1"></i> Download
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  @endif
+
+                  <div class="d-flex justify-content-end mt-2">
+                    <small class="text-muted">
+                      <i class="fas fa-clock mr-1"></i> Posted
+                      {{ isset($announcements->announcement_date) ? \Carbon\Carbon::parse($announcements->announcement_date)->diffForHumans() : 'Unknown date' }}
+                    </small>
+                  </div>
+                </div>
+              @else
+                <div class="text-center py-4">
+                  <i class="fas fa-info-circle fa-3x text-muted mb-3"></i>
+                  <h5 class="text-muted">No Announcements</h5>
+                  <p class="text-muted mb-0">
+                    There are no announcements at this time. Check back later!
+                  </p>
+                </div>
+              @endif
+            </div>
+          </div>
         </div>
 
-        <div class="card-body py-3">
-          @if ($announcements)
-        <div class="announcement-container">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <h4 class="text-primary mb-0" style="font-size: 20px;">{{ $announcements->title }}</h4>
-          <span class="badge badge-primary">
-          {{ isset($announcements->announcement_date) ? \Carbon\Carbon::parse($announcements->announcement_date)->format('d M Y') : '' }}
-          </span>
-        </div>
-        <div class="announcement-content p-3 bg-light rounded">
-          <p class="mb-0" style="font-size: 19px; font-weight: bold;">{{ $announcements->content }}</p>
-        </div>
-
-        @if($announcements->announcement_file)
-        <div class="pdf-attachment mt-3 p-3 border rounded bg-white">
-        <div class="d-flex align-items-center justify-content-between">
-        <div class="d-flex align-items-center">
-        <i class="fas fa-file-pdf text-danger mr-3" style="font-size: 2rem;"></i>
-        <div>
-        <h6 class="mb-1">PDF Attachment</h6>
-        <small class="text-muted">Click to view or download the PDF document</small>
-        </div>
-        </div>
-        <div class="btn-group">
-        <a href="{{ $announcements->announcement_file }}" class="btn btn-primary btn-sm" target="_blank">
-        <i class="fas fa-eye mr-1"></i> View PDF
-        </a>
-        <a href="{{ $announcements->announcement_file }}" class="btn btn-outline-primary btn-sm" download>
-        <i class="fas fa-download mr-1"></i> Download
-        </a>
-        </div>
-        </div>
-        </div>
-      @endif
-
-        <div class="d-flex justify-content-end mt-2">
-          <small class="text-muted">
-          <i class="fas fa-clock mr-1"></i> Posted
-          {{ isset($announcements->announcement_date) ? \Carbon\Carbon::parse($announcements->announcement_date)->diffForHumans() : 'Unknown date' }}
-          </small>
-        </div>
-        </div>
-      @else
-        <div class="text-center py-4">
-        <i class="fas fa-info-circle fa-3x text-muted mb-3"></i>
-        <h5 class="text-muted">No Announcements</h5>
-        <p class="text-muted mb-0">
-        There are no announcements at this time. Check back later!
-        </p>
-        </div>
-      @endif
-        </div>
-        </div>
-      </div>
-      </div>
-
-      <!-- Latest TOEIC Result Summary -->
-      @if($examResults)
-      <!-- Show actual exam results -->
-      <div class="row mb-3">
-      <div class="col-12">
-      <div
-      class="card shadow-sm border-0 {{ ($examResults->total_score ?? 0) >= 500 ? 'border-left-success' : 'border-left-danger' }}"
-      style="border-left: 4px solid {{ ($examResults->total_score ?? 0) >= 500 ? '#1cc88a' : '#e74a3b' }};">
-      <div class="card-body">
-        <div class="row no-gutters align-items-center">
-        <div class="col-auto mr-3">
-        <i
-        class="fas {{ ($examResults->total_score ?? 0) >= 500 ? 'fa-trophy' : 'fa-exclamation-triangle' }} fa-2x {{ ($examResults->total_score ?? 0) >= 500 ? 'text-success' : 'text-danger' }}"></i>
-        </div>
-        <div class="col">
-        <div
-        class="h5 mb-1 font-weight-bold {{ ($examResults->total_score ?? 0) >= 500 ? 'text-success' : 'text-danger' }}">
-        Latest TOEIC Result: {{ ($examResults->total_score ?? 0) >= 500 ? 'PASSED' : 'FAILED' }}
-        </div>
-        <div class="row">
-        <div class="col-md-3">
-          <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Exam ID</div>
-          <div class="h6 mb-0 font-weight-bold text-gray-800">
-          {{ $examResults->exam_id ?? 'N/A' }}
+        <div class="col-md-6">
+          <div class="card shadow-sm border-0">
+            <div class="card-header bg-light d-flex align-items-center justify-content-between py-3">
+              <div>
+                <i class="fas fa-chart-line text-primary mr-2"></i>
+                <strong style="font-size:16px;">My TOEIC Results</strong>
+              </div>
+              @if(count($examScores) > 0)
+                <span class="badge badge-primary">{{ count($examScores) }} Results</span>
+              @endif
+            </div>
+            <div class="card-body p-0">
+              @if(count($examScores) > 0)
+                <div class="table-responsive">
+                  <table class="table table-hover mb-0">
+                    <thead class="thead-light">
+                      <tr>
+                        <th class="px-4 py-3">Exam ID</th>
+                        <th class="px-4 py-3">
+                          <i class="fas fa-headphones mr-1 text-muted"></i> Listening
+                        </th>
+                        <th class="px-4 py-3">
+                          <i class="fas fa-book-open mr-1 text-muted"></i> Reading
+                        </th>
+                        <th class="px-4 py-3">
+                          <i class="fas fa-trophy mr-1 text-muted"></i> Total
+                        </th>
+                        <th class="px-4 py-3">Status</th>
+                        <th class="px-4 py-3">Date</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @foreach($examScores as $result)
+                        <tr>
+                          <td class="px-4 py-3">
+                            <strong class="text-primary">{{ $result->exam_id ?? 'N/A' }}</strong>
+                          </td>
+                          <td class="px-4 py-3">
+                            <span class="badge badge-info">{{ $result->listening_score ?? 0 }}</span>
+                          </td>
+                          <td class="px-4 py-3">
+                            <span class="badge badge-info">{{ $result->reading_score ?? 0 }}</span>
+                          </td>
+                          <td class="px-4 py-3">
+                            <span class="badge {{ ($result->total_score ?? 0) >= 500 ? 'badge-success' : 'badge-danger' }}">
+                              {{ $result->total_score ?? 0 }}
+                            </span>
+                          </td>
+                          <td class="px-4 py-3">
+                            @if(($result->total_score ?? 0) >= 500)
+                              <span class="badge badge-success">
+                                <i class="fas fa-check mr-1"></i> PASS
+                              </span>
+                            @else
+                              <span class="badge badge-danger">
+                                <i class="fas fa-times mr-1"></i> FAIL
+                              </span>
+                            @endif
+                          </td>
+                          <td class="px-4 py-3">
+                            <small class="text-muted">
+                              {{ $result->exam_date ? $result->exam_date->format('d M Y') : ($result->created_at ? $result->created_at->format('d M Y') : 'N/A') }}
+                            </small>
+                          </td>
+                        </tr>
+                      @endforeach
+                    </tbody>
+                  </table>
+                </div>
+              @else
+                <div class="text-center py-5">
+                  <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
+                  <h5 class="text-muted">No TOEIC Results Yet</h5>
+                  <p class="text-muted mb-0">
+                    Your TOEIC exam results will appear here once they are uploaded by the administrator.
+                  </p>
+                </div>
+              @endif
+            </div>
           </div>
         </div>
-        <div class="col-md-2">
-          <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Listening</div>
-          <div class="h6 mb-0 font-weight-bold text-gray-800">
-          {{ $examResults->listening_score ?? 0 }}
-          </div>
-        </div>
-        <div class="col-md-2">
-          <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Reading</div>
-          <div class="h6 mb-0 font-weight-bold text-gray-800">
-          {{ $examResults->reading_score ?? 0 }}
-          </div>
-        </div>
-        <div class="col-md-2">
-          <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Score
-          </div>
-          <div
-          class="h6 mb-0 font-weight-bold {{ ($examResults->total_score ?? 0) >= 500 ? 'text-success' : 'text-danger' }}">
-          {{ $examResults->total_score ?? 0 }}
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Exam Date</div>
-          <div class="h6 mb-0 font-weight-bold text-gray-800">
-          {{ $examResults->exam_date ? $examResults->exam_date->format('d M Y') : ($examResults->created_at ? $examResults->created_at->format('d M Y') : 'N/A') }}
-          </div>
-        </div>
-        </div>
-        </div>
-        </div>
-      </div>
-      </div>
-      </div>
-      </div>
-    @endif
-
-      <!-- Dashboard Content Row -->
-      <div class="row mb-3">
-      <!-- Exam Schedule -->
-      <div class="col-md-6">
-        <div class="card shadow-sm border-0">
-        <div class="card-header bg-light d-flex align-items-center justify-content-between py-3">
-          <div>
-          <i class="fas fa-calendar-alt text-primary mr-2"></i>
-          <strong style="font-size:16px;">Exam Schedule</strong>
-          </div>
-          @if(count($schedules) > 0)
-        <span class="badge badge-primary">{{ count($schedules) }} Schedules</span>
-      @endif
-        </div>
-        <div class="card-body p-0">
-          @if(count($schedules) > 0)
-        <div class="table-responsive">
-        <table class="table table-hover mb-0">
-          <thead class="thead-light">
-          <tr>
-          <th class="px-4 py-3">Date</th>
-          <th class="px-4 py-3">Time</th>
-          <th class="px-4 py-3">Links</th>
-          </tr>
-          </thead>
-          <tbody>
-          @foreach($schedules as $schedule)
-        <tr>
-          <td class="px-4 py-3">
-          <strong
-          class="text-primary">{{ \Carbon\Carbon::parse($schedule->exam_date)->format('d M Y') }}</strong>
-          </td>
-          <td class="px-4 py-3">
-          <span class="badge badge-info">{{ $schedule->exam_time }}</span>
-          </td>
-          <td class="px-4 py-3">
-          @if($schedule->itc_link)
-        <a href="{{ $schedule->itc_link }}" class="btn btn-sm btn-outline-primary mr-1" target="_blank">
-        <i class="fas fa-external-link-alt mr-1"></i> ITC
-        </a>
-        @endif
-          @if($schedule->zoom_link)
-        <a href="{{ $schedule->zoom_link }}" class="btn btn-sm btn-outline-success" target="_blank">
-        <i class="fas fa-video mr-1"></i> Zoom
-        </a>
-        @endif
-          </td>
-        </tr>
-        @endforeach
-          </tbody>
-        </table>
-        </div>
-      @else
-        <div class="text-center py-5">
-        <i class="fas fa-calendar-alt fa-3x text-muted mb-3"></i>
-        <h5 class="text-muted">No Scheduled Exams</h5>
-        <p class="text-muted mb-0">
-        There are no upcoming TOEIC exams scheduled at this time.
-        </p>
-        </div>
-      @endif
-        </div>
-        </div>
-      </div>
-
-      <!-- My TOEIC Results -->
-      <div class="col-md-6">
-        <div class="card shadow-sm border-0">
-        <div class="card-header bg-light d-flex align-items-center justify-content-between py-3">
-          <div>
-          <i class="fas fa-chart-line text-primary mr-2"></i>
-          <strong style="font-size:16px;">My TOEIC Results</strong>
-          </div>
-          @if(count($examScores) > 0)
-        <span class="badge badge-primary">{{ count($examScores) }} Results</span>
-      @endif
-        </div>
-        <div class="card-body p-0">
-          @if(count($examScores) > 0)
-        <div class="table-responsive">
-        <table class="table table-hover mb-0">
-          <thead class="thead-light">
-          <tr>
-          <th class="px-4 py-3">Exam ID</th>
-          <th class="px-4 py-3">
-          <i class="fas fa-headphones mr-1 text-muted"></i> Listening
-          </th>
-          <th class="px-4 py-3">
-          <i class="fas fa-book-open mr-1 text-muted"></i> Reading
-          </th>
-          <th class="px-4 py-3">
-          <i class="fas fa-trophy mr-1 text-muted"></i> Total
-          </th>
-          <th class="px-4 py-3">Status</th>
-          <th class="px-4 py-3">Date</th>
-          </tr>
-          </thead>
-          <tbody>
-          @foreach($examScores as $result)
-        <tr>
-          <td class="px-4 py-3">
-          <strong class="text-primary">{{ $result->exam_id ?? 'N/A' }}</strong>
-          </td>
-          <td class="px-4 py-3">
-          <span class="badge badge-info">{{ $result->listening_score ?? 0 }}</span>
-          </td>
-          <td class="px-4 py-3">
-          <span class="badge badge-info">{{ $result->reading_score ?? 0 }}</span>
-          </td>
-          <td class="px-4 py-3">
-          <span class="badge {{ ($result->total_score ?? 0) >= 500 ? 'badge-success' : 'badge-danger' }}">
-          {{ $result->total_score ?? 0 }}
-          </span>
-          </td>
-          <td class="px-4 py-3">
-          @if(($result->total_score ?? 0) >= 500)
-        <span class="badge badge-success">
-        <i class="fas fa-check mr-1"></i> PASS
-        </span>
-        @else
-        <span class="badge badge-danger">
-        <i class="fas fa-times mr-1"></i> FAIL
-        </span>
-        @endif
-          </td>
-          <td class="px-4 py-3">
-          <small class="text-muted">
-          {{ $result->exam_date ? $result->exam_date->format('d M Y') : ($result->created_at ? $result->created_at->format('d M Y') : 'N/A') }}
-          </small>
-          </td>
-        </tr>
-        @endforeach
-          </tbody>
-        </table>
-        </div>
-      @else
-        <div class="text-center py-5">
-        <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
-        <h5 class="text-muted">No TOEIC Results Yet</h5>
-        <p class="text-muted mb-0">
-        Your TOEIC exam results will appear here once they are uploaded by the administrator.
-        </p>
-        </div>
-      @endif
-        </div>
-        </div>
-      </div>
       </div>
     </div>
     </section>
