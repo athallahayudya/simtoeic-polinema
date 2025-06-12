@@ -44,8 +44,7 @@
                                     </div>
                                 </div>
                                 <div class="table-responsive">
-                                    <table class="table table-bordered table-striped table-hover table-sm"
-                                        id="table_user">
+                                    <table class="table table-bordered table-striped table-hover table-sm" id="table_user">
                                         <thead>
                                             <tr>
                                                 <th>ID</th>
@@ -73,9 +72,26 @@
     <div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" aria-hidden="true"></div>
 @endsection
 
-@push('scripts')
-    <script>
+@push('style')
+    <link rel="stylesheet" href="{{ asset('css/user-management.css') }}">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.bootstrap4.min.css">
+@endpush
 
+@push('scripts')
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.bootstrap4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.print.min.js"></script>
+    <script>
         function modalAction(url = '') {
             $('#myModal').load(url, function () {
                 $('#myModal').modal('show');
@@ -132,7 +148,7 @@
                         orderable: false,
                         searchable: false,
                         render: function (data, type, row) {
-                                return data && data !== '-' ? '<a href="' + data + '" target="_blank">KTP</a>' : '-';
+                            return data && data !== '-' ? '<a href="' + data + '" target="_blank">KTP</a>' : '-';
                         }
                     },
                     {
@@ -142,7 +158,7 @@
                         orderable: false,
                         searchable: false,
                         render: function (data, type, row) {
-                                return data && data !== '-' ? '<a href="' + data + '" target="_blank">Photo</a>' : '-';
+                            return data && data !== '-' ? '<a href="' + data + '" target="_blank">Photo</a>' : '-';
                         }
                     },
                     {
@@ -165,15 +181,46 @@
                         searchable: false
                     }
                 ],
-                order: [[0, 'desc']]
+                order: [[0, 'desc']],
+                dom: 'Bfrtip',
+                buttons: [
+                    {
+                        extend: 'copy',
+                        exportOptions: {
+                            columns: ':not(:last-child)' // Exclude the Action column
+                        }
+                    },
+                    {
+                        extend: 'csv',
+                        exportOptions: {
+                            columns: ':not(:last-child)'
+                        }
+                    },
+                    {
+                        extend: 'excel',
+                        exportOptions: {
+                            columns: ':not(:last-child)'
+                        }
+                    },
+                    {
+                        extend: 'pdf',
+                        exportOptions: {
+                            columns: ':not(:last-child)'
+                        }
+                    },
+                    {
+                        extend: 'print',
+                        exportOptions: {
+                            columns: ':not(:last-child)'
+                        }
+                    }
+                ],
+                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]]
             });
+
             $('#filter_role').on('change', function () {
                 dataUser.ajax.reload(); 
             });
         });
     </script>
-@endpush
-
-@push('style')
-    <link rel="stylesheet" href="{{ asset('css/user-management.css') }}">
 @endpush
