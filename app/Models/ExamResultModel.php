@@ -23,7 +23,8 @@ class ExamResultModel extends Model
         'reading_score',
         'total_score',
         'exam_date',
-        'status'
+        'status',
+        'exam_type'
     ];
 
     public $timestamps = true;
@@ -128,5 +129,30 @@ class ExamResultModel extends Model
         }
         $totalScore = $this->total_score ?: $this->score;
         return $totalScore >= 500 ? 'pass' : 'fail';
+    }
+
+    // Get exam type display name
+    public function getExamTypeDisplayAttribute()
+    {
+        return $this->exam_type === 'gratis' ? 'Gratis' : 'Mandiri';
+    }
+
+    // Get exam type badge
+    public function getExamTypeBadgeAttribute()
+    {
+        return $this->exam_type === 'gratis'
+            ? '<span class="badge badge-success">Gratis</span>'
+            : '<span class="badge badge-primary">Mandiri</span>';
+    }
+
+    // Scopes for exam types
+    public function scopeGratis($query)
+    {
+        return $query->where('exam_type', 'gratis');
+    }
+
+    public function scopeMandiri($query)
+    {
+        return $query->where('exam_type', 'mandiri');
     }
 }

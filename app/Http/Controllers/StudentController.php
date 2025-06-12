@@ -9,10 +9,8 @@ use App\Models\ExamResultModel;
 use App\Models\StudentModel;
 use App\Models\UserModel;
 use App\Models\ExamRegistrationModel;
+use App\Models\VerificationRequestModel;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Log;
-use Yajra\DataTables\Facades\DataTables;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 
 class StudentController extends Controller
@@ -32,6 +30,24 @@ class StudentController extends Controller
             ->where('total_score', '>', 0) // Only get actual exam results, not registration placeholders
             ->latest()
             ->first();
+
+        // Get all exam scores for history (both gratis and mandiri)
+        $allExamScores = ExamResultModel::where('user_id', auth()->id())
+            ->where('total_score', '>', 0)
+            ->orderBy('exam_date', 'desc')
+            ->get();
+
+        // Check if student is eligible for certificate request
+        $canRequestCertificate = false;
+        $examCount = $allExamScores->count();
+        $hasFailedScores = $allExamScores->where('total_score', '<', 500)->count() > 0;
+
+        // Students can request verification letter if they don't have pending request
+        // No exam requirements - anyone can request for various reasons (exam failure, special conditions, etc.)
+        $existingRequest = VerificationRequestModel::where('user_id', auth()->id())
+            ->where('status', 'pending')
+            ->first();
+        $canRequestCertificate = !$existingRequest;
 
         // Get all exam results for the current student to display in the scores table
         $examScores = ExamResultModel::where('user_id', auth()->id())
@@ -125,6 +141,8 @@ class StudentController extends Controller
             'totalItems',
             'completionPercentage',
             'examScores',
+            'allExamScores',
+            'canRequestCertificate',
             'user'
         ));
     }
@@ -319,5 +337,116 @@ class StudentController extends Controller
         // Redirect with success message
         return redirect()->route('student.registration.form')
             ->with('success', 'You have successfully registered for the TOEIC exam. Please check your telegram for confirmation details.');
+    }
+
+    /**
+     * Show request page with verification requests
+     */
+    public function requestIndex()
+    {
+        $user = Auth::guard('web')->user();
+        if (!$user || $user->role !== 'student') {
+            abort(403, 'Unauthorized or insufficient permissions.');
+        }
+
+        // Get all verification requests for this student
+        $verificationRequests = VerificationRequestModel::where('user_id', auth()->id())
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Get exam results for eligibility check
+        $allExamScores = ExamResultModel::where('user_id', auth()->id())
+            ->where('total_score', '>', 0)
+            ->orderBy('exam_date', 'desc')
+            ->get();
+
+        // Check eligibility for new request
+        $canRequestCertificate = false;
+        $examCount = $allExamScores->count();
+        $hasFailedScores = $allExamScores->where('total_score', '<', 500)->count() > 0;
+
+        // Students can request verification letter if:
+        // 1. They have taken 2+ exams with scores < 500, OR
+        // 2. They have special conditions (mental disability, etc.) regardless of exam history
+        // Check if there's no pending request
+        $existingRequest = VerificationRequestModel::where('user_id', auth()->id())
+            ->where('status', 'pending')
+            ->first();
+
+        $canRequestCertificate = !$existingRequest; // Anyone can request if no pending request exists
+
+        return view('users-student.request-index', [
+            'type_menu' => 'request',
+            'verificationRequests' => $verificationRequests,
+            'allExamScores' => $allExamScores,
+            'canRequestCertificate' => $canRequestCertificate,
+            'examCount' => $examCount,
+            'hasFailedScores' => $hasFailedScores,
+            'existingRequest' => $existingRequest
+        ]);
+    }
+
+    /**
+     * Show verification request form
+     */
+    public function showVerificationRequestForm()
+    {
+        $user = Auth::guard('web')->user();
+        if (!$user || $user->role !== 'student') {
+            abort(403, 'Unauthorized or insufficient permissions.');
+        }
+
+        // Get exam scores for display (optional)
+        $allExamScores = ExamResultModel::where('user_id', auth()->id())
+            ->where('total_score', '>', 0)
+            ->orderBy('exam_date', 'desc')
+            ->get();
+
+        // Check if there's already a pending request
+        $existingRequest = VerificationRequestModel::where('user_id', auth()->id())
+            ->where('status', 'pending')
+            ->first();
+
+        if ($existingRequest) {
+            return redirect()->route('student.request.index')
+                ->with('error', 'You already have a verification request that is being processed.');
+        }
+
+        return view('users-student.verification-request', [
+            'type_menu' => 'verification_request',
+            'examScores' => $allExamScores
+        ]);
+    }
+
+    /**
+     * Submit verification request
+     */
+    public function submitVerificationRequest(Request $request)
+    {
+        $user = Auth::guard('web')->user();
+        if (!$user || $user->role !== 'student') {
+            abort(403, 'Unauthorized or insufficient permissions.');
+        }
+
+        $request->validate([
+            'comment' => 'required|string|max:1000',
+            'certificate_file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120' // 5MB max
+        ]);
+
+        // Store the uploaded certificate
+        $certificateFile = $request->file('certificate_file');
+        $fileName = time() . '_' . $user->user_id . '_' . $certificateFile->getClientOriginalName();
+        $filePath = $certificateFile->storeAs('verification_requests', $fileName, 'public');
+
+        // Create the request
+        VerificationRequestModel::create([
+            'user_id' => $user->user_id,
+            'comment' => $request->comment,
+            'certificate_file' => $filePath,
+            'status' => 'pending'
+        ]);
+
+        return redirect()->route('student.dashboard')
+            ->with('success', 'Verification request has been submitted successfully. Please wait for admin approval.');
     }
 }

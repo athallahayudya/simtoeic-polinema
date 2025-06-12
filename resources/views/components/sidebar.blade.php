@@ -19,7 +19,7 @@
 
                 <!-- Management Dropdown -->
                 <li
-                    class="nav-item dropdown {{ in_array(Request::segment(1), ['registration', 'exam-results', 'users']) ? 'active' : '' }}">
+                    class="nav-item dropdown {{ in_array(Request::segment(1), ['registration', 'exam-results', 'users']) || Request::is('admin/verification-requests*') ? 'active' : '' }}">
                     <a href="#" class="nav-link has-dropdown">
                         <i class="fas fa-cogs"></i> <span>Management</span>
                     </a>
@@ -32,6 +32,10 @@
                         </li>
                         <li class="{{ Request::is('users*') || Request::is('users*') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('users') }}">Users</a>
+                        </li>
+                        <li class="{{ Request::is('admin/verification-requests*') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ route('admin.verification.requests.index') }}">Verification
+                                Requests</a>
                         </li>
                     </ul>
                 </li>
@@ -76,6 +80,15 @@
                         <i class="fas fa-clipboard-list"></i> <span>Registration</span>
                     </a>
                 </li>
+
+                <!-- Request (for students only) -->
+                @if(Auth::user()?->role === 'student')
+                    <li class="{{ Request::is('*/verification-request*') || Request::is('*/request*') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('student.request.index') }}">
+                            <i class="fas fa-certificate"></i> <span>Request</span>
+                        </a>
+                    </li>
+                @endif
 
                 <!-- FAQs -->
                 <li class="{{ Request::is('faq*') ? 'active' : '' }}">
