@@ -93,7 +93,7 @@
 
       <div class="row mt-3">
         <div class="col-12">
-        <h6><strong>Attached Certificate:</strong></h6>
+        <h6><strong>Attached Files:</strong></h6>
         <div id="modal-certificate-preview"></div>
         </div>
       </div>
@@ -232,14 +232,37 @@
         $('#modal-comment').text(data.comment);
 
         // Show certificate preview
-        const certificateUrl = `/storage/${data.certificate_file}`;
-        const fileExtension = data.certificate_file.split('.').pop().toLowerCase();
+        let certificateHtml = '';
+        
+        // Handle first file
+        if (data.certificate_file) {
+          const certificateUrl = `/storage/${data.certificate_file}`;
+          const fileExtension = data.certificate_file.split('.').pop().toLowerCase();
 
-        if (['jpg', 'jpeg', 'png'].includes(fileExtension)) {
-        $('#modal-certificate-preview').html(`<img src="${certificateUrl}" class="img-fluid" style="max-height: 300px;">`);
-        } else {
-        $('#modal-certificate-preview').html(`<a href="${certificateUrl}" target="_blank" class="btn btn-primary"><i class="fas fa-file-pdf mr-1"></i>View PDF</a>`);
+          if (['jpg', 'jpeg', 'png'].includes(fileExtension)) {
+            certificateHtml += `<div class="mb-3"><h6>File 1:</h6><img src="${certificateUrl}" class="img-fluid" style="max-height: 300px;"></div>`;
+          } else {
+            certificateHtml += `<div class="mb-3"><h6>File 1:</h6><a href="${certificateUrl}" target="_blank" class="btn btn-primary"><i class="fas fa-file-pdf mr-1"></i>View PDF File 1</a></div>`;
+          }
         }
+        
+        // Handle second file
+        if (data.certificate_file_2) {
+          const certificateUrl2 = `/storage/${data.certificate_file_2}`;
+          const fileExtension2 = data.certificate_file_2.split('.').pop().toLowerCase();
+
+          if (['jpg', 'jpeg', 'png'].includes(fileExtension2)) {
+            certificateHtml += `<div class="mb-3"><h6>File 2:</h6><img src="${certificateUrl2}" class="img-fluid" style="max-height: 300px;"></div>`;
+          } else {
+            certificateHtml += `<div class="mb-3"><h6>File 2:</h6><a href="${certificateUrl2}" target="_blank" class="btn btn-primary"><i class="fas fa-file-pdf mr-1"></i>View PDF File 2</a></div>`;
+          }
+        }
+        
+        if (!certificateHtml) {
+          certificateHtml = '<span class="text-muted">No files uploaded</span>';
+        }
+        
+        $('#modal-certificate-preview').html(certificateHtml);
 
         // Show admin notes if processed
         if (data.status !== 'pending') {

@@ -165,13 +165,13 @@
             <div class="col-md-12">
             <div class="form-group">
               <label for="certificate_file">
-              <i class="fas fa-upload mr-1"></i>Upload Supporting Evidence
+              <i class="fas fa-upload mr-1"></i>Upload Supporting Evidence (File 1)
               <span class="text-danger">*</span>
               </label>
               <div class="custom-file">
               <input type="file" class="custom-file-input @error('certificate_file') is-invalid @enderror"
                 id="certificate_file" name="certificate_file" accept=".pdf,.jpg,.jpeg,.png" required>
-              <label class="custom-file-label" for="certificate_file">Choose file...</label>
+              <label class="custom-file-label" for="certificate_file">Choose first file...</label>
               </div>
               <small class="form-text text-muted">
               <i class="fas fa-file mr-1"></i>Upload supporting documents (medical certificates, TOEIC
@@ -187,9 +187,44 @@
               <div class="card">
                 <div class="card-body p-3">
                 <h6 class="card-title mb-2">
-                  <i class="fas fa-eye mr-1"></i>File Preview
+                  <i class="fas fa-eye mr-1"></i>File 1 Preview
                 </h6>
                 <div id="previewContent"></div>
+                </div>
+              </div>
+              </div>
+            </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12">
+            <div class="form-group">
+              <label for="certificate_file_2">
+              <i class="fas fa-upload mr-1"></i>Upload Supporting Evidence (File 2)
+              <span class="text-muted">(Optional)</span>
+              </label>
+              <div class="custom-file">
+              <input type="file" class="custom-file-input @error('certificate_file_2') is-invalid @enderror"
+                id="certificate_file_2" name="certificate_file_2" accept=".pdf,.jpg,.jpeg,.png">
+              <label class="custom-file-label" for="certificate_file_2">Choose second file...</label>
+              </div>
+              <small class="form-text text-muted">
+              <i class="fas fa-file mr-1"></i>Upload additional supporting documents if needed
+              <br><strong>Allowed formats:</strong> PDF, JPG, JPEG, PNG | <strong>Maximum size:</strong> 5MB
+              </small>
+              @error('certificate_file_2')
+          <div class="invalid-feedback">{{ $message }}</div>
+        @enderror
+
+              <!-- File preview area for second file -->
+              <div id="filePreview2" class="mt-3" style="display: none;">
+              <div class="card">
+                <div class="card-body p-3">
+                <h6 class="card-title mb-2">
+                  <i class="fas fa-eye mr-1"></i>File 2 Preview
+                </h6>
+                <div id="previewContent2"></div>
                 </div>
               </div>
               </div>
@@ -242,7 +277,7 @@
       }
     });
 
-    // File upload handling
+    // File upload handling for first file
     $('#certificate_file').on('change', function () {
       const file = this.files[0];
       const label = $(this).next('.custom-file-label');
@@ -260,7 +295,7 @@
         confirmButtonColor: '#dc3545'
         });
         this.value = '';
-        label.text('Choose file...');
+        label.text('Choose first file...');
         $('#filePreview').hide();
         return;
       }
@@ -274,7 +309,7 @@
         confirmButtonColor: '#dc3545'
         });
         this.value = '';
-        label.text('Choose file...');
+        label.text('Choose first file...');
         $('#filePreview').hide();
         return;
       }
@@ -283,10 +318,58 @@
       label.text(file.name);
 
       // Show file preview
-      showFilePreview(file);
+      showFilePreview(file, 'previewContent', 'filePreview');
       } else {
-      label.text('Choose file...');
+      label.text('Choose first file...');
       $('#filePreview').hide();
+      }
+    });
+
+    // File upload handling for second file
+    $('#certificate_file_2').on('change', function () {
+      const file = this.files[0];
+      const label = $(this).next('.custom-file-label');
+
+      if (file) {
+      const fileSize = file.size / 1024 / 1024; // Convert to MB
+      const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+
+      // Validate file size
+      if (fileSize > 5) {
+        Swal.fire({
+        icon: 'error',
+        title: 'File Too Large',
+        text: 'File size must be less than 5MB.',
+        confirmButtonColor: '#dc3545'
+        });
+        this.value = '';
+        label.text('Choose second file...');
+        $('#filePreview2').hide();
+        return;
+      }
+
+      // Validate file type
+      if (!allowedTypes.includes(file.type)) {
+        Swal.fire({
+        icon: 'error',
+        title: 'Invalid File Format',
+        text: 'Please upload PDF, JPG, JPEG, or PNG files only.',
+        confirmButtonColor: '#dc3545'
+        });
+        this.value = '';
+        label.text('Choose second file...');
+        $('#filePreview2').hide();
+        return;
+      }
+
+      // Update label with filename
+      label.text(file.name);
+
+      // Show file preview
+      showFilePreview(file, 'previewContent2', 'filePreview2');
+      } else {
+      label.text('Choose second file...');
+      $('#filePreview2').hide();
       }
     });
 
@@ -348,9 +431,9 @@
     });
 
     // File preview function
-    function showFilePreview(file) {
+    function showFilePreview(file, previewContentId, previewContainerId) {
     const reader = new FileReader();
-    const previewContent = $('#previewContent');
+    const previewContent = $('#' + previewContentId);
 
     reader.onload = function (e) {
       let content = '';
@@ -374,7 +457,7 @@
       }
 
       previewContent.html(content);
-      $('#filePreview').fadeIn();
+      $('#' + previewContainerId).fadeIn();
     };
 
     if (file.type.startsWith('image/')) {

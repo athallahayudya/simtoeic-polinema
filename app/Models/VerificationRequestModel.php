@@ -16,6 +16,7 @@ class VerificationRequestModel extends Model
         'user_id',
         'comment',
         'certificate_file',
+        'certificate_file_2',
         'status',
         'admin_notes',
         'approved_by',

@@ -426,23 +426,30 @@ class StudentController extends Controller
         $user = Auth::guard('web')->user();
         if (!$user || $user->role !== 'student') {
             abort(403, 'Unauthorized or insufficient permissions.');
-        }
-
-        $request->validate([
+        }        $request->validate([
             'comment' => 'required|string|max:1000',
-            'certificate_file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120' // 5MB max
+            'certificate_file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120', // 5MB max
+            'certificate_file_2' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120' // 5MB max, optional
         ]);
 
-        // Store the uploaded certificate
+        // Store the uploaded certificates
         $certificateFile = $request->file('certificate_file');
         $fileName = time() . '_' . $user->user_id . '_' . $certificateFile->getClientOriginalName();
         $filePath = $certificateFile->storeAs('verification_requests', $fileName, 'public');
+
+        $filePath2 = null;
+        if ($request->hasFile('certificate_file_2')) {
+            $certificateFile2 = $request->file('certificate_file_2');
+            $fileName2 = time() . '_2_' . $user->user_id . '_' . $certificateFile2->getClientOriginalName();
+            $filePath2 = $certificateFile2->storeAs('verification_requests', $fileName2, 'public');
+        }
 
         // Create the request
         VerificationRequestModel::create([
             'user_id' => $user->user_id,
             'comment' => $request->comment,
             'certificate_file' => $filePath,
+            'certificate_file_2' => $filePath2,
             'status' => 'pending'
         ]);
 

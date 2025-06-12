@@ -57,24 +57,44 @@ class VerificationRequestController extends Controller
                         substr($comment, 0, 100) . '...</span>';
                 }
                 return $comment;
-            })
-            ->addColumn('supporting_evidence', function ($request) {
+            })            ->addColumn('supporting_evidence', function ($request) {
+                $files = [];
+                
+                // Handle first file
                 if ($request->certificate_file) {
                     $fileUrl = asset('storage/' . $request->certificate_file);
                     $fileName = basename($request->certificate_file);
                     $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
 
                     if (in_array($fileExtension, ['jpg', 'jpeg', 'png'])) {
-                        return '<a href="' . $fileUrl . '" target="_blank" class="btn btn-sm btn-info">
-                                    <i class="fas fa-image"></i> View Image
+                        $files[] = '<a href="' . $fileUrl . '" target="_blank" class="btn btn-sm btn-info mr-1 mb-1">
+                                    <i class="fas fa-image"></i> File 1
                                 </a>';
                     } else {
-                        return '<a href="' . $fileUrl . '" target="_blank" class="btn btn-sm btn-primary">
-                                    <i class="fas fa-file-pdf"></i> View PDF
+                        $files[] = '<a href="' . $fileUrl . '" target="_blank" class="btn btn-sm btn-primary mr-1 mb-1">
+                                    <i class="fas fa-file-pdf"></i> File 1
                                 </a>';
                     }
                 }
-                return '<span class="text-muted">No file</span>';
+                
+                // Handle second file
+                if ($request->certificate_file_2) {
+                    $fileUrl2 = asset('storage/' . $request->certificate_file_2);
+                    $fileName2 = basename($request->certificate_file_2);
+                    $fileExtension2 = strtolower(pathinfo($fileName2, PATHINFO_EXTENSION));
+
+                    if (in_array($fileExtension2, ['jpg', 'jpeg', 'png'])) {
+                        $files[] = '<a href="' . $fileUrl2 . '" target="_blank" class="btn btn-sm btn-info mr-1 mb-1">
+                                    <i class="fas fa-image"></i> File 2
+                                </a>';
+                    } else {
+                        $files[] = '<a href="' . $fileUrl2 . '" target="_blank" class="btn btn-sm btn-primary mr-1 mb-1">
+                                    <i class="fas fa-file-pdf"></i> File 2
+                                </a>';
+                    }
+                }
+                
+                return !empty($files) ? implode('<br>', $files) : '<span class="text-muted">No files</span>';
             })
             ->addColumn('status_badge', function ($request) {
                 return $request->status_badge;
@@ -117,9 +137,7 @@ class VerificationRequestController extends Controller
     public function show($id)
     {
         $request = VerificationRequestModel::with(['user.student', 'approvedBy'])
-            ->findOrFail($id);
-
-        return response()->json([
+            ->findOrFail($id);        return response()->json([
             'success' => true,
             'data' => [
                 'request_id' => $request->request_id,
@@ -127,6 +145,7 @@ class VerificationRequestController extends Controller
                 'student_nim' => $request->user->student->nim ?? 'N/A',
                 'comment' => $request->comment,
                 'certificate_file' => $request->certificate_file,
+                'certificate_file_2' => $request->certificate_file_2,
                 'status' => $request->status,
                 'admin_notes' => $request->admin_notes,
                 'approved_by' => $request->approvedBy->name ?? null,

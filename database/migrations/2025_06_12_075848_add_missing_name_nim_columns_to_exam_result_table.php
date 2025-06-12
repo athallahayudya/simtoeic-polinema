@@ -14,11 +14,14 @@ return new class extends Migration
     public function up()
     {
         Schema::table('exam_result', function (Blueprint $table) {
-            $table->string('name')->nullable()->after('user_id');
-            $table->string('nim')->nullable()->after('name');
-
-            // Add index for better performance
-            $table->index('nim');
+            // Check if columns don't exist before adding them
+            if (!Schema::hasColumn('exam_result', 'name')) {
+                $table->string('name')->nullable()->after('user_id');
+            }
+            if (!Schema::hasColumn('exam_result', 'nim')) {
+                $table->string('nim')->nullable()->after('name');
+                $table->index('nim');
+            }
         });
     }
 

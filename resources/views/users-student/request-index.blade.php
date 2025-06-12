@@ -168,12 +168,18 @@
           <span title="{{ $request->comment }}">
           {{ Str::limit($request->comment, 50) }}
           </span>
-          </td>
-          <td>
+          </td>          <td>
           @if($request->certificate_file)
         <a href="{{ asset('storage/' . $request->certificate_file) }}" target="_blank"
         class="btn btn-info btn-sm mb-1">
-        <i class="fas fa-eye mr-1"></i>View Document
+        <i class="fas fa-eye mr-1"></i>View File 1
+        </a>
+        @endif
+        
+          @if($request->certificate_file_2)
+        <a href="{{ asset('storage/' . $request->certificate_file_2) }}" target="_blank"
+        class="btn btn-info btn-sm mb-1">
+        <i class="fas fa-eye mr-1"></i>View File 2
         </a>
         @endif
 
@@ -185,7 +191,7 @@
         </a>
         @endif
 
-          @if(!$request->certificate_file && (!$request->generated_certificate_path || $request->status !== 'approved'))
+          @if(!$request->certificate_file && !$request->certificate_file_2 && (!$request->generated_certificate_path || $request->status !== 'approved'))
         <span class="text-muted">-</span>
         @endif
           </td>
