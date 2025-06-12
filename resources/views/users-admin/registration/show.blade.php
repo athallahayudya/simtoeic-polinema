@@ -62,6 +62,8 @@
                             <span class="badge badge-success">Success</span>
                         @elseif($user->exam_status == 'fail')
                             <span class="badge badge-danger">Failed</span>
+                        @elseif($user->exam_status == 'on_process')
+                            <span class="badge badge-info">On Process</span>
                         @else
                             <span class="badge badge-secondary">Unknown</span>
                         @endif
@@ -70,10 +72,6 @@
                 <tr>
                     <th>Phone Number</th>
                     <td>{{ $user->phone_number ?? 'N/A' }}</td>
-                </tr>
-                <tr>
-                    <th>Created At</th>
-                    <td>{{ $user->created_at }}</td>
                 </tr>
             </table>
         </div>

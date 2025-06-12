@@ -38,6 +38,10 @@
                 <label>Exam Status</label>
                 <input type="text" class="form-control" value="{{ $user->exam_status ?? '-' }}" readonly>
             </div>
+            <div class="form-group">
+                <label>Telegram ID</label>
+                <input type="text" class="form-control" value="{{ $user->telegram_chat_id ?? '-' }}" readonly>
+            </div>
             @if($user->role === 'student')
             <div class="form-group">
                 <label>Campus</label>
