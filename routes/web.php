@@ -290,20 +290,8 @@ Route::group(['prefix' => 'users', 'middleware' => ['auth', 'prevent-back-histor
     Route::put('/{id}/update_ajax', [ManageUsersController::class, 'update_ajax']);
     Route::get('/{id}/delete_ajax', [ManageUsersController::class, 'confirm_ajax']);
     Route::delete('/{id}/delete_ajax', [ManageUsersController::class, 'delete_ajax']);
+    Route::post('/store', [ManageUsersController::class, 'store'])->name('users.store');
 });
-
-// Registration - Admin
-Route::prefix('registration')->middleware(['auth', 'prevent-back-history'])->group(function () {
-    Route::get('/', [App\Http\Controllers\UserDataTableController::class, 'index'])->name('registration.index');
-    Route::get('/users-data', [App\Http\Controllers\UserDataTableController::class, 'getUsers'])->name('users.data');
-    Route::get('/{id}/show_ajax', [App\Http\Controllers\UserDataTableController::class, 'show_ajax']);
-    Route::get('/{id}/edit_ajax', [App\Http\Controllers\UserDataTableController::class, 'edit_ajax']);
-    Route::get('/{id}/delete_ajax', [App\Http\Controllers\UserDataTableController::class, 'confirm_ajax']);
-    Route::post('/{id}/update_ajax', [App\Http\Controllers\UserDataTableController::class, 'update_ajax']);
-    Route::post('/{id}/delete_ajax', [App\Http\Controllers\UserDataTableController::class, 'delete_ajax']);
-    Route::delete('/delete-all', [App\Http\Controllers\UserDataTableController::class, 'deleteAll'])->name('registration.delete-all');
-});
-Route::post('/registration', [App\Http\Controllers\UserDataTableController::class, 'store'])->name('registration.store')->middleware(['auth', 'prevent-back-history']);
 
 // Student routes
 Route::group(['prefix' => 'student', 'middleware' => ['auth', 'prevent-back-history']], function () {
