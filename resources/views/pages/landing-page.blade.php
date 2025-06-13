@@ -239,8 +239,8 @@
                 <span class="block text-gradient">POLINEMA</span>
               </h1>
               <p class="text-xl text-gray-600 max-w-2xl leading-relaxed" id="hero-subtitle">
-                Sistem Informasi Manajemen TOEIC untuk Civitas Akademika Politeknik Negeri Malang.
-                Kelola hasil ujian, jadwal, dan sertifikat TOEIC dengan mudah dan efisien.
+                TOEIC Management Information System for the Academic Community of Malang State Polytechnic. 
+                Manage TOEIC test results, schedules, and certificates easily and efficiently.
               </p>
             </div>
 
@@ -249,12 +249,12 @@
               <a href="{{ route('auth.login') }}"
                 class="bg-gradient-to-r from-primary to-secondary text-white px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-xl hover:shadow-2xl">
                 <i data-lucide="log-in" class="inline w-5 h-5 mr-2"></i>
-                Login ke Sistem
+                Login to System
               </a>
               <a href="#about"
                 class="bg-white text-gray-700 px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 transform hover:scale-105 border-2 border-gray-200 hover:border-primary">
                 <i data-lucide="info" class="inline w-5 h-5 mr-2"></i>
-                Pelajari Lebih Lanjut
+                Learn More
               </a>
             </div>
 
@@ -283,8 +283,8 @@
                 <i data-lucide="file-text" class="w-6 h-6 text-blue-600"></i>
               </div>
               <div>
-                <div class="font-bold text-gray-900">Manajemen Hasil TOEIC</div>
-                <div class="text-xs text-gray-500">Upload dan kelola hasil ujian TOEIC</div>
+                <div class="font-bold text-gray-900">Manage TOEIC Results</div>
+                <div class="text-xs text-gray-500">Upload and manage TOEIC results</div>  
               </div>
             </div>
             <!-- Feature Card 2 -->
@@ -294,8 +294,8 @@
                 <i data-lucide="calendar" class="w-6 h-6 text-green-600"></i>
               </div>
               <div>
-                <div class="font-bold text-gray-900">Jadwal Ujian</div>
-                <div class="text-xs text-gray-500">Atur dan pantau jadwal ujian TOEIC</div>
+                <div class="font-bold text-gray-900">Calendar</div>
+                <div class="text-xs text-gray-500">Set and schedule TOEIC dates</div>
               </div>
             </div>
             <!-- Feature Card 3 -->
@@ -306,16 +306,11 @@
               </div>
               <div>
                 <div class="font-bold text-gray-900">Multi-Role Access</div>
-                <div class="text-xs text-gray-500">Akses untuk semua civitas akademika</div>
+                <div class="text-xs text-gray-500">Access for all academic community members</div>
               </div>
             </div>
 
           </div>
-        </div>
-
-        <!-- Scroll Indicator -->
-        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-gray-400 animate-bounce">
-          <i data-lucide="chevron-down" class="w-6 h-6"></i>
         </div>
     </section>
 
@@ -324,15 +319,16 @@
     <section id="about" class="py-16 bg-white">
       <!-- Section Header -->
       <div class="text-center mb-12">
-        <span class="inline-block px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-medium mb-4">Tentang
-          SIMTOEIC</span>
+        <span class="inline-block px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-medium mb-4">
+          About SIMTOEIC
+        </span>
         <h2 class="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-          Sistem Informasi Manajemen
+          System Information Management
           <span class="text-gradient">TOEIC POLINEMA</span>
         </h2>
         <p class="text-gray-600 max-w-3xl mx-auto">
-          SIMTOEIC adalah platform digital yang dirancang khusus untuk mengelola seluruh aspek ujian TOEIC
-          di lingkungan Politeknik Negeri Malang, mulai dari pendaftaran hingga pengelolaan hasil ujian.
+          SIMTOEIC is a digital platform specifically designed to manage all aspects of TOEIC tests in the academic
+          community of Malang State Polytechnic, starting from registration to managing results.
         </p>
       </div>
 
@@ -346,17 +342,17 @@
               <i data-lucide="users" class="w-8 h-8 text-white"></i>
             </div>
             <h3 class="text-lg font-bold text-gray-900 mb-2">Multi-Role System</h3>
-            <p class="text-gray-600 text-sm">Mendukung 5 role: Admin, Mahasiswa, Dosen, Staff, dan Alumni</p>
+            <p class="text-gray-600 text-sm">Supports 5 roles: Admin, Student, Lecturer, Staff, and Alumni</p>
           </div>
 
           <!-- Feature 2 -->
           <div class="text-center">
             <div
               class="w-16 h-16 bg-gradient-to-r from-green-500 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <i data-lucide="file-upload" class="w-8 h-8 text-white"></i>
+              <i data-lucide="file-text" class="w-8 h-8 text-white"></i>
             </div>
-            <h3 class="text-lg font-bold text-gray-900 mb-2">Import Hasil Ujian</h3>
-            <p class="text-gray-600 text-sm">Upload hasil ujian melalui file PDF dengan parsing otomatis</p>
+            <h3 class="text-lg font-bold text-gray-900 mb-2">Import Exam Results</h3>
+            <p class="text-gray-600 text-sm">Upload exam results via PDF file with automatic parsing</p>
           </div>
 
           <!-- Feature 3 -->
@@ -365,8 +361,8 @@
               class="w-16 h-16 bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <i data-lucide="calendar-check" class="w-8 h-8 text-white"></i>
             </div>
-            <h3 class="text-lg font-bold text-gray-900 mb-2">Manajemen Jadwal</h3>
-            <p class="text-gray-600 text-sm">Kelola jadwal ujian dan pendaftaran peserta dengan mudah</p>
+            <h3 class="text-lg font-bold text-gray-900 mb-2">Schedule Management</h3>
+            <p class="text-gray-600 text-sm">Easily manage exam schedules and participant registrations</p>
           </div>
 
           <!-- Feature 4 -->
@@ -375,16 +371,16 @@
               class="w-16 h-16 bg-gradient-to-r from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <i data-lucide="send" class="w-8 h-8 text-white"></i>
             </div>
-            <h3 class="text-lg font-bold text-gray-900 mb-2">Notifikasi Telegram</h3>
-            <p class="text-gray-600 text-sm">Kirim pengumuman dan notifikasi melalui Telegram Bot</p>
+            <h3 class="text-lg font-bold text-gray-900 mb-2">Telegram Notifications</h3>
+            <p class="text-gray-600 text-sm">Send announcements and notifications via Telegram Bot</p>
           </div>
         </div>
       </div>
 
       <!-- Team Section -->
       <div class="text-center mb-12">
-        <h3 class="text-2xl font-bold text-gray-900 mb-4">Tim Pengembang</h3>
-        <p class="text-gray-600">Dikembangkan oleh mahasiswa Politeknik Negeri Malang</p>
+        <h3 class="text-2xl font-bold text-gray-900 mb-4">Development Team</h3>
+        <p class="text-gray-600">Developed by students of Malang State Polytechnic</p>
       </div>
       <style>
         .shine-text {
@@ -496,114 +492,180 @@
             <div
               class="inline-flex items-center px-4 py-2 bg-blue-100 rounded-full text-sm font-medium text-blue-700 mb-6">
               <i data-lucide="graduation-cap" class="w-4 h-4 mr-2"></i>
-              Kolaborasi Kampus
+              Campus Collaboration
             </div>
             <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
               Campus That <span class="text-gradient">Collaborated With Us</span>
             </h2>
             <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              SIMTOEIC telah dipercaya oleh berbagai kampus dan institusi pendidikan untuk mengelola
-              program TOEIC mereka dengan sistem yang terintegrasi dan efisien.
+              SIMTOEIC collaborates with various campuses to provide a comprehensive TOEIC management system. Our
+              platform supports multiple campuses, allowing students and staff to manage TOEIC tests efficiently.
             </p>
           </div>
 
           <!-- Campus Grid -->
           <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16" id="campus-grid">
-            <!-- Campus 1 - POLINEMA -->
-            <div
-              class="campus-card bg-white rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 group"
-              data-campus="1">
-              <div class="text-center">
-                <div
-                  class="w-24 h-24 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                  <i data-lucide="building" class="w-12 h-12 text-white"></i>
-                </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-2">POLINEMA</h3>
-                <p class="text-gray-600 text-sm mb-4">Politeknik Negeri Malang</p>
-                <div class="text-xs text-gray-500">
-                  <p>📍 Malang, Jawa Timur</p>
-                  <p>👥 15,000+ Mahasiswa</p>
-                  <p>🏆 Kampus Utama</p>
-                </div>
+          <!-- Campus 1 - POLINEMA -->
+          <div
+            class="campus-card bg-white rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 group relative overflow-hidden"
+            data-campus="1">
+            <div class="text-center relative z-10">
+              <div
+                class="w-24 h-24 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <i data-lucide="building" class="w-12 h-12 text-white"></i>
+              </div>
+              <h3 class="text-xl font-bold text-gray-900 mb-2">POLINEMA</h3>
+              <p class="text-gray-600 text-sm mb-4">Politeknik Negeri Malang</p>
+              <div class="text-xs text-gray-500">
+                <p></p>
+                <p>📍 Malang, Jawa Timur</p>
+                <p>🏆 Campus Utama</p>
               </div>
             </div>
-
-            <!-- Campus 2 - Partner Campus -->
-            <div
-              class="campus-card bg-white rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 group"
-              data-campus="2">
-              <div class="text-center">
-                <div
-                  class="w-24 h-24 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                  <i data-lucide="school" class="w-12 h-12 text-white"></i>
-                </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-2">POLTEK</h3>
-                <p class="text-gray-600 text-sm mb-4">Politeknik Partner</p>
-                <div class="text-xs text-gray-500">
-                  <p>📍 Jawa Timur</p>
-                  <p>👥 8,000+ Mahasiswa</p>
-                  <p>🤝 Kampus Partner</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Campus 3 - Vocational School -->
-            <div
-              class="campus-card bg-white rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 group"
-              data-campus="3">
-              <div class="text-center">
-                <div
-                  class="w-24 h-24 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                  <i data-lucide="book-open" class="w-12 h-12 text-white"></i>
-                </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-2">SMK NEGERI</h3>
-                <p class="text-gray-600 text-sm mb-4">Sekolah Menengah Kejuruan</p>
-                <div class="text-xs text-gray-500">
-                  <p>📍 Malang Raya</p>
-                  <p>👥 2,500+ Siswa</p>
-                  <p>🎓 Sekolah Kejuruan</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Campus 4 - Language Center -->
-            <div
-              class="campus-card bg-white rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 group"
-              data-campus="4">
-              <div class="text-center">
-                <div
-                  class="w-24 h-24 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                  <i data-lucide="globe" class="w-12 h-12 text-white"></i>
-                </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-2">UPA BAHASA</h3>
-                <p class="text-gray-600 text-sm mb-4">Unit Pelaksana Akademik Bahasa</p>
-                <div class="text-xs text-gray-500">
-                  <p>📍 POLINEMA</p>
-                  <p>👥 500+ Peserta/Bulan</p>
-                  <p>🌐 Pusat Bahasa</p>
-                </div>
-              </div>
+            <div class="overlay absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-6">
+              <h4 class="text-lg font-bold text-white mb-2">POLINEMA Malang</h4>
+              <p class="text-sm font-light text-white text-left">Polinema is a state vocational polytechnic in Malang, Indonesia, offering applied diploma and master's programs to prepare students for skilled work.</p>
             </div>
           </div>
+
+          <!-- Campus 2 -->
+          <div
+            class="campus-card bg-white rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 group relative overflow-hidden"
+            data-campus="2">
+            <div class="text-center relative z-10">
+              <div
+                class="w-24 h-24 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <i data-lucide="building" class="w-12 h-12 text-white"></i>
+              </div>
+              <h3 class="text-xl font-bold text-gray-900 mb-2">POLINEMA <br> PSDKU Kediri</h3>
+              <p class="text-gray-600 text-sm mb-4">Polteknik Negeri Malang <br> PSDKU Kediri</p>
+              <div class="text-xs text-gray-500">
+                <p></p>
+                <p>📍 Kediri, Jawa Timur</p>
+                <p>🤝 Campus Partner</p>
+              </div>
+            </div>
+            <div class="overlay absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-6">
+              <h4 class="text-lg font-bold text-white mb-2">POLINEMA <br> PSDKU Kediri</h4>
+              <p class="text-sm font-light text-white text-left">Polinema's PSDKU in Kediri is an off-campus program of Malang State Polytechnic, providing practical vocational education to meet the needs of local industry in the Kediri region.</p>
+            </div>
+          </div>
+
+          <!-- Campus 3  -->
+          <div
+            class="campus-card bg-white rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 group relative overflow-hidden"
+            data-campus="3">
+            <div class="text-center relative z-10">
+              <div
+                class="w-24 h-24 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <i data-lucide="building" class="w-12 h-12 text-white"></i>
+              </div>
+              <h3 class="text-xl font-bold text-gray-900 mb-2">POLINEMA <br> PSDKU Lumajang</h3>
+              <p class="text-gray-600 text-sm mb-4">Politeknik Negeri Malang <br> PSDKU Lumajang</p>
+              <div class="text-xs text-gray-500">
+                <p></p>
+                <p>📍 Lumajang, Jawa Timur</p>
+                <p>🎓 Campus Partner</p>
+              </div>
+            </div>
+            <div class="overlay absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-6">
+              <h4 class="text-lg font-bold text-white mb-2">POLINEMA <br> PSDKU Lumajang</h4>
+              <p class="text-sm font-light text-white text-left">Polinema's PSDKU in Lumajang offers hands-on, competency-based education to support the local industrial and agricultural sectors, aiming to enhance its graduates' regional and national competitiveness.</p>
+            </div>
+          </div>
+
+          <!-- Campus 4 -->
+          <div
+            class="campus-card bg-white rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 group relative overflow-hidden"
+            data-campus="4">
+            <div class="text-center relative z-10">
+              <div
+                class="w-24 h-24 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <i data-lucide="building" class="w-12 h-12 text-white"></i>
+              </div>
+              <h3 class="text-xl font-bold text-gray-900 mb-2">POLINEMA <br> PSDKU Pamekasan</h3>
+              <p class="text-gray-600 text-sm mb-4">Politeknik Negeri Malang <br> PSDKU Pamekasan</p>
+              <div class="text-xs text-gray-500">
+                <p></p>
+                <p>📍 Pamekasan, Jawa Timur</p>
+                <p>🌐 Campus Partner</p>
+              </div>
+            </div>
+            <div class="overlay absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-6">
+              <h4 class="text-lg font-bold text-white mb-2">POLINEMA <br> PSDKU Pamekasan</h4>
+              <p class="text-sm font-light text-white text-left">Polinema's PSDKU campus in Pamekasan, Madura Island, offers hands-on vocational education in engineering and entrepreneurship to develop a skilled local workforce ready for the job market.</p>
+            </div>
+          </div>
+        </div>
+
+        <style>
+          .campus-card {
+            position: relative;
+            overflow: hidden;
+          }
+
+          .campus-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            z-index: 0;
+          }
+
+          .campus-card[data-campus="1"]::before {
+            background-image: url('{{ asset('img/campus/UTAMA.png') }} ')
+          }
+
+          .campus-card[data-campus="2"]::before {
+            background-image: url('{{ asset('img/campus/KEDIRI.png') }} ')
+          }
+
+          .campus-card[data-campus="3"]::before {
+            background-image: url('{{ asset('img/campus/LUMAJANG.png') }} ')
+          }
+
+          .campus-card[data-campus="4"]::before {
+            background-image: url('{{ asset('img/campus/PAMEKASAN.png') }} ')
+          }
+
+          .campus-card:hover::before {
+            opacity: 1;
+          }
+
+          .campus-card .overlay {
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+          }
+
+          .campus-card:hover .text-center {
+            opacity: 0;
+            transition: opacity 0.5s ease;
+          }
+        </style>
 
           <!-- Statistics Section -->
           <div class="bg-white rounded-3xl p-8 shadow-xl" id="campus-stats">
             <div class="grid md:grid-cols-4 gap-8 text-center">
               <div class="stat-item" data-stat="1">
                 <div class="text-4xl font-bold text-gradient mb-2">4+</div>
-                <p class="text-gray-600">Kampus Partner</p>
+                <p class="text-gray-600">Campus Partners</p>
               </div>
               <div class="stat-item" data-stat="2">
                 <div class="text-4xl font-bold text-gradient mb-2">25,000+</div>
-                <p class="text-gray-600">Total Mahasiswa</p>
+                <p class="text-gray-600">Total Students</p>
               </div>
               <div class="stat-item" data-stat="3">
                 <div class="text-4xl font-bold text-gradient mb-2">500+</div>
-                <p class="text-gray-600">Ujian TOEIC/Bulan</p>
+                <p class="text-gray-600">Total Exams</p>
               </div>
               <div class="stat-item" data-stat="4">
                 <div class="text-4xl font-bold text-gradient mb-2">95%</div>
-                <p class="text-gray-600">Tingkat Kepuasan</p>
+                <p class="text-gray-600">Pass Rate</p>
               </div>
             </div>
           </div>
@@ -615,8 +677,8 @@
                 class="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <i data-lucide="shield-check" class="w-8 h-8 text-white"></i>
               </div>
-              <h3 class="text-xl font-bold text-gray-900 mb-3">Sistem Terintegrasi</h3>
-              <p class="text-gray-600">Platform terpusat untuk mengelola seluruh aspek ujian TOEIC dengan efisien</p>
+              <h3 class="text-xl font-bold text-gray-900 mb-3">Integrated System</h3>
+              <p class="text-gray-600">A comprehensive TOEIC management system that supports all aspects of the tests</p>
             </div>
 
             <div class="benefit-card text-center" data-benefit="2">
@@ -624,8 +686,8 @@
                 class="w-16 h-16 bg-gradient-to-r from-green-500 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <i data-lucide="trending-up" class="w-8 h-8 text-white"></i>
               </div>
-              <h3 class="text-xl font-bold text-gray-900 mb-3">Peningkatan Efisiensi</h3>
-              <p class="text-gray-600">Otomatisasi proses administrasi dan pelaporan hasil ujian TOEIC</p>
+              <h3 class="text-xl font-bold text-gray-900 mb-3">Efficiency Improvement</h3>
+              <p class="text-gray-600">Automation of administrative processes and reporting of TOEIC results</p>
             </div>
 
             <div class="benefit-card text-center" data-benefit="3">
@@ -634,7 +696,7 @@
                 <i data-lucide="users" class="w-8 h-8 text-white"></i>
               </div>
               <h3 class="text-xl font-bold text-gray-900 mb-3">Multi-Role Support</h3>
-              <p class="text-gray-600">Mendukung berbagai peran pengguna dari mahasiswa hingga administrator</p>
+              <p class="text-gray-600">Supports various user roles from students to administrators</p>
             </div>
           </div>
         </div>
@@ -647,7 +709,7 @@
           <div class="text-center mb-10">
             <h2 class="text-4xl md:text-5xl font-bold mt-2 mb-2">Frequently Asked Questions</h2>
             <p class="text-gray-600 text-sm">Have questions about TOEIC preparation? Contact our support team via email,
-              and we’ll assist you promptly.</p>
+              and we'll assist you promptly.</p>
           </div>
           <div class="space-y-4">
             <div class="border rounded-lg px-6 py-2 hover:border-primary/30 transition-colors">
@@ -767,8 +829,8 @@
           </div>
 
           <p class="text-gray-300 leading-relaxed max-w-md">
-            Sistem Informasi Manajemen TOEIC untuk Civitas Akademika Politeknik Negeri Malang.
-            Kelola hasil ujian, jadwal, dan sertifikat TOEIC dengan mudah dan efisien.
+            System Information Management for the Academic Community of Malang State Polytechnic.
+            Manage TOEIC test results, schedules, and certificates easily and efficiently.
           </p>
 
           <!-- Contact Info Cards -->
@@ -934,22 +996,6 @@
               <a href="https://github.com/yonandamayla/simtoeic-polinema"
                 class="text-primary hover:text-secondary transition-colors">PBL Group 2</a>
             </p>
-          </div>
-
-          <!-- Stats -->
-          <div class="flex items-center space-x-8">
-            <div class="text-center">
-              <div class="text-lg font-bold text-gradient">10K+</div>
-              <div class="text-xs text-gray-400">Students</div>
-            </div>
-            <div class="text-center">
-              <div class="text-lg font-bold text-gradient">95%</div>
-              <div class="text-xs text-gray-400">Success Rate</div>
-            </div>
-            <div class="text-center">
-              <div class="text-lg font-bold text-gradient">850+</div>
-              <div class="text-xs text-gray-400">Avg Score</div>
-            </div>
           </div>
         </div>
       </div>
