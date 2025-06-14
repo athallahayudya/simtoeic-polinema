@@ -19,14 +19,11 @@
 
                 <!-- Management Dropdown -->
                 <li
-                    class="nav-item dropdown {{ in_array(Request::segment(1), ['registration', 'exam-results', 'users']) || Request::is('admin/verification-requests*') ? 'active' : '' }}">
+                    class="nav-item dropdown {{ in_array(Request::segment(1), ['exam-results', 'users']) || Request::is('admin/verification-requests*') ? 'active' : '' }}">
                     <a href="#" class="nav-link has-dropdown">
                         <i class="fas fa-cogs"></i> <span>Management</span>
                     </a>
                     <ul class="dropdown-menu">
-                        <li class="{{ Request::is('registration*') ? 'active' : '' }}">
-                            <a class="nav-link" href="{{ url('registration') }}">Registration</a>
-                        </li>
                         <li class="{{ Request::is('exam-results*') ? 'active' : '' }}">
                             <a class="nav-link" href="{{ url('exam-results') }}">Exam Results</a>
                         </li>

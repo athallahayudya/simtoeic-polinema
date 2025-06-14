@@ -8,7 +8,10 @@ use App\Models\StaffModel;
 use App\Models\StudentModel;
 use App\Models\UserModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
 
 class ManageUsersController extends Controller
@@ -262,6 +265,100 @@ class ManageUsersController extends Controller
                 'status' => false,
                 'message' => 'User not found.'
             ]);
+        }
+    }
+
+    public function store(Request $request)
+    {
+        $rules = [
+            'name' => 'required|min:3',
+            'identity_number' => 'required|unique:users,identity_number|min:5',
+            'role' => 'required|in:student,lecturer,staff,alumni,admin',
+            'password' => ['required', 'min:8', 'regex:/[A-Za-z]/', 'regex:/[0-9]/'],
+            'password_confirmation' => 'required|same:password'
+        ];
+
+        // Add student-specific validation rules if role is student
+        if ($request->input('role') === 'student') {
+            $rules['major'] = 'required';
+            $rules['study_program'] = 'required';
+            $rules['campus'] = 'required';
+        }
+
+        // Validate only relevant fields
+        $validator = Validator::make($request->only(array_keys($rules)), $rules, [
+            'password.regex' => 'Password must include at least one letter and one number',
+            'password_confirmation.same' => 'Password confirmation must match password'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'msgField' => $validator->errors()->messages(),
+            ], 422);
+        }
+
+        try {
+            // Create the user
+            $user = UserModel::create([
+                'identity_number' => $request->identity_number,
+                'role' => $request->role,
+                'password' => Hash::make($request->password),
+                'exam_status' => 'not_yet'
+            ]);
+
+            // Create appropriate profile based on role
+            if ($request->role === 'student') {
+                // Include all required fields for StudentModel
+                StudentModel::create([
+                    'user_id' => $user->user_id,
+                    'name' => $request->name,
+                    'nim' => $request->identity_number, // Using identity_number as NIM for students
+                    'major' => $request->major,
+                    'study_program' => $request->study_program,
+                    'campus' => $request->campus,
+                    'batch' => date('Y'),   // Add current year as batch
+                    'status' => 'active',   // Add default status
+                    'phone_number' => $request->phone_number ?? null,
+                    'email' => $request->email ?? null
+                ]);
+            } elseif ($request->role === 'lecturer') {
+                LecturerModel::create([
+                    'user_id' => $user->user_id,
+                    'name' => $request->name,
+                    'nidn' => $request->identity_number, // Using identity_number as NIDN for lecturers
+                    'phone_number' => $request->phone_number ?? null,
+                    'email' => $request->email ?? null
+                ]);
+            } elseif ($request->role === 'staff') {
+                StaffModel::create([
+                    'user_id' => $user->user_id,
+                    'name' => $request->name,
+                    'nip' => $request->identity_number, // Using identity_number as NIP for staff
+                    'phone_number' => $request->phone_number ?? null,
+                    'email' => $request->email ?? null
+                ]);
+            } elseif ($request->role === 'alumni') {
+                AlumniModel::create([
+                    'user_id' => $user->user_id,
+                    'name' => $request->name,
+                    'nik' => $request->identity_number, // Using identity_number as NIK for alumni
+                    'phone_number' => $request->phone_number ?? null,
+                    'email' => $request->email ?? null
+                ]);
+            }
+
+            return response()->json([
+                'status' => true,
+                'message' => 'User created successfully',
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Create user error: ' . $e->getMessage());
+            return response()->json([
+                'status' => false,
+                'message' => 'Failed to create user. Please try again.',
+            ], 500);
         }
     }
 }

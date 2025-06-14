@@ -95,14 +95,6 @@
                             });
                         }
                     },
-                    error: function(xhr) {
-                        console.log(xhr.responseJSON);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: 'An error occurred while processing your request.'
-                        });
-                    }
                 });
             });
         });
