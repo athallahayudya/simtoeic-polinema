@@ -93,30 +93,11 @@ class AdminDashboardController extends Controller
         $lecturerGrowth = $this->calculateUserGrowth('lecturer');
         $alumniGrowth = $this->calculateUserGrowth('alumni');
 
-        // User registration by month (last 6 months)
-        $userRegistrationData = UserModel::select(
-            DB::raw('MONTH(created_at) as month'),
-            DB::raw('COUNT(*) as count')
-        )
-            ->where('created_at', '>=', now()->subMonths(6))
-            ->groupBy('month')
-            ->orderBy('month')
-            ->get();
+        // User registration by month (last 6 months) - Using ORM
+        $userRegistrationData = $this->getUserRegistrationByMonth();
 
-        // Exam scores distribution with TOEIC standards
-        $scoreDistribution = ExamResultModel::select(
-            DB::raw('CASE
-                WHEN score >= 945 THEN "Proficient (945-990)"
-                WHEN score >= 785 THEN "Advanced (785-944)"
-                WHEN score >= 550 THEN "Intermediate (550-784)"
-                WHEN score >= 225 THEN "Elementary (225-549)"
-                ELSE "Beginner (10-224)"
-            END as grade'),
-            DB::raw('COUNT(*) as count')
-        )
-            ->whereNotNull('score')
-            ->groupBy('grade')
-            ->get();
+        // Exam scores distribution with TOEIC standards - Using ORM
+        $scoreDistribution = $this->getScoreDistribution();
 
         // If no data, create default structure
         if ($scoreDistribution->isEmpty()) {
@@ -137,25 +118,17 @@ class AdminDashboardController extends Controller
         // Get all exam results for detailed chart
         $allExamResults = ExamResultModel::select('score')->get();
 
+        // Exam Score Distribution by Major using ORM
+        $majorScoreDistribution = $this->getMajorScoreDistribution();
+
         // Recent announcements
         $recentAnnouncements = AnnouncementModel::where('announcement_status', 'published')
             ->orderBy('created_at', 'desc')
             ->limit(5)
             ->get();
 
-        // Enhanced campus distribution with additional statistics
-        $campusDistribution = StudentModel::select(
-            'campus',
-            DB::raw('count(*) as total'),
-            DB::raw('ROUND(AVG(CASE WHEN exam_result.score IS NOT NULL THEN exam_result.score END), 1) as avg_score'),
-            DB::raw('COUNT(CASE WHEN exam_result.score IS NOT NULL THEN 1 END) as exam_taken'),
-            DB::raw('COUNT(CASE WHEN exam_result.score >= 550 THEN 1 END) as passed_count')
-        )
-            ->leftJoin('users', 'student.user_id', '=', 'users.user_id')
-            ->leftJoin('exam_result', 'users.user_id', '=', 'exam_result.user_id')
-            ->groupBy('campus')
-            ->orderBy('total', 'desc')
-            ->get();
+        // Enhanced campus distribution with additional statistics - Using ORM
+        $campusDistribution = $this->getCampusDistribution();
 
         return view('users-admin.dashboard.index', compact(
             'type_menu',
@@ -186,7 +159,8 @@ class AdminDashboardController extends Controller
             'totalParticipants',
             'passRate',
             'excellentRate',
-            'allExamResults'
+            'allExamResults',
+            'majorScoreDistribution'
         ));
     }
 
@@ -213,5 +187,161 @@ class AdminDashboardController extends Controller
         }
 
         return round((($currentMonthCount - $lastMonthCount) / $lastMonthCount) * 100, 1);
+    }
+
+    /**
+     * Get exam score distribution by major using ORM
+     */
+    private function getMajorScoreDistribution()
+    {
+        // Define standard majors
+        $standardMajors = [
+            'Teknik Elektro',
+            'Teknik Mesin',
+            'Teknik Sipil',
+            'Teknik Kimia',
+            'Akuntansi',
+            'Administrasi Niaga',
+            'Teknologi Informasi'
+        ];
+
+        // Get all exam results with student data using ORM relationships
+        $examResults = ExamResultModel::with(['user.student'])
+            ->whereHas('user.student')
+            ->whereNotNull('score')
+            ->get();
+
+        // Process data for each major
+        $majorStats = collect();
+
+        foreach ($standardMajors as $major) {
+            // Filter exam results for this specific major
+            $majorResults = $examResults->filter(function ($result) use ($major) {
+                return $result->user &&
+                    $result->user->student &&
+                    $result->user->student->major === $major;
+            });
+
+            // Calculate statistics
+            $totalParticipants = $majorResults->count();
+            $scores = $majorResults->pluck('score');
+
+            $averageScore = $totalParticipants > 0 ? round($scores->avg(), 1) : 0;
+            $minScore = $totalParticipants > 0 ? $scores->min() : 0;
+            $maxScore = $totalParticipants > 0 ? $scores->max() : 0;
+            $passedCount = $scores->where('>=', 550)->count();
+
+            $majorStats->push((object) [
+                'major' => $major,
+                'total_participants' => $totalParticipants,
+                'average_score' => $averageScore,
+                'min_score' => $minScore,
+                'max_score' => $maxScore,
+                'passed_count' => $passedCount
+            ]);
+        }
+
+        return $majorStats->sortByDesc('total_participants');
+    }
+
+    /**
+     * Get user registration data by month using ORM
+     */
+    private function getUserRegistrationByMonth()
+    {
+        $users = UserModel::where('created_at', '>=', now()->subMonths(6))->get();
+
+        $monthlyData = collect();
+
+        foreach ($users as $user) {
+            $month = $user->created_at->month;
+            $existing = $monthlyData->firstWhere('month', $month);
+
+            if ($existing) {
+                $existing->count++;
+            } else {
+                $monthlyData->push((object)[
+                    'month' => $month,
+                    'count' => 1
+                ]);
+            }
+        }
+
+        return $monthlyData->sortBy('month');
+    }
+
+    /**
+     * Get score distribution using ORM
+     */
+    private function getScoreDistribution()
+    {
+        $examResults = ExamResultModel::whereNotNull('score')->get();
+
+        $distribution = collect([
+            (object)['grade' => 'Beginner (10-224)', 'count' => 0],
+            (object)['grade' => 'Elementary (225-549)', 'count' => 0],
+            (object)['grade' => 'Intermediate (550-784)', 'count' => 0],
+            (object)['grade' => 'Advanced (785-944)', 'count' => 0],
+            (object)['grade' => 'Proficient (945-990)', 'count' => 0],
+        ]);
+
+        foreach ($examResults as $result) {
+            $score = $result->score;
+
+            if ($score >= 945) {
+                $distribution[4]->count++;
+            } elseif ($score >= 785) {
+                $distribution[3]->count++;
+            } elseif ($score >= 550) {
+                $distribution[2]->count++;
+            } elseif ($score >= 225) {
+                $distribution[1]->count++;
+            } else {
+                $distribution[0]->count++;
+            }
+        }
+
+        return $distribution;
+    }
+
+    /**
+     * Get campus distribution using ORM
+     */
+    private function getCampusDistribution()
+    {
+        $students = StudentModel::with(['user.examResults'])
+            ->whereNotNull('campus')
+            ->get();
+
+        $campusStats = collect();
+        $campuses = $students->pluck('campus')->unique();
+
+        foreach ($campuses as $campus) {
+            $campusStudents = $students->where('campus', $campus);
+            $total = $campusStudents->count();
+
+            // Get all exam results for students in this campus
+            $examResults = collect();
+            foreach ($campusStudents as $student) {
+                if ($student->user && $student->user->examResults) {
+                    $examResults = $examResults->merge($student->user->examResults);
+                }
+            }
+
+            $examResultsWithScore = $examResults->whereNotNull('score');
+            $examTaken = $examResultsWithScore->count();
+            $avgScore = $examTaken > 0 ? round($examResultsWithScore->avg('score'), 1) : 0;
+            $passedCount = $examResultsWithScore->where('score', '>=', 550)->count();
+
+            $campusStats->push((object)[
+                'campus' => $campus,
+                'total' => $total,
+                'avg_score' => $avgScore,
+                'exam_taken' => $examTaken,
+                'passed_count' => $passedCount
+            ]);
+        }
+
+        return $campusStats->sortByDesc('total');
     }
 }

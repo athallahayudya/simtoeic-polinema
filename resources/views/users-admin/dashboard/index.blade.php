@@ -252,6 +252,43 @@
             border-bottom: 1px solid #e9ecef !important;
         }
 
+        /* Major Chart Styling */
+        .major-chart-container {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .major-table-container {
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .major-table th {
+            background-color: #f8f9fa;
+            border-top: none;
+            font-weight: 600;
+            color: #495057;
+            padding: 15px 10px;
+        }
+
+        .major-table td {
+            padding: 12px 10px;
+            vertical-align: middle;
+        }
+
+        .major-table .badge {
+            font-size: 0.85rem;
+            padding: 6px 12px;
+        }
+
+        .progress-sm {
+            height: 4px;
+            border-radius: 2px;
+        }
+
         /* Responsive adjustments */
         @media (max-width: 768px) {
             .stat-card .card-body {
@@ -264,6 +301,17 @@
 
             .stat-card .fa-lg {
                 font-size: 1.2em !important;
+            }
+
+            .major-table th,
+            .major-table td {
+                padding: 8px 5px;
+                font-size: 0.85rem;
+            }
+            
+            .major-table .badge {
+                font-size: 0.75rem;
+                padding: 4px 8px;
             }
         }
     </style>
@@ -531,6 +579,88 @@
                 </div>
             </div>
 
+            <!-- Exam Score Distribution by Major Section -->
+            <div class="row mb-4">
+                <div class="col-lg-12">
+                    <div class="card card-dashboard h-100">
+                        <div class="card-header">
+                            <h4 class="mb-0"><i class="fas fa-graduation-cap mr-2 text-success"></i> Exam Score Distribution by Major</h4>
+                            <small class="text-muted">Average TOEIC scores across different departments</small>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container" style="position: relative; height:400px;">
+                                <canvas id="majorScoreDistributionChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Major Score Summary Table -->
+            <div class="row mb-4">
+                <div class="col-lg-12">
+                    <div class="card card-dashboard h-100">
+                        <div class="card-header">
+                            <h4 class="mb-0"><i class="fas fa-table mr-2 text-primary"></i> Score Summary by Major</h4>
+                            <small class="text-muted">Detailed statistics for each department</small>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover major-table">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th><i class="fas fa-university mr-1"></i> Major</th>
+                                            <th class="text-center"><i class="fas fa-users mr-1"></i> Participants</th>
+                                            <th class="text-center"><i class="fas fa-chart-line mr-1"></i> Average Score</th>
+                                            <th class="text-center"><i class="fas fa-arrow-down mr-1"></i> Min Score</th>
+                                            <th class="text-center"><i class="fas fa-arrow-up mr-1"></i> Max Score</th>
+                                            <th class="text-center"><i class="fas fa-check-circle mr-1"></i> Passed</th>
+                                            <th class="text-center"><i class="fas fa-percentage mr-1"></i> Pass Rate</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($majorScoreDistribution as $major)
+                                        <tr>
+                                            <td><strong class="text-primary">{{ $major->major }}</strong></td>
+                                            <td class="text-center">
+                                                <span class="badge badge-info badge-lg">{{ $major->total_participants }}</span>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="font-weight-bold text-success">{{ number_format($major->average_score, 1) }}</span>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="text-danger">{{ $major->min_score }}</span>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="text-success">{{ $major->max_score }}</span>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="badge badge-success">{{ $major->passed_count }}</span>
+                                            </td>
+                                            <td class="text-center">
+                                                @php
+                                                    $passRate = $major->total_participants > 0 ? ($major->passed_count / $major->total_participants) * 100 : 0;
+                                                @endphp
+                                                <span class="font-weight-bold {{ $passRate >= 50 ? 'text-success' : 'text-danger' }}">
+                                                    {{ number_format($passRate, 1) }}%
+                                                </span>
+                                                <div class="progress mt-2 progress-sm">
+                                                    <div class="progress-bar {{ $passRate >= 75 ? 'bg-success' : ($passRate >= 50 ? 'bg-warning' : 'bg-danger') }}" 
+                                                         style="width: {{ $passRate }}%"
+                                                         data-toggle="tooltip" 
+                                                         title="{{ number_format($passRate, 1) }}% Pass Rate"></div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Announcements Section -->
             <div class="row mb-4">
                 <div class="col-lg-12">
@@ -760,6 +890,138 @@
                 elements: {
                     bar: {
                         borderRadius: 5 // Rounded corners for bars
+                    }
+                }
+            }
+        });
+
+        // Major Score Distribution Chart
+        var ctxMajor = document.getElementById('majorScoreDistributionChart').getContext('2d');
+        
+        var majorScoreData = @json($majorScoreDistribution ?? collect());
+        
+        var majorLabels = [];
+        var averageScores = [];
+        var participantCounts = [];
+        
+        majorScoreData.forEach(function(item) {
+            majorLabels.push(item.major);
+            averageScores.push(parseFloat(item.average_score) || 0);
+            participantCounts.push(parseInt(item.total_participants) || 0);
+        });
+        
+        var majorChart = new Chart(ctxMajor, {
+            type: 'bar',
+            data: {
+                labels: majorLabels,
+                datasets: [{
+                    label: 'Average TOEIC Score',
+                    data: averageScores,
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.8)',   // Blue - Teknik Elektro
+                        'rgba(255, 99, 132, 0.8)',   // Red - Teknik Mesin
+                        'rgba(255, 205, 86, 0.8)',   // Yellow - Teknik Sipil
+                        'rgba(75, 192, 192, 0.8)',   // Teal - Teknik Kimia
+                        'rgba(153, 102, 255, 0.8)',  // Purple - Akuntansi
+                        'rgba(255, 159, 64, 0.8)',   // Orange - Administrasi Niaga
+                        'rgba(199, 199, 199, 0.8)'   // Grey - Teknologi Informasi
+                    ],
+                    borderColor: [
+                        'rgb(54, 162, 235)',
+                        'rgb(255, 99, 132)',
+                        'rgb(255, 205, 86)',
+                        'rgb(75, 192, 192)',
+                        'rgb(153, 102, 255)',
+                        'rgb(255, 159, 64)',
+                        'rgb(199, 199, 199)'
+                    ],
+                    borderWidth: 2,
+                    borderRadius: 6,
+                    borderSkipped: false,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: {
+                    duration: 1500,
+                    easing: 'easeOutQuart'
+                },
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            max: 990,
+                            stepSize: 100,
+                            fontColor: '#666',
+                            fontSize: 12,
+                            callback: function(value) {
+                                return value + ' pts';
+                            }
+                        },
+                        gridLines: {
+                            color: 'rgba(0, 0, 0, 0.1)',
+                            drawBorder: false
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Average TOEIC Score',
+                            fontColor: '#333',
+                            fontSize: 14,
+                            fontStyle: 'bold'
+                        }
+                    }],
+                    xAxes: [{
+                        ticks: {
+                            maxRotation: 45,
+                            minRotation: 45,
+                            fontColor: '#666',
+                            fontSize: 11
+                        },
+                        gridLines: {
+                            display: false
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Department / Major',
+                            fontColor: '#333',
+                            fontSize: 14,
+                            fontStyle: 'bold'
+                        }
+                    }]
+                },
+                legend: {
+                    display: false
+                },
+                tooltips: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleFontColor: '#fff',
+                    bodyFontColor: '#fff',
+                    cornerRadius: 8,
+                    displayColors: false,
+                    callbacks: {
+                        title: function(tooltipItems) {
+                            return tooltipItems[0].label;
+                        },
+                        label: function(tooltipItem) {
+                            var dataIndex = tooltipItem.index;
+                            var majorData = majorScoreData[dataIndex];
+                            var passRate = majorData.total_participants > 0 ? 
+                                (majorData.passed_count / majorData.total_participants * 100).toFixed(1) : '0.0';
+                            
+                            return [
+                                'Average Score: ' + tooltipItem.yLabel.toFixed(1) + ' pts',
+                                'Total Participants: ' + majorData.total_participants,
+                                'Passed (≥550): ' + majorData.passed_count,
+                                'Pass Rate: ' + passRate + '%',
+                                'Score Range: ' + majorData.min_score + ' - ' + majorData.max_score
+                            ];
+                        }
+                    }
+                },
+                elements: {
+                    bar: {
+                        borderRadius: 6
                     }
                 }
             }
