@@ -122,9 +122,11 @@ async function parsePdfTables(pdfPath, outputPath) {
             if (!headerFound && (line.includes('RESULT') || line.includes('NAME') || line.includes('ID'))) {
                 // Try to extract headers
                 const possibleHeaders = line.split(/\s+/);
-                if (possibleHeaders.some(h => ['RESULT', 'NAME', 'ID', 'L', 'R', 'TOT'].includes(h.toUpperCase()))) {
+                const requiredHeaders = ['RESULT', 'NAME', 'ID', 'L', 'R', 'TOT'];
+                if (possibleHeaders.some(h => requiredHeaders.includes(h.toUpperCase()))) {
                     headers = possibleHeaders.map(h => h.toUpperCase());
                     headerFound = true;
+                    console.log('Found headers:', headers);
                     continue;
                 }
             }
@@ -173,10 +175,12 @@ async function parsePdfTables(pdfPath, outputPath) {
         const result = {
             success: true,
             tables: [{
-                headers: ['result', 'name', 'id', 'L', 'R', 'tot'],
+                headers: headerFound ? headers.map(h => h.toLowerCase()) : ['result', 'name', 'id', 'L', 'R', 'tot'],
                 data: tableData
             }],
-            rawText: text
+            rawText: text,
+            headerFound: headerFound,
+            detectedHeaders: headerFound ? headers : []
         };
         
         fs.writeFileSync(outputPath, JSON.stringify(result, null, 2));
@@ -221,6 +225,9 @@ JS;
             throw new Exception("PDF parsing failed: " . ($parsedData['error'] ?? 'Unknown error'));
         }
 
+        // Validate PDF format first
+        $this->validatePdfFormat($parsedData);
+
         $processedData = [];
 
         foreach ($parsedData['tables'] as $table) {
@@ -255,8 +262,14 @@ JS;
                 ];
 
                 // Validate required fields
-                if (empty($processedRow['nim']) || empty($processedRow['name'])) {
-                    Log::warning("Skipping row with missing required data", $processedRow);
+                if (
+                    empty($processedRow['nim']) || empty($processedRow['name']) ||
+                    empty($processedRow['exam_id']) ||
+                    !is_numeric($processedRow['listening_score']) ||
+                    !is_numeric($processedRow['reading_score']) ||
+                    !is_numeric($processedRow['total_score'])
+                ) {
+                    Log::warning("Skipping row with missing or invalid required data", $processedRow);
                     continue;
                 }
 
@@ -348,5 +361,170 @@ JS;
 
         // If pattern doesn't match, return the original ID
         return $id;
+    }
+
+    /**
+     * Validate PDF format against expected columns
+     * 
+     * @param array $parsedData
+     * @throws Exception
+     */
+    private function validatePdfFormat($parsedData)
+    {
+        $requiredColumns = ['result', 'name', 'id', 'L', 'R', 'tot'];
+        $validFormatFound = false;
+
+        Log::info('Validating PDF format with parsed data', ['tables_count' => count($parsedData['tables'] ?? [])]);
+
+        // Check if any table has the required format
+        foreach ($parsedData['tables'] as $tableIndex => $table) {
+            Log::info("Checking table {$tableIndex}", ['headers' => $table['headers'] ?? 'none']);
+
+            if (empty($table['headers'])) {
+                continue;
+            }
+
+            $headers = array_map('strtolower', $table['headers']);
+            $missingColumns = [];
+            $foundColumns = [];
+
+            foreach ($requiredColumns as $requiredCol) {
+                $found = false;
+                foreach ($headers as $header) {
+                    // Check for exact match or common variations
+                    if ($this->isColumnMatch($header, $requiredCol)) {
+                        $found = true;
+                        $foundColumns[] = $requiredCol;
+                        break;
+                    }
+                }
+                if (!$found) {
+                    $missingColumns[] = $requiredCol;
+                }
+            }
+
+            Log::info("Table {$tableIndex} validation result", [
+                'found_columns' => $foundColumns,
+                'missing_columns' => $missingColumns
+            ]);
+
+            // If no missing columns, format is valid
+            if (empty($missingColumns)) {
+                $validFormatFound = true;
+                Log::info("Valid format found in table {$tableIndex}");
+                break;
+            }
+        }
+
+        // If no valid format found, also check data structure
+        if (!$validFormatFound) {
+            Log::info('Header-based validation failed, checking data structure');
+            $validFormatFound = $this->validateDataStructure($parsedData);
+        }
+
+        if (!$validFormatFound) {
+            $errorMessage = "PDF format error: The uploaded PDF does not match the required Import Format Guide. Please ensure your PDF contains columns: result, name, id, L (Listening), R (Reading), and tot (Total Score).";
+            Log::error('PDF format validation failed', ['error' => $errorMessage]);
+            throw new Exception($errorMessage);
+        }
+
+        // Additional check: ensure we have actual data that can be processed
+        $hasValidData = false;
+        foreach ($parsedData['tables'] as $table) {
+            if (!empty($table['data'])) {
+                $hasValidData = true;
+                break;
+            }
+        }
+
+        if (!$hasValidData) {
+            $errorMessage = "PDF format error: No valid data rows found in the PDF. Please ensure your PDF contains actual exam result data with the required columns: result, name, id, L (Listening), R (Reading), and tot (Total Score).";
+            Log::error('PDF contains no valid data', ['error' => $errorMessage]);
+            throw new Exception($errorMessage);
+        }
+
+        Log::info('PDF format validation passed');
+    }
+
+    /**
+     * Check if column header matches required column
+     * 
+     * @param string $header
+     * @param string $required
+     * @return bool
+     */
+    private function isColumnMatch($header, $required)
+    {
+        $header = strtolower(trim($header));
+        $required = strtolower($required);
+
+        // Direct match
+        if ($header === $required) {
+            return true;
+        }
+
+        // Check variations
+        $variations = [
+            'result' => ['result', 'exam_id', 'id_exam', 'examid'],
+            'name' => ['name', 'student_name', 'full_name', 'nama'],
+            'id' => ['id', 'nim', 'student_id', 'student_nim'],
+            'l' => ['l', 'listening', 'listening_score', 'listen'],
+            'r' => ['r', 'reading', 'reading_score', 'read'],
+            'tot' => ['tot', 'total', 'total_score', 'score', 'final_score']
+        ];
+
+        if (isset($variations[$required])) {
+            foreach ($variations[$required] as $variation) {
+                if ($header === $variation || strpos($header, $variation) !== false) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Validate data structure when headers are not clearly defined
+     * 
+     * @param array $parsedData
+     * @return bool
+     */
+    private function validateDataStructure($parsedData)
+    {
+        $validRowsFound = 0;
+
+        foreach ($parsedData['tables'] as $table) {
+            if (empty($table['data'])) {
+                continue;
+            }
+
+            // Check if at least one row has the expected structure
+            foreach ($table['data'] as $row) {
+                $hasExpectedFields = isset($row['result']) &&
+                    isset($row['name']) &&
+                    isset($row['id']) &&
+                    isset($row['L']) &&
+                    isset($row['R']) &&
+                    isset($row['tot']);
+
+                // Additional validation: check if values are not empty/null
+                $hasValidValues = !empty($row['result']) &&
+                    !empty($row['name']) &&
+                    !empty($row['id']) &&
+                    is_numeric($row['L']) &&
+                    is_numeric($row['R']) &&
+                    is_numeric($row['tot']);
+
+                if ($hasExpectedFields && $hasValidValues) {
+                    $validRowsFound++;
+                }
+            }
+        }
+
+        Log::info("Data structure validation found {$validRowsFound} valid rows");
+
+        // Require at least one valid row
+        return $validRowsFound > 0;
     }
 }

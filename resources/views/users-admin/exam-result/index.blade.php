@@ -67,6 +67,19 @@
         .filter-group {
             margin-bottom: 10px;
         }
+
+        .alert-danger {
+            border-left: 4px solid #dc3545;
+        }
+
+        .alert-success {
+            border-left: 4px solid #28a745;
+        }
+
+        .alert-dismissible .close {
+            top: 50%;
+            transform: translateY(-50%);
+        }
     </style>
 @endpush
 
@@ -114,6 +127,60 @@
                                 </div>
                             </form>
                         </div>
+
+                        <!-- Format Error Alert -->
+                        @if(session('format_error'))
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <div class="d-flex align-items-start">
+                                    <i class="fas fa-exclamation-circle fa-lg mr-3 mt-1"></i>
+                                    <div>
+                                        <strong>Import Format Error!</strong>
+                                        <p class="mb-0 mt-1">{{ session('format_error') }}</p>
+                                        <small class="mt-2 d-block">
+                                            Please check the Import Format Guide below and ensure your PDF contains the exact
+                                            column names:
+                                            <strong>result</strong>, <strong>name</strong>, <strong>id</strong>,
+                                            <strong>L</strong>, <strong>R</strong>, and <strong>tot</strong>.
+                                        </small>
+                                    </div>
+                                </div>
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        @endif
+
+                        <!-- General Error Alert -->
+                        @if(session('error'))
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <div class="d-flex align-items-start">
+                                    <i class="fas fa-exclamation-triangle fa-lg mr-3 mt-1"></i>
+                                    <div>
+                                        <strong>Import Error!</strong>
+                                        <p class="mb-0 mt-1">{{ session('error') }}</p>
+                                    </div>
+                                </div>
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        @endif
+
+                        <!-- Success Alert -->
+                        @if(session('success'))
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                <div class="d-flex align-items-start">
+                                    <i class="fas fa-check-circle fa-lg mr-3 mt-1"></i>
+                                    <div>
+                                        <strong>Import Successful!</strong>
+                                        <p class="mb-0 mt-1">{{ session('success') }}</p>
+                                    </div>
+                                </div>
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        @endif
 
                         <div class="alert alert-danger">
                             <div class="d-flex align-items-start">
@@ -377,46 +444,30 @@
                 }
             }
 
-            // Form submission with AJAX
+            // Form submission validation
             $('#importForm').on('submit', function (e) {
-                e.preventDefault();
-
                 // Check if file is selected
                 var fileInput = $('#importFile')[0];
                 if (!fileInput.files.length) {
-                    showMessageModal('Please select a PDF file to import.', false);
+                    e.preventDefault();
+                    alert('Please select a PDF file to import.');
+                    return false;
+                }
+
+                // Check file type
+                var fileName = fileInput.files[0].name;
+                var fileExtension = fileName.split('.').pop().toLowerCase();
+                if (fileExtension !== 'pdf') {
+                    e.preventDefault();
+                    alert('Please select a PDF file.');
                     return false;
                 }
 
                 // Disable button to prevent multiple submissions
-                $('#importButton').prop('disabled', true).text('Importing...');
+                $('#importButton').prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i> Importing...');
 
-                var formData = new FormData(this);
-
-                $.ajax({
-                    url: $(this).attr('action'),
-                    type: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function (response) {
-                        // Re-enable button
-                        $('#importButton').prop('disabled', false).html('<i class="fas fa-upload mr-1"></i> Import Results');
-
-                        // Show success message
-                        showMessageModal('Exam results imported successfully!', true);
-
-                        // Reload the page to refresh the datatable
-                        setTimeout(function () {
-                            window.location.reload();
-                        }, 1500);
-                    },
-                    error: function (xhr) {
-                        // Re-enable button
-                        $('#importButton').prop('disabled', false).html('<i class="fas fa-upload mr-1"></i> Import Results');
-                        showMessageModal('Error importing file: ' + xhr.responseText, false);
-                    }
-                });
+                // Form will submit normally - no need to prevent default
+                return true;
             });
 
             // Initialize custom file input

@@ -8,6 +8,7 @@ use App\Models\ExamScheduleModel;
 use App\Services\PdfTableParserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Exception;
 
 
 class ExamResultController extends Controller
@@ -37,6 +38,11 @@ class ExamResultController extends Controller
             $parsedData = $pdfParserService->parsePdfTables($file->getPathname());
 
             Log::info('Parsed PDF Results: ' . json_encode($parsedData));
+
+            // Check if no data was parsed - indicates format error
+            if (empty($parsedData)) {
+                throw new Exception("PDF format error: The uploaded PDF does not match the required Import Format Guide. No valid data was found. Please ensure your PDF contains columns: result, name, id, L (Listening), R (Reading), and tot (Total Score).");
+            }
 
             $importedCount = 0;
             $skippedCount = 0;
@@ -112,10 +118,15 @@ class ExamResultController extends Controller
                     Log::info("Created/Updated exam result ID: {$examResult->result_id} for user {$user->user_id}");
 
                     $importedCount++;
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     Log::error("Error importing record for NIM {$data['nim']}: " . $e->getMessage());
                     $skippedCount++;
                 }
+            }
+
+            // If no records were imported, it means the PDF format is wrong
+            if ($importedCount === 0) {
+                throw new Exception("PDF format error: No valid records could be imported from the PDF. Please check that your PDF contains the required columns (result, name, id, L, R, tot) and follows the Import Format Guide shown below.");
             }
 
             $message = "PDF imported successfully! {$importedCount} records imported";
@@ -125,10 +136,19 @@ class ExamResultController extends Controller
 
             return redirect()->route('exam-results.index')
                 ->with('success', $message);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Import error: ' . $e->getMessage());
+
+            // Check if it's a format validation error
+            if (strpos($e->getMessage(), 'PDF format error') !== false) {
+                return redirect()->back()
+                    ->with('format_error', $e->getMessage())
+                    ->withInput();
+            }
+
             return redirect()->back()
-                ->with('error', 'Error importing file: ' . $e->getMessage());
+                ->with('error', 'Error importing file: ' . $e->getMessage())
+                ->withInput();
         }
     }
 
@@ -150,7 +170,7 @@ class ExamResultController extends Controller
                 'status' => true,
                 'message' => 'Exam result deleted successfully.'
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Error deleting exam result: ' . $e->getMessage());
 
             return response()->json([
