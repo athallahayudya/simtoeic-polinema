@@ -16,6 +16,7 @@ class AnnouncementModel extends Model
         'title',
         'content',
         'announcement_file',
+        'photo',
         'announcement_status',
         'announcement_date',
         'visible_to',

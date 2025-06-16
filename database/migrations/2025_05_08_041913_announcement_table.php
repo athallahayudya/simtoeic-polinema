@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('title');
             $table->string('content');
             $table->string('announcement_file')->nullable();
+            $table->string('photo')->nullable();
             $table->enum('announcement_status', ['draft', 'published'])->default('draft');
             $table->date('announcement_date');
             $table->json('visible_to')->nullable();

@@ -142,6 +142,30 @@
                                                 </div>
                                             </div>
                                         @endif
+                                        @if ($announcements->photo)
+                                            <div class="pdf-attachment mt-3 p-2 border rounded bg-white">
+                                                <div class="d-flex align-items-center justify-content-between">
+                                                    <div class="d-flex align-items-center">
+                                                        <i class="fas fa-file-image text-danger mr-2"
+                                                            style="font-size: 1.5rem;"></i>
+                                                        <div>
+                                                            <h6 class="mb-1">Photo Attachment</h6>
+                                                            <small class="text-muted">Click to view or download</small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="btn-group">
+                                                        <a href="{{ $announcements->photo }}"
+                                                            class="btn btn-primary btn-sm" target="_blank">
+                                                            <i class="fas fa-eye mr-1"></i> View
+                                                        </a>
+                                                        <a href="{{ $announcements->photo }}"
+                                                            class="btn btn-outline-primary btn-sm" download>
+                                                            <i class="fas fa-download mr-1"></i> Download
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endif
 
                                         <div class="d-flex justify-content-end mt-2">
                                             <small class="text-muted">
