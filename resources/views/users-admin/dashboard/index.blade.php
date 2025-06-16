@@ -769,11 +769,12 @@
 
         // Prepare data for TOEIC proficiency levels
         var scoreRanges = {
-            '0 - 250': 0,
-            '255 - 500': 0,
-            '501 - 700': 0,
-            '701 - 900': 0,
-            '901 - 990': 0
+            '10 - 250': 0,
+            '255 - 400': 0,
+            '405 - 600': 0,
+            '605 - 780': 0,
+            '785 - 900': 0,
+            '905 - 990': 0
         };
 
         var allExamResults = @json($allExamResults ?? collect());
@@ -782,15 +783,17 @@
             allExamResults.forEach(function (result) {
                 var score = result.score;
                 if (score >= 0 && score <= 250) {
-                    scoreRanges['0 - 250']++;
-                } else if (score >= 255 && score <= 500) {
-                    scoreRanges['255 - 500']++;
-                } else if (score >= 501 && score <= 700) {
-                    scoreRanges['501 - 700']++;
-                } else if (score >= 701 && score <= 900) {
-                    scoreRanges['701 - 900']++;
-                } else if (score >= 901 && score <= 990) {
-                    scoreRanges['901 - 990']++;
+                    scoreRanges['10 - 250']++;
+                } else if (score >= 255 && score <= 400) {
+                    scoreRanges['255 - 400']++;
+                } else if (score >= 405 && score <= 600) {
+                    scoreRanges['405 - 600']++;
+                } else if (score >= 605 && score <= 780) {
+                    scoreRanges['605 - 780']++;
+                } else if (score >= 785 && score <= 900) {
+                    scoreRanges['785 - 900']++;
+                } else if (score >= 905 && score <= 990) {
+                    scoreRanges['905 - 990']++;
                 }
             });
         }
@@ -805,16 +808,18 @@
                     backgroundColor: [
                         'rgba(220, 53, 69, 0.8)',   // Red for Beginner
                         'rgba(255, 193, 7, 0.8)',   // Yellow for Elementary
-                        'rgba(255, 159, 64, 0.8)',  // Orange for Intermediate
-                        'rgba(23, 162, 184, 0.8)',  // Blue for Advanced
-                        'rgba(40, 167, 69, 0.8)'    // Green for Proficient
+                        'rgba(255, 159, 64, 0.8)',  // Orange for Lower Intermediate
+                        'rgba(23, 162, 184, 0.8)',  // Blue for Mid Intermediate
+                        'rgba(40, 167, 69, 0.8)',    // Green for Upper Intermediate
+                        'rgba(108, 117, 125, 0.8)'   // Grey for Advanced
                     ],
                     borderColor: [
                         'rgb(220, 53, 69)',
                         'rgb(255, 193, 7)',
                         'rgb(255, 159, 64)',
                         'rgb(23, 162, 184)',
-                        'rgb(40, 167, 69)'
+                        'rgb(40, 167, 69)',
+                        'rgb(108, 117, 125)'
                     ],
                     borderWidth: 1
                 }]
@@ -860,7 +865,7 @@
                         },
                         scaleLabel: {
                             display: true,
-                            labelString: 'TOEIC Proficiency Level',
+                            labelString: 'TOEIC Proficiency Level CEFR',
                             fontColor: '#333', // Darker font color for label
                             fontSize: 14, // Larger font size for label
                             fontStyle: 'bold'
