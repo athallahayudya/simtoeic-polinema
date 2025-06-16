@@ -8,6 +8,47 @@
   <link rel="stylesheet"
     href="{{ asset('assets/modules/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css') }}">
   <link rel="stylesheet" href="{{ asset('assets/modules/datatables/Select-1.2.4/css/select.bootstrap4.min.css') }}">
+  <style>
+    .main-card {
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+    }
+
+    .quick-info {
+    display: flex;
+    align-items: flex-start;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    }
+
+    .quick-info i {
+    font-size: 24px;
+    margin-right: 15px;
+    color: #6777ef;
+    }
+
+    .table-simple {
+    margin-bottom: 0;
+    }
+
+    .table-simple th {
+    background-color: #f8f9fa;
+    }
+
+    .empty-placeholder {
+    text-align: center;
+    padding: 30px 15px;
+    }
+
+    .empty-placeholder i {
+    font-size: 40px;
+    color: #cdd3d8;
+    margin-bottom: 15px;
+    }
+  </style>
 @endpush
 
 @section('main')
@@ -41,69 +82,157 @@
       </div>
     @endif
 
-      <!-- Request Action Card -->
-      <div class="row">
-      <div class="col-12">
-        <div class="card">
-        <div class="card-header bg-primary text-white">
-          <h4><i class="fas fa-certificate mr-2"></i>Verification Letter Request</h4>
-        </div>
-        <div class="card-body">
-          @if($canRequestCertificate)
-        <div class="alert alert-success">
-        <h5><i class="fas fa-check-circle mr-2"></i>You can submit a verification request!</h5>
-        <p class="mb-3">Submit a verification request for various purposes such as:</p>
-        <ul class="mb-3">
+      <!-- Main Action Card -->
+      <div class="card main-card">
+      <div class="card-body p-0">
+        <div class="row no-gutters">
+        <!-- Request Information & Button -->
+        <div class="col-lg-12">
+          <div class="p-4"> @if($canRequestCertificate)
+      <div class="quick-info mb-3">
+        <i class="fas fa-info-circle"></i>
+        <div>
+        <h6 class="mb-1">Request verification for:</h6>
+        <ul class="mb-0 pl-3">
         <li>TOEIC exam participation verification</li>
-        <li>Special conditions documentation (medical, disability, etc.)</li>
+        <li>Special conditions documentation</li>
         <li>Academic requirement fulfillment</li>
         <li>Other administrative purposes</li>
         </ul>
-        <a href="{{ route('student.verification.request.form') }}" class="btn btn-success btn-lg">
-        <i class="fas fa-plus mr-1"></i> Create New Request
-        </a>
         </div>
+      </div>
+
+      <div class="text-center pt-1 pb-3">
+        <a href="{{ route('student.verification.request.form') }}" class="btn btn-primary">
+        + Create New Request
+        </a>
+      </div>
       @else
         <div class="alert alert-warning">
-        <h5><i class="fas fa-exclamation-triangle mr-2"></i>Request Not Available</h5>
-        <p class="mb-0">You already have a pending or approved verification request. Please wait for the current
-        request to be processed or contact admin for assistance.</p>
+        <div class="d-flex">
+        <div class="mr-3">
+          <i class="fas fa-exclamation-triangle fa-2x text-warning"></i>
+        </div>
+        <div>
+          <h5>Request Not Available</h5>
+          <p class="mb-0">You already have a pending or approved verification request. Please wait for the
+          current request to be processed or contact admin for assistance.</p>
+        </div>
+        </div>
         </div>
       @endif
+          </div>
         </div>
         </div>
       </div>
       </div>
 
-      <!-- Exam History -->
-      @if(count($allExamScores) > 0)
-      <div class="row">
-      <div class="col-12">
-      <div class="card">
+      <!-- Verification Requests History -->
+      <div class="card main-card">
       <div class="card-header">
-        <h4><i class="fas fa-history mr-2"></i>Your Exam History</h4>
+        <h4><i class="fas fa-list-alt mr-2"></i>My Verification Requests</h4>
       </div>
       <div class="card-body">
-        <div class="table-responsive">
-        <table class="table table-striped">
+        @if(count($verificationRequests) > 0)
+      <div class="table-responsive">
+      <table class="table table-hover table-simple" id="requests-table">
         <thead>
         <tr>
-          <th>Exam ID</th>
-          <th>Type</th>
-          <th>Listening</th>
-          <th>Reading</th>
-          <th>Total</th>
-          <th>Status</th>
-          <th>Date</th>
+        <th>Date</th>
+        <th>Status</th>
+        <th>Comment</th>
+        <th>Files</th>
+        <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach($verificationRequests as $request)
+        <tr>
+        <td>{{ $request->created_at->format('d M Y') }}</td>
+        <td>{!! $request->status_badge !!}</td>
+        <td>
+        <span title="{{ $request->comment }}">
+        {{ Str::limit($request->comment, 40) }}
+        </span>
+        </td>
+        <td>
+        @if($request->certificate_file || $request->certificate_file_2)
+        <div class="btn-group">
+        <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-toggle="dropdown">
+        <i class="fas fa-file mr-1"></i> Files
+        </button>
+        <div class="dropdown-menu">
+        @if($request->certificate_file)
+        <a href="{{ asset('storage/' . $request->certificate_file) }}" class="dropdown-item"
+        target="_blank">
+        <i class="fas fa-file-alt mr-1"></i> View File 1
+        </a>
+      @endif
+        @if($request->certificate_file_2)
+        <a href="{{ asset('storage/' . $request->certificate_file_2) }}" class="dropdown-item"
+        target="_blank">
+        <i class="fas fa-file-alt mr-1"></i> View File 2
+        </a>
+      @endif
+        </div>
+        </div>
+      @endif
+
+        @if($request->status === 'approved' && $request->generated_certificate_path)
+      <a href="{{ asset('storage/' . $request->generated_certificate_path) }}" target="_blank"
+        class="btn btn-success btn-sm ml-1">
+        <i class="fas fa-download mr-1"></i> Letter
+      </a>
+      @endif
+        </td>
+        <td>
+        @if($request->status === 'approved' || $request->status === 'rejected')
+      <button class="btn btn-info btn-sm" onclick="showRequestDetail({{ $request->request_id }})">
+        <i class="fas fa-info-circle"></i>
+      </button>
+      @else
+      <span class="text-muted">-</span>
+      @endif
+        </td>
+        </tr>
+      @endforeach
+        </tbody>
+      </table>
+      </div>
+      @else
+        <div class="empty-placeholder">
+        <i class="fas fa-inbox"></i>
+        <h5>No Verification Requests Yet</h5> @if($canRequestCertificate)
+      <a href="{{ route('student.verification.request.form') }}" class="btn btn-outline-primary mt-3">
+        Create First Request
+      </a>
+      @endif
+        </div>
+      @endif
+      </div>
+      </div>
+
+      <!-- Simplified Exam History (Conditional Display) -->
+      @if(count($allExamScores) > 0)
+      <div class="card main-card">
+      <div class="card-header">
+      <h4><i class="fas fa-history mr-2"></i>Exam Results</h4>
+      </div>
+      <div class="card-body p-0">
+      <div class="table-responsive">
+      <table class="table table-simple">
+        <thead>
+        <tr>
+        <th>Exam ID</th>
+        <th>Total Score</th>
+        <th>Status</th>
+        <th>Date</th>
         </tr>
         </thead>
         <tbody>
         @foreach($allExamScores as $result)
         <tr>
-        <td><strong class="text-primary">{{ $result->exam_id ?? 'N/A' }}</strong></td>
-        <td>{!! $result->exam_type_badge !!}</td>
-        <td><span class="badge badge-info">{{ $result->listening_score ?? 0 }}</span></td>
-        <td><span class="badge badge-info">{{ $result->reading_score ?? 0 }}</span></td>
+        <td class="text-primary">{{ $result->exam_id ?? 'N/A' }}</td>
         <td>
         <span class="badge {{ ($result->total_score ?? 0) >= 500 ? 'badge-success' : 'badge-danger' }}">
         {{ $result->total_score ?? 0 }}
@@ -111,133 +240,30 @@
         </td>
         <td>
         @if(($result->total_score ?? 0) >= 500)
-        <span class="badge badge-success"><i class="fas fa-check mr-1"></i> PASS</span>
+      <span class="badge badge-success"><i class="fas fa-check mr-1"></i> PASS</span>
       @else
-        <span class="badge badge-danger"><i class="fas fa-times mr-1"></i> FAIL</span>
+      <span class="badge badge-danger"><i class="fas fa-times mr-1"></i> FAIL</span>
       @endif
         </td>
         <td>
-        <small class="text-muted">
         {{ $result->exam_date ? $result->exam_date->format('d M Y') : ($result->created_at ? $result->created_at->format('d M Y') : 'N/A') }}
-        </small>
         </td>
         </tr>
       @endforeach
         </tbody>
-        </table>
-        </div>
-      </div>
+      </table>
       </div>
       </div>
       </div>
     @endif
-
-      <!-- Verification Requests History -->
-      <div class="row">
-      <div class="col-12">
-        <div class="card">
-        <div class="card-header">
-          <h4><i class="fas fa-list mr-2"></i>My Verification Requests</h4>
-        </div>
-        <div class="card-body">
-          @if(count($verificationRequests) > 0)
-        <div class="table-responsive">
-        <table class="table table-hover" id="requests-table">
-          <thead class="thead-light">
-          <tr>
-          <th>No</th>
-          <th>Request Date</th>
-          <th>Status</th>
-          <th>Comment</th>
-          <th>Supporting Evidence</th>
-          <th>Action</th>
-          </tr>
-          </thead>
-          <tbody>
-          @foreach($verificationRequests as $index => $request)
-        <tr>
-          <td>{{ $index + 1 }}</td>
-          <td>
-          <small class="text-muted">
-          {{ $request->created_at->format('d M Y H:i') }}
-          </small>
-          </td>
-          <td>
-          {!! $request->status_badge !!}
-          </td>
-          <td>
-          <span title="{{ $request->comment }}">
-          {{ Str::limit($request->comment, 50) }}
-          </span>
-          </td>
-          <td>
-          @if($request->certificate_file)
-        <a href="{{ asset('storage/' . $request->certificate_file) }}" target="_blank"
-        class="btn btn-info btn-sm mb-1">
-        <i class="fas fa-eye mr-1"></i>View File 1
-        </a>
-        @endif
-
-          @if($request->certificate_file_2)
-        <a href="{{ asset('storage/' . $request->certificate_file_2) }}" target="_blank"
-        class="btn btn-info btn-sm mb-1">
-        <i class="fas fa-eye mr-1"></i>View File 2
-        </a>
-        @endif
-
-          @if($request->status === 'approved' && $request->generated_certificate_path)
-        <br>
-        <a href="{{ asset('storage/' . $request->generated_certificate_path) }}" target="_blank"
-        class="btn btn-success btn-sm">
-        <i class="fas fa-download mr-1"></i>Download Letter
-        </a>
-        @endif
-
-          @if(!$request->certificate_file && !$request->certificate_file_2 && (!$request->generated_certificate_path || $request->status !== 'approved'))
-        <span class="text-muted">-</span>
-        @endif
-          </td>
-          <td>
-          @if($request->status === 'approved' || $request->status === 'rejected')
-        <button class="btn btn-info btn-sm" onclick="showRequestDetail({{ $request->request_id }})"
-        title="View Admin Message">
-        <i class="fas fa-info-circle"></i> Detail
-        </button>
-        @else
-        <span class="text-muted">-</span>
-        @endif
-          </td>
-        </tr>
-        @endforeach
-          </tbody>
-        </table>
-        </div>
-      @else
-        <div class="text-center py-5">
-        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-        <h5 class="text-muted">No Verification Requests Yet</h5>
-        <p class="text-muted mb-0">
-          You haven't submitted any verification requests yet.
-          @if($canRequestCertificate)
-        <a href="{{ route('student.verification.request.form') }}">Create your first request</a>
-        @else
-        Complete the requirements above to submit a request.
-        @endif
-        </p>
-        </div>
-      @endif
-        </div>
-        </div>
-      </div>
-      </div>
     </div>
     </section>
   </div>
 
-  <!-- Modal untuk menampilkan detail pesan admin -->
+  <!-- Simplified Modal for Request Details -->
   <div class="modal fade" id="requestDetailModal" tabindex="-1" role="dialog" aria-labelledby="requestDetailModalLabel"
     aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
       <h5 class="modal-title" id="requestDetailModalLabel">Request Detail</h5>
@@ -246,34 +272,28 @@
       </button>
       </div>
       <div class="modal-body">
-      <div class="row">
-        <div class="col-md-6">
-        <h6><strong>Request Information:</strong></h6>
-        <p><strong>Request Date:</strong> <span id="detail-request-date"></span></p>
-        <p><strong>Status:</strong> <span id="detail-status"></span></p>
-        </div>
-        <div class="col-md-6">
-        <h6><strong>Processing Information:</strong></h6>
-        <p><strong>Processed Date:</strong> <span id="detail-processed-date"></span></p>
-        <p><strong>Processed By:</strong> <span id="detail-processed-by"></span></p>
-        </div>
-      </div>
+      <dl class="row">
+        <dt class="col-sm-4">Request Date:</dt>
+        <dd class="col-sm-8" id="detail-request-date"></dd>
+
+        <dt class="col-sm-4">Status:</dt>
+        <dd class="col-sm-8" id="detail-status"></dd>
+
+        <dt class="col-sm-4">Processed Date:</dt>
+        <dd class="col-sm-8" id="detail-processed-date"></dd>
+
+        <dt class="col-sm-4">Processed By:</dt>
+        <dd class="col-sm-8" id="detail-processed-by"></dd>
+      </dl>
+
       <hr>
-      <div class="row">
-        <div class="col-12">
-        <h6><strong>Your Comment:</strong></h6>
-        <div class="alert alert-light">
-          <p id="detail-user-comment" class="mb-0"></p>
-        </div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-12">
-        <h6><strong>Admin Message:</strong></h6>
-        <div class="alert" id="detail-admin-message-container">
-          <p id="detail-admin-message" class="mb-0"></p>
-        </div>
-        </div>
+
+      <h6><strong>Your Comment:</strong></h6>
+      <p id="detail-user-comment" class="p-2 bg-light rounded mb-3"></p>
+
+      <h6><strong>Admin Message:</strong></h6>
+      <div class="alert" id="detail-admin-message-container">
+        <p id="detail-admin-message" class="mb-0"></p>
       </div>
       </div>
       <div class="modal-footer">
@@ -294,8 +314,9 @@
     @if(count($verificationRequests) > 0)
     $('#requests-table').DataTable({
       responsive: true,
-      order: [[1, 'desc']], // Sort by date
-      pageLength: 10,
+      order: [[0, 'desc']], // Sort by date
+      pageLength: 5,
+      lengthMenu: [[5, 10, 25], [5, 10, 25]],
       language: {
       emptyTable: "No verification requests found",
       zeroRecords: "No matching requests found"
