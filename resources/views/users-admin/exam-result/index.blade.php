@@ -268,7 +268,7 @@
                                         <option value="405-600">405-600 (A2 - B1) Lower Intermediate</option>
                                         <option value="605-780">605-780 (B1 - B2) Mid Intermediate</option>
                                         <option value="785-900">785-900 (B2 - C1) Upper Intermediate</option>
-                                        <option value="905-990">905-990 (C2) Advanced</option>
+                                        <option value="905-990">905-990 (C1) Advanced</option>
                                     </select>
                                 </div>
                             </div>
