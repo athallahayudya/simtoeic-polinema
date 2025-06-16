@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AdminModel;
 use App\Models\AlumniModel;
 use App\Models\LecturerModel;
 use App\Models\StaffModel;
@@ -19,7 +20,7 @@ class ManageUsersController extends Controller
     public function list(Request $request)
     {
         $user = UserModel::select('user_id', 'identity_number', 'role', 'exam_status', 'phone_number')
-            ->with(['alumni', 'student', 'staff', 'lecturer']);
+            ->with(['alumni', 'student', 'staff', 'lecturer', 'admin']);
 
         if ($request->has('role') && !empty($request->role)) {
             $user->where('role', $request->role);
@@ -40,6 +41,9 @@ class ManageUsersController extends Controller
                     case 'alumni':
                         $profile = $user->alumni;
                         return $profile ? $profile->name : 'N/A';
+                    case 'admin':
+                        $profile = $user->admin;
+                        return $profile ? $profile->name : 'N/A';
                     default:
                         return 'N/A';
                 }
@@ -58,6 +62,9 @@ class ManageUsersController extends Controller
                     case 'alumni':
                         $profile = $user->alumni;
                         return $profile ? $profile->home_address : '-';
+                    case 'admin':
+                        $profile = $user->admin;
+                        return $profile ? $profile->home_address : '-';
                     default:
                         return '-';
                 }
@@ -75,6 +82,9 @@ class ManageUsersController extends Controller
                         return $profile ? $profile->current_address : '-';
                     case 'alumni':
                         $profile = $user->alumni;
+                        return $profile ? $profile->current_address : '-';
+                    case 'admin':
+                        $profile = $user->admin;
                         return $profile ? $profile->current_address : '-';
                     default:
                         return '-';
@@ -149,7 +159,7 @@ class ManageUsersController extends Controller
 
     public function show_ajax($user_id)
     {
-        $user = UserModel::with(['student', 'lecturer', 'staff', 'alumni'])->findOrFail($user_id);
+        $user = UserModel::with(['student', 'lecturer', 'staff', 'alumni', 'admin'])->findOrFail($user_id);
 
         $profile = null;
         if ($user->role === 'student') {
@@ -160,6 +170,8 @@ class ManageUsersController extends Controller
             $profile = StaffModel::where('user_id', $user->user_id)->first();
         } elseif ($user->role === 'alumni') {
             $profile = AlumniModel::where('user_id', $user->user_id)->first();
+        } elseif ($user->role === 'admin') {
+            $profile = AdminModel::where('user_id', $user->user_id)->first();
         }
 
         return view('users-admin.manage-user.show', [
@@ -170,7 +182,7 @@ class ManageUsersController extends Controller
 
     public function edit_ajax($user_id)
     {
-        $user = UserModel::with(['student', 'lecturer', 'staff', 'alumni'])->findOrFail($user_id);
+        $user = UserModel::with(['student', 'lecturer', 'staff', 'alumni', 'admin'])->findOrFail($user_id);
 
         $profile = null;
         if ($user->role === 'student') {
@@ -181,6 +193,8 @@ class ManageUsersController extends Controller
             $profile = StaffModel::where('user_id', $user->user_id)->first();
         } elseif ($user->role === 'alumni') {
             $profile = AlumniModel::where('user_id', $user->user_id)->first();
+        } elseif ($user->role === 'admin') {
+            $profile = AdminModel::where('user_id', $user->user_id)->first();
         }
 
         return view('users-admin.manage-user.edit', [
@@ -191,41 +205,129 @@ class ManageUsersController extends Controller
 
     public function update_ajax(Request $request, $user_id)
     {
-        $user = UserModel::with(['student', 'lecturer', 'staff', 'alumni'])->findOrFail($user_id);
+        try {
+            // Get the current user to check if identity_number actually changed
+            $currentUser = UserModel::findOrFail($user_id);
 
-        $data = $request->only(['name', 'home_address', 'current_address']);
+            // Validation rules
+            $rules = [
+                'role' => 'required|in:admin,student,lecturer,staff,alumni',
+                'name' => 'required|min:3',
+                'home_address' => 'nullable|string',
+                'current_address' => 'nullable|string',
+            ];
 
-        // choose the related model based on user role
-        $relatedModel = match ($user->role) {
-            'student' => $user->student ?: new StudentModel(),
-            'lecturer' => $user->lecturer ?: new LecturerModel(),
-            'staff' => $user->staff ?: new StaffModel(),
-            'alumni' => $user->alumni ?: new AlumniModel(),
-            default => null,
-        };
-
-        if ($request->hasFile('photo')) {
-            if ($relatedModel->photo && Storage::disk('public')->exists(str_replace('storage/', '', $relatedModel->photo))) {
-                Storage::disk('public')->delete(str_replace('storage/', '', $relatedModel->photo));
+            // Only validate identity_number uniqueness if it's different from current
+            if ($request->identity_number !== $currentUser->identity_number) {
+                $rules['identity_number'] = 'required|min:5|unique:users,identity_number';
+            } else {
+                $rules['identity_number'] = 'required|min:5';
             }
-            $path = $request->file('photo')->store(match ($user->role) {
-                'student' => 'student/photos',
-                'lecturer' => 'lecturer/photos',
-                'staff' => 'staff/photos',
-                'alumni' => 'alumni/photos',
-                default => 'user/photos',
-            },  'public');
-            $relatedModel->photo = 'storage/' . $path;
+
+            // Debug logging
+            Log::info('Identity number validation check: ', [
+                'user_id' => $user_id,
+                'current_identity' => $currentUser->identity_number,
+                'new_identity' => $request->identity_number,
+                'is_different' => $request->identity_number !== $currentUser->identity_number,
+                'validation_rule' => $rules['identity_number']
+            ]);
+
+            $validator = Validator::make($request->all(), $rules);
+
+            if ($validator->fails()) {
+                Log::error('Validation failed for user update: ', [
+                    'user_id' => $user_id,
+                    'request_data' => $request->all(),
+                    'validation_errors' => $validator->errors()->messages()
+                ]);
+                return response()->json([
+                    'status' => false,
+                    'msgField' => $validator->errors()->messages(),
+                ], 422);
+            }
+
+            // Load with relationships
+            $user = UserModel::with(['student', 'lecturer', 'staff', 'alumni', 'admin'])->findOrFail($user_id);
+
+            // Update user basic info first
+            $user->update([
+                'role' => $request->role,
+                'identity_number' => $request->identity_number,
+            ]);
+
+            // Get current profile based on role
+            $profile = null;
+            switch ($request->role) {
+                case 'student':
+                    $profile = $user->student ?: new StudentModel();
+                    break;
+                case 'lecturer':
+                    $profile = $user->lecturer ?: new LecturerModel();
+                    break;
+                case 'staff':
+                    $profile = $user->staff ?: new StaffModel();
+                    break;
+                case 'alumni':
+                    $profile = $user->alumni ?: new AlumniModel();
+                    break;
+                case 'admin':
+                    $profile = $user->admin ?: new AdminModel();
+                    break;
+            }
+
+            if ($profile) {
+                // Common profile data
+                $profileData = [
+                    'user_id' => $user->user_id,
+                    'name' => $request->name,
+                    'home_address' => $request->home_address,
+                    'current_address' => $request->current_address,
+                ];
+
+                // Add role-specific fields
+                switch ($request->role) {
+                    case 'student':
+                        $profileData['nim'] = $request->identity_number;
+                        // Only set defaults if it's a new profile
+                        if (!$profile->exists) {
+                            $profileData['batch'] = date('Y');
+                            $profileData['status'] = 'active';
+                            $profileData['major'] = 'N/A';
+                            $profileData['study_program'] = 'N/A';
+                            $profileData['campus'] = 'malang';
+                        }
+                        break;
+                    case 'lecturer':
+                        $profileData['nidn'] = $request->identity_number;
+                        break;
+                    case 'staff':
+                        $profileData['nip'] = $request->identity_number;
+                        break;
+                    case 'alumni':
+                        $profileData['nik'] = $request->identity_number;
+                        break;
+                    case 'admin':
+                        $profileData['nidn'] = $request->identity_number;
+                        break;
+                }
+
+                $profile->fill($profileData);
+                $profile->save();
+            }
+
+            return response()->json(['status' => true, 'message' => 'User updated successfully']);
+        } catch (\Exception $e) {
+            Log::error('Error in update_ajax: ', [
+                'user_id' => $user_id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json([
+                'status' => false,
+                'message' => 'An error occurred: ' . $e->getMessage()
+            ], 500);
         }
-
-        $relatedModel->fill($data);
-        $relatedModel->user_id = $user->user_id;
-        $relatedModel->save();
-
-        // Update data in the user model
-        $user->update($data);
-
-        return response()->json(['status' => true, 'message' => 'User updated successfully']);
     }
 
     public function confirm_ajax($user_id)
@@ -352,7 +454,6 @@ class ManageUsersController extends Controller
                 'status' => true,
                 'message' => 'User created successfully',
             ]);
-
         } catch (\Exception $e) {
             Log::error('Create user error: ' . $e->getMessage());
             return response()->json([

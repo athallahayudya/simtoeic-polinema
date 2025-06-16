@@ -17,7 +17,8 @@
         </div>
     </div>
 @else
-    <form action="{{ url('/users/' . $user->user_id . '/update_ajax') }}" method="POST" id="form-edit" enctype="multipart/form-data">
+    <form action="{{ url('/users/' . $user->user_id . '/update_ajax') }}" method="POST" id="form-edit"
+        enctype="multipart/form-data">
         @csrf
         @method('PUT')
         <div id="modal-master" class="modal-dialog modal-lg" role="document">
@@ -30,23 +31,46 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
+                        <label>Role</label>
+                        <select name="role" id="role" class="form-control" required>
+                            <option value="">Select Role</option>
+                            <option value="admin" {{ ($user->role ?? old('role')) == 'admin' ? 'selected' : '' }}>Admin
+                            </option>
+                            <option value="student" {{ ($user->role ?? old('role')) == 'student' ? 'selected' : '' }}>Student
+                            </option>
+                            <option value="lecturer" {{ ($user->role ?? old('role')) == 'lecturer' ? 'selected' : '' }}>
+                                Lecturer</option>
+                            <option value="staff" {{ ($user->role ?? old('role')) == 'staff' ? 'selected' : '' }}>Staff
+                            </option>
+                            <option value="alumni" {{ ($user->role ?? old('role')) == 'alumni' ? 'selected' : '' }}>Alumni
+                            </option>
+                        </select>
+                        <small id="error-role" class="error-text form-text text-danger"></small>
+                    </div>
+                    <div class="form-group">
+                        <label>Identity Number</label>
+                        <input type="text" name="identity_number" id="identity_number" class="form-control"
+                            value="{{ $user->identity_number ?? old('identity_number') }}" required>
+                        <small class="form-text text-muted">NIM for students, employee ID for staff/lecturer, etc.</small>
+                        <small id="error-identity_number" class="error-text form-text text-danger"
+                            style="display: block; color: red; font-weight: bold;"></small>
+                    </div>
+                    <div class="form-group">
                         <label>Name</label>
-                        <input type="text" name="name" id="name" class="form-control" value="{{ $profile->name ?? old('name') }}" required>
+                        <input type="text" name="name" id="name" class="form-control"
+                            value="{{ $profile->name ?? old('name') }}" required>
                         <small id="error-name" class="error-text form-text text-danger"></small>
                     </div>
                     <div class="form-group">
-                        <label>Photo</label>
-                        <input type="file" name="photo" id="photo" class="form-control" accept="image/*">
-                        <small id="error-photo" class="error-text form-text text-danger"></small>
-                    </div>
-                    <div class="form-group">
-                        <label>Home Address</label>
-                        <input type="text" name="home_address" id="home_address" class="form-control" value="{{ $profile->home_address ?? old('home_address') }}" required>
+                        <label>Home Address <span class="text-muted">(Optional)</span></label>
+                        <input type="text" name="home_address" id="home_address" class="form-control"
+                            value="{{ $profile->home_address ?? old('home_address') }}">
                         <small id="error-home_address" class="error-text form-text text-danger"></small>
                     </div>
                     <div class="form-group">
-                        <label>Current Address</label>
-                        <input type="text" name="current_address" id="current_address" class="form-control" value="{{ $profile->current_address ?? old('current_address') }}" required>
+                        <label>Current Address <span class="text-muted">(Optional)</span></label>
+                        <input type="text" name="current_address" id="current_address" class="form-control"
+                            value="{{ $profile->current_address ?? old('current_address') }}">
                         <small id="error-current_address" class="error-text form-text text-danger"></small>
                     </div>
                 </div>
@@ -59,8 +83,8 @@
     </form>
 
     <script>
-        $(document).ready(function() {
-            $('#form-edit').on('submit', function(e) {
+        $(document).ready(function () {
+            $('#form-edit').on('submit', function (e) {
                 e.preventDefault();
                 $.ajax({
                     url: $(this).attr('action'),
@@ -68,7 +92,7 @@
                     data: new FormData(this),
                     contentType: false,
                     processData: false,
-                    success: function(response) {
+                    success: function (response) {
                         if (response.status === true) {
                             Swal.fire({
                                 icon: 'success',
@@ -77,22 +101,53 @@
                                 timer: 2000,
                                 showConfirmButton: false
                             }).then(() => {
-                                $('#modal-master').modal('hide'); 
-                                location.reload(); 
+                                $('#modal-master').modal('hide');
+                                location.reload();
                             });
                         } else {
-                            $.each(response.msgField, function(key, value) {
-                                $('#error-' + key).text(value[0]); 
+                            // Clear previous errors
+                            $('.error-text').text('');
+
+                            // Display new errors
+                            $.each(response.msgField, function (key, value) {
+                                $('#error-' + key).text(value[0]);
                             });
+
+                            // Log errors for debugging
+                            console.log('Validation errors:', response.msgField);
                         }
                     },
-                    error: function(xhr) {
-                        console.log(xhr.responseJSON);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error!',
-                            text: 'An error occurred while processing your request.',
-                        });
+                    error: function (xhr) {
+                        console.log('Error response:', xhr.responseJSON);
+
+                        // Handle validation errors (422)
+                        if (xhr.status === 422 && xhr.responseJSON && xhr.responseJSON.msgField) {
+                            // Clear previous errors
+                            $('.error-text').text('');
+
+                            // Display validation errors
+                            $.each(xhr.responseJSON.msgField, function (key, value) {
+                                console.log('Setting error for field:', key, 'value:', value[0]);
+                                var errorElement = $('#error-' + key);
+                                console.log('Error element found:', errorElement.length > 0);
+                                errorElement.text(value[0]);
+                                console.log('Error element text set to:', errorElement.text());
+                            });
+
+                            console.log('Validation errors:', xhr.responseJSON.msgField);
+
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Validation Failed!',
+                                text: 'Please check the form for errors.',
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error!',
+                                text: 'An error occurred while processing your request.',
+                            });
+                        }
                     }
                 });
             });
