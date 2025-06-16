@@ -156,39 +156,58 @@ class AnnouncementController extends Controller
     {
         Log::info('Upload request received', [
             'title' => $request->title,
-            'has_file' => $request->hasFile('announcement_file'),
-            'file_size' => $request->hasFile('announcement_file') ? $request->file('announcement_file')->getSize() : 0
+            'has_announcement_file' => $request->hasFile('announcement_file'),
+            'has_photo' => $request->hasFile('photo'),
+            'announcement_file_size' => $request->hasFile('announcement_file') ? $request->file('announcement_file')->getSize() : 0,
+            'photo_file_size' => $request->hasFile('photo') ? $request->file('photo')->getSize() : 0
         ]);
 
         $request->validate([
             'title' => 'required|string|max:255',
-            'announcement_file' => 'required|file|mimes:pdf|max:10240',
+            'announcement_file' => 'nullable|file|mimes:pdf|max:10240',
+            'photo' => 'nullable|file|mimes:jpg,jpeg,png|max:10240',
             'description' => 'nullable|string',
             'visible_to' => 'nullable|array',
             'visible_to.*' => 'in:student,staff,alumni,lecturer'
         ]);
 
         try {
-            // Store the file
-            $file = $request->file('announcement_file');
-            $fileName = 'announcement_' . time() . '.pdf';
-            $filePath = $file->storeAs('public/announcements', $fileName);
+            // Initialize file columns
+            $announcementFileUrl = null;
+            $photoUrl = null;
+
+            // Store announcement file if provided
+            if ($request->hasFile('announcement_file')) {
+                $file = $request->file('announcement_file');
+                $fileName = 'announcement_' . time() . '.' . $file->getClientOriginalExtension();
+                $filePath = $file->storeAs('public/announcements', $fileName);
+                $announcementFileUrl = Storage::url($filePath);
+            }
+
+            // Store photo if provided
+            if ($request->hasFile('photo')) {
+                $file = $request->file('photo');
+                $fileName = 'photo_' . time() . '.' . $file->getClientOriginalExtension();
+                $filePath = $file->storeAs('public/announcements', $fileName);
+                $photoUrl = Storage::url($filePath);
+            }
 
             // If no specific roles selected, make visible to all by setting null
             $visibleTo = $request->visible_to && count($request->visible_to) > 0 ? $request->visible_to : null;
 
             // Create announcement record
-            $announcement = new AnnouncementModel();
+            $announcement = new \App\Models\AnnouncementModel();
             $announcement->title = $request->title;
             $announcement->content = $request->description ?? '';
-            $announcement->announcement_file = Storage::url($filePath);
+            $announcement->announcement_file = $announcementFileUrl;
+            $announcement->photo = $photoUrl;
             $announcement->announcement_date = now();
             $announcement->announcement_status = 'published';
-            $announcement->visible_to = $visibleTo; // Let Laravel handle JSON encoding via model casting
+            $announcement->visible_to = $visibleTo;
             $announcement->created_by = auth()->id();
             $announcement->save();
 
-            // Send Telegram notifications for PDF announcements (always published)
+            // Send Telegram notifications
             $this->sendTelegramNotifications($announcement);
 
             return response()->json([

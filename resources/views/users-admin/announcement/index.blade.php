@@ -105,20 +105,20 @@
         </section>
     </div>
 
-    <!-- Upload PDF Modal -->
-    <div class="modal fade" id="uploadPdfModal" tabindex="-1" role="dialog" aria-labelledby="uploadPdfModalLabel"
+    <!-- Upload Announcement Modal -->
+    <div class="modal fade" id="uploadModal" tabindex="-1" role="dialog" aria-labelledby="uploadModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="uploadPdfModalLabel">
-                        <i class="fas fa-file-pdf mr-2 text-danger"></i>Upload Announcement PDF
+                    <h5 class="modal-title" id="uploadModalLabel">
+                        <i class="fas fa-upload mr-2 text-primary"></i>Upload Announcement PDF/IMG
                     </h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form id="uploadPdfForm" enctype="multipart/form-data">
+                <form id="uploadForm" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-body">
                         <div class="form-group">
@@ -127,13 +127,23 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="announcement_file">PDF File <span class="text-danger">*</span></label>
+                            <label for="announcement_file">PDF File</label>
                             <div class="custom-file">
                                 <input type="file" class="custom-file-input" id="announcement_file" name="announcement_file"
-                                    accept=".pdf" required>
+                                    accept=".pdf">
                                 <label class="custom-file-label" for="announcement_file">Choose PDF file...</label>
                             </div>
                             <small class="form-text text-muted">Maximum file size: 10MB. Only PDF files are allowed.</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="photo">Photo</label>
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="photo" name="photo"
+                                    accept=".jpg,.jpeg,.png">
+                                <label class="custom-file-label" for="photo">Choose image...</label>
+                            </div>
+                            <small class="form-text text-muted">Maximum file size: 10MB. Allowed image types: JPG, JPEG, PNG.</small>
                         </div>
 
                         <div class="form-group">
@@ -180,7 +190,7 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                         <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-upload mr-1"></i> Upload PDF
+                            <i class="fas fa-upload mr-1"></i> Upload
                         </button>
                     </div>
                 </form>
@@ -194,7 +204,6 @@
 @push('scripts')
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
     <script>
-
         function modalAction(url = '') {
             $('#myModal').load(url, function () {
                 $('#myModal').modal('show');
@@ -223,10 +232,10 @@
                         }
                     },
                     {
-                        text: '<i class="fas fa-file-pdf mr-1"></i> Upload PDF',
+                        text: '<i class="fas fa-upload mr-1"></i> Upload PDF/IMG',
                         className: 'btn btn-primary',
                         action: function (e, dt, node, config) {
-                            $('#uploadPdfModal').modal('show');
+                            $('#uploadModal').modal('show');
                         }
                     }
                 ],
@@ -308,11 +317,8 @@
                     error: function (xhr) {
                         var errors = xhr.responseJSON.errors;
                         if (errors) {
-                            // Clear previous errors
                             form.find('.is-invalid').removeClass('is-invalid');
                             form.find('.invalid-feedback').remove();
-
-                            // Display new errors
                             $.each(errors, function (key, value) {
                                 var input = form.find('[name="' + key + '"]');
                                 input.addClass('is-invalid');
@@ -327,32 +333,41 @@
                 });
             });
 
-            // Handle PDF upload form submission
-            $('#uploadPdfForm').on('submit', function (e) {
+            // Handle upload form submission
+            $('#uploadForm').on('submit', function (e) {
                 e.preventDefault();
                 console.log('Upload form submitted!');
 
                 var formData = new FormData(this);
                 var submitBtn = $(this).find('button[type="submit"]');
                 var originalText = submitBtn.html();
-                var fileInput = $('#announcement_file')[0];
-                var file = fileInput.files[0];
+                var pdfFile = $('#announcement_file')[0].files[0];
+                var photoFile = $('#photo')[0].files[0];
 
                 // Debug form data
                 console.log('Form data being sent:');
                 console.log('Title:', $('#title').val());
-                console.log('File:', file);
+                console.log('PDF File:', pdfFile);
+                console.log('Photo File:', photoFile);
                 console.log('Description:', $('#description').val());
 
-                // Check if file exists
-                if (!file) {
-                    Swal.fire('No File Selected!', 'Please select a PDF file to upload.', 'error');
+                // Check file size if exists
+                if (pdfFile && pdfFile.size > 10 * 1024 * 1024) {
+                    Swal.fire('File Too Large!', 'Please select a PDF file smaller than 10MB.', 'error');
+                    return;
+                }
+                if (photoFile && photoFile.size > 10 * 1024 * 1024) {
+                    Swal.fire('File Too Large!', 'Please select an image file smaller than 10MB.', 'error');
                     return;
                 }
 
-                // Check file size before upload
-                if (file && file.size > 10 * 1024 * 1024) { // 10MB in bytes
-                    Swal.fire('File Too Large!', 'Please select a PDF file smaller than 10MB.', 'error');
+                // Check file type if exists
+                if (pdfFile && pdfFile.type !== 'application/pdf') {
+                    Swal.fire('Invalid File Type!', 'Please select a valid PDF file.', 'error');
+                    return;
+                }
+                if (photoFile && !['image/jpeg', 'image/jpg', 'image/png'].includes(photoFile.type)) {
+                    Swal.fire('Invalid File Type!', 'Please select a valid image (JPG, JPEG, PNG).', 'error');
                     return;
                 }
 
@@ -362,7 +377,7 @@
                 // Add progress indicator
                 var progressHtml = '<div class="progress mt-2" id="uploadProgress" style="height: 20px;"><div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div></div>';
                 if ($('#uploadProgress').length === 0) {
-                    $(progressHtml).insertAfter('#announcement_file').next('.form-text');
+                    $(progressHtml).insertAfter('#photo').next('.form-text');
                 }
 
                 $.ajax({
@@ -373,7 +388,6 @@
                     contentType: false,
                     xhr: function () {
                         var xhr = new window.XMLHttpRequest();
-                        // Upload progress
                         xhr.upload.addEventListener("progress", function (evt) {
                             if (evt.lengthComputable) {
                                 var percentComplete = (evt.loaded / evt.total) * 100;
@@ -387,9 +401,9 @@
                             $('#uploadProgress .progress-bar').css('width', '100%');
                             setTimeout(function () {
                                 Swal.fire('Success!', response.message, 'success');
-                                $('#uploadPdfModal').modal('hide');
-                                $('#uploadPdfForm')[0].reset();
-                                $('.custom-file-label').text('Choose PDF file...');
+                                $('#uploadModal').modal('hide');
+                                $('#uploadForm')[0].reset();
+                                $('.custom-file-label').text('Choose file...');
                                 $('#uploadProgress').remove();
                                 dataAnnouncement.ajax.reload();
                             }, 500);
@@ -416,11 +430,10 @@
                         } else if (xhr.status === 500) {
                             Swal.fire('Server Error!', 'Internal server error occurred. Please try again later.', 'error');
                         } else {
-                            Swal.fire('Error!', 'An error occurred while uploading the PDF. Status: ' + xhr.status, 'error');
+                            Swal.fire('Error!', 'An error occurred while uploading the file. Status: ' + xhr.status, 'error');
                         }
                     },
                     complete: function () {
-                        // Re-enable submit button and remove progress bar
                         submitBtn.prop('disabled', false).html(originalText);
                         setTimeout(function () {
                             $('#uploadProgress').remove();
@@ -429,26 +442,32 @@
                 });
             });
 
-            // Handle file input change to show selected filename and validate size
+            // Handle file input change to show selected filename and validate size/type
             $('.custom-file-input').on('change', function () {
                 var fileName = $(this).val().split('\\').pop();
                 var file = this.files[0];
                 var fileLabel = $(this).next('.custom-file-label');
+                var id = $(this).attr('id');
 
                 if (file) {
                     var fileSize = file.size;
                     var maxSize = 10 * 1024 * 1024; // 10MB
+                    var validTypes = id === 'announcement_file' ? ['application/pdf'] : ['image/jpeg', 'image/jpg', 'image/png'];
 
                     if (fileSize > maxSize) {
                         fileLabel.text('File too large (max 10MB)').addClass('text-danger');
                         $(this).val(''); // Clear the input
-                        Swal.fire('File Too Large!', 'Please select a PDF file smaller than 10MB.', 'error');
+                        Swal.fire('File Too Large!', 'Please select a file smaller than 10MB.', 'error');
+                    } else if (!validTypes.includes(file.type)) {
+                        fileLabel.text('Invalid file type').addClass('text-danger');
+                        $(this).val(''); // Clear the input
+                        Swal.fire('Invalid File Type!', 'Please select a valid ' + (id === 'announcement_file' ? 'PDF' : 'image (JPG, JPEG, PNG)') + ' file.', 'error');
                     } else {
                         var fileSizeMB = (fileSize / (1024 * 1024)).toFixed(2);
                         fileLabel.text(fileName + ' (' + fileSizeMB + ' MB)').removeClass('text-danger');
                     }
                 } else {
-                    fileLabel.text('Choose PDF file...').removeClass('text-danger');
+                    fileLabel.text(id === 'announcement_file' ? 'Choose PDF file...' : 'Choose image...').removeClass('text-danger');
                 }
             });
         });

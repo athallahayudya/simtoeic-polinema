@@ -260,14 +260,15 @@
                             </div>
                             <div class="col-md-3">
                                 <div class="filter-group">
-                                    <label>TOEIC Band</label>
+                                    <label>Level CEFR</label>
                                     <select id="score-filter" class="form-control">
                                         <option value="">All Levels</option>
-                                        <option value="0-250">0-250 (Beginner)</option>
-                                        <option value="255-500">255-500 (Elementary)</option>
-                                        <option value="501-700">501-700 (Intermediate)</option>
-                                        <option value="701-900">701-900 (Advanced)</option>
-                                        <option value="901-990">901-990 (Proficient)</option>
+                                        <option value="0-250">0-250 (A1) Beginner</option>
+                                        <option value="255-400">255-400 (A1 - A2) Elementary</option>
+                                        <option value="405-600">405-600 (A2 - B1) Lower Intermediate</option>
+                                        <option value="605-780">605-780 (B1 - B2) Mid Intermediate</option>
+                                        <option value="785-900">785-900 (B2 - C1) Upper Intermediate</option>
+                                        <option value="905-990">905-990 (C1) Advanced</option>
                                     </select>
                                 </div>
                             </div>
