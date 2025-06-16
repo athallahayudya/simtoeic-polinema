@@ -456,9 +456,7 @@ class StudentController extends Controller
             'certificate_file' => $filePath,
             'certificate_file_2' => $filePath2,
             'status' => 'pending'
-        ]);
-
-        return redirect()->route('student.dashboard')
+        ]);        return redirect()->route('student.request.index')
             ->with('success', 'Verification request has been submitted successfully. Please wait for admin approval.');
     }
 

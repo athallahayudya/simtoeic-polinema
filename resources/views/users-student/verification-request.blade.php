@@ -22,96 +22,14 @@
     </div>
 
     <div class="section-body">
-      <!-- Information Card -->
+      <!-- Verification Request Form -->
       <div class="row">
-      <div class="col-12">
-        <div class="card">
-        <div class="card-header">
-          <h4><i class="fas fa-info-circle mr-2"></i>Request Information</h4>
+      <div class="col-lg-8 col-md-10 mx-auto">
+        <div class="card shadow-sm">
+        <div class="card-header bg-gradient-primary py-3">
+          <h4 class="mb-0 text-white"><i class="fas fa-certificate mr-2 text-white"></i>New Verification Request</h4>
         </div>
-        <div class="card-body">
-          <div class="alert alert-info">
-          <h5><i class="fas fa-info-circle mr-2"></i>Verification Request Guidelines:</h5>
-          <p class="mb-2">You can submit a verification request for various purposes. Common examples include:</p>
-          <ul class="mb-3">
-            <li><strong>TOEIC Exam Participation:</strong> Verification of exam attempts and scores</li>
-            <li><strong>Special Conditions:</strong> Medical conditions, disabilities, or other circumstances</li>
-            <li><strong>Academic Requirements:</strong> Documentation for academic purposes</li>
-            <li><strong>Administrative Needs:</strong> Other official documentation requirements</li>
-          </ul>
-          <div class="alert alert-warning mb-0">
-            <strong><i class="fas fa-edit mr-1"></i>Important:</strong> Write your own detailed description
-            explaining your specific situation and needs. Include supporting documents relevant to your request.
-          </div>
-          </div>
-        </div>
-        </div>
-      </div>
-      </div>
-
-      <!-- Exam History -->
-      <div class="row">
-      <div class="col-12">
-        <div class="card">
-        <div class="card-header">
-          <h4><i class="fas fa-history mr-2"></i>Your Exam History</h4>
-        </div>
-        <div class="card-body">
-          <div class="table-responsive">
-          <table class="table table-striped">
-            <thead>
-            <tr>
-              <th>Exam ID</th>
-              <th>Type</th>
-              <th>Listening</th>
-              <th>Reading</th>
-              <th>Total</th>
-              <th>Status</th>
-              <th>Date</th>
-            </tr>
-            </thead>
-            <tbody>
-            @foreach($examScores as $result)
-          <tr>
-            <td><strong class="text-primary">{{ $result->exam_id ?? 'N/A' }}</strong></td>
-            <td>{!! $result->exam_type_badge !!}</td>
-            <td><span class="badge badge-info">{{ $result->listening_score ?? 0 }}</span></td>
-            <td><span class="badge badge-info">{{ $result->reading_score ?? 0 }}</span></td>
-            <td>
-            <span class="badge {{ ($result->total_score ?? 0) >= 500 ? 'badge-success' : 'badge-danger' }}">
-            {{ $result->total_score ?? 0 }}
-            </span>
-            </td>
-            <td>
-            @if(($result->total_score ?? 0) >= 500)
-          <span class="badge badge-success"><i class="fas fa-check mr-1"></i> PASS</span>
-        @else
-          <span class="badge badge-danger"><i class="fas fa-times mr-1"></i> FAIL</span>
-        @endif
-            </td>
-            <td>
-            <small class="text-muted">
-            {{ $result->exam_date ? $result->exam_date->format('d M Y') : ($result->created_at ? $result->created_at->format('d M Y') : 'N/A') }}
-            </small>
-            </td>
-          </tr>
-        @endforeach
-            </tbody>
-          </table>
-          </div>
-        </div>
-        </div>
-      </div>
-      </div>
-
-      <!-- Request Form -->
-      <div class="row">
-      <div class="col-12">
-        <div class="card">
-        <div class="card-header bg-primary text-white">
-          <h4><i class="fas fa-file-alt mr-2"></i>Verification Request Form</h4>
-        </div>
-        <div class="card-body">
+        <div class="card-body p-4">
           @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
         <i class="fas fa-check-circle mr-2"></i>{{ session('success') }}
@@ -131,124 +49,115 @@
       @endif
 
           <form action="{{ route('student.verification.request.submit') }}" method="POST"
-          enctype="multipart/form-data" id="verificationForm">
+          enctype="multipart/form-data" id="verificationForm" class="needs-validation" novalidate>
           @csrf
 
-          <div class="row">
-            <div class="col-md-12">
-            <div class="form-group">
-              <label for="comment">
-              <i class="fas fa-comment mr-1"></i>Description/Reason for Request
-              <span class="text-danger">*</span>
-              </label>
-              <textarea class="form-control @error('comment') is-invalid @enderror" id="comment" name="comment"
-              rows="6"
-              placeholder="Write your own detailed explanation here...&#10;&#10;Describe your specific situation and why you need this verification letter. Be clear and specific about your circumstances, condition, or requirements."
-              required>{{ old('comment') }}</textarea>
-              <small class="form-text text-muted">
-              <i class="fas fa-info-circle mr-1"></i>Minimum 50 characters required. Write your own
-              description - be specific about your personal situation and needs.
-              </small>
-              @error('comment')
-          <div class="invalid-feedback">{{ $message }}</div>
+          <!-- Reason for Request -->
+          <div class="form-group">
+            <label for="comment" class="font-weight-bold">
+            <i class="fas fa-comment-alt mr-1 text-primary"></i>Reason for Request <span
+              class="text-danger">*</span>
+            </label>
+            <textarea class="form-control @error('comment') is-invalid @enderror" id="comment" name="comment"
+            rows="4" placeholder="Please describe why you need this verification document..."
+            required>{{ old('comment') }}</textarea>
+            <div class="d-flex justify-content-between mt-1">
+            <small class="text-muted"><i class="fas fa-info-circle mr-1"></i>Min 20 characters</small>
+            <small class="text-muted"><span id="charCount"
+              class="font-weight-bold text-danger">0</span>/1000</small>
+            </div>
+            @error('comment')
+        <div class="invalid-feedback">{{ $message }}</div>
         @enderror
-              <div class="text-right">
-              <small class="text-muted">
-                <span id="charCount">0</span>/1000 characters
-              </small>
-              </div>
-            </div>
-            </div>
           </div>
 
-          <div class="row">
-            <div class="col-md-12">
-            <div class="form-group">
-              <label for="certificate_file">
-              <i class="fas fa-upload mr-1"></i>Upload Supporting Evidence (File 1)
-              <span class="text-danger">*</span>
-              </label>
-              <div class="custom-file">
+          <!-- Upload File -->
+          <div class="form-group">
+            <label for="certificate_file" class="font-weight-bold">
+            <i class="fas fa-file-upload mr-1 text-primary"></i>Supporting Document <span
+              class="text-danger">*</span>
+            </label>
+            <div class="input-group">
+            <div class="custom-file">
               <input type="file" class="custom-file-input @error('certificate_file') is-invalid @enderror"
-                id="certificate_file" name="certificate_file" accept=".pdf,.jpg,.jpeg,.png" required>
-              <label class="custom-file-label" for="certificate_file">Choose first file...</label>
-              </div>
-              <small class="form-text text-muted">
-              <i class="fas fa-file mr-1"></i>Upload supporting documents (medical certificates, TOEIC
-              certificates, academic documents, etc.)
-              <br><strong>Allowed formats:</strong> PDF, JPG, JPEG, PNG | <strong>Maximum size:</strong> 5MB
-              </small>
-              @error('certificate_file')
-          <div class="invalid-feedback">{{ $message }}</div>
+              id="certificate_file" name="certificate_file" accept=".pdf,.jpg,.jpeg,.png" required>
+              <label class="custom-file-label" for="certificate_file">Choose file...</label>
+            </div>
+            </div>
+            <small class="form-text text-muted"><i class="fas fa-info-circle mr-1"></i>Allowed: PDF, JPG, PNG (max
+            5MB)</small>
+            @error('certificate_file')
+        <div class="invalid-feedback">{{ $message }}</div>
         @enderror
 
-              <!-- File preview area -->
-              <div id="filePreview" class="mt-3" style="display: none;">
-              <div class="card">
-                <div class="card-body p-3">
-                <h6 class="card-title mb-2">
-                  <i class="fas fa-eye mr-1"></i>File 1 Preview
-                </h6>
-                <div id="previewContent"></div>
-                </div>
-              </div>
+            <!-- File preview area -->
+            <div id="filePreview" class="mt-3" style="display: none;">
+            <div class="card border-light shadow-sm">
+              <div class="card-body p-3 text-center">
+              <div id="previewContent"></div>
               </div>
             </div>
             </div>
           </div>
 
-          <div class="row">
-            <div class="col-md-12">
-            <div class="form-group">
-              <label for="certificate_file_2">
-              <i class="fas fa-upload mr-1"></i>Upload Supporting Evidence (File 2)
-              <span class="text-muted">(Optional)</span>
-              </label>
-              <div class="custom-file">
-              <input type="file" class="custom-file-input @error('certificate_file_2') is-invalid @enderror"
-                id="certificate_file_2" name="certificate_file_2" accept=".pdf,.jpg,.jpeg,.png">
-              <label class="custom-file-label" for="certificate_file_2">Choose second file...</label>
-              </div>
-              <small class="form-text text-muted">
-              <i class="fas fa-file mr-1"></i>Upload additional supporting documents if needed
-              <br><strong>Allowed formats:</strong> PDF, JPG, JPEG, PNG | <strong>Maximum size:</strong> 5MB
-              </small>
-              @error('certificate_file_2')
-          <div class="invalid-feedback">{{ $message }}</div>
-        @enderror
+          <!-- Additional Documents Section -->
+          <div class="form-group mb-4">
+            <!-- Container for additional documents -->
+            <div id="additionalDocuments" class="mt-3">
+            <!-- Additional document fields will be added here dynamically -->
+            </div>
 
-              <!-- File preview area for second file -->
-              <div id="filePreview2" class="mt-3" style="display: none;">
-              <div class="card">
-                <div class="card-body p-3">
-                <h6 class="card-title mb-2">
-                  <i class="fas fa-eye mr-1"></i>File 2 Preview
-                </h6>
-                <div id="previewContent2"></div>
-                </div>
-              </div>
-              </div>
+            <div class="d-flex justify-content-center mt-3">
+            <button type="button" id="addDocumentBtn" class="btn btn-outline-primary px-4">
+              <i class="fas fa-plus-circle mr-1"></i> Add Another Document <span class="text-danger">*</span>
+            </button>
             </div>
-            </div>
+            <small class="text-center d-block mt-2 text-muted"><i class="fas fa-info-circle mr-1"></i>At least 2 documents are required for verification</small>
           </div>
 
-          <hr>
-
-          <div class="row">
-            <div class="col-12">
-            <div class="form-group mb-0">
-              <div class="d-flex justify-content-between align-items-center">
-              <a href="{{ route('student.request.index') }}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left mr-1"></i> Back to Request
-              </a>
-              <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
-                <i class="fas fa-paper-plane mr-1"></i> Submit Verification Request
-              </button>
-              </div>
-            </div>
+          <!-- Submit Button -->
+          <div class="form-group mb-0">
+            <div class="d-flex justify-content-between align-items-center">
+            <a href="{{ route('student.request.index') }}" class="btn btn-outline-secondary btn-rounded">
+              <i class="fas fa-arrow-left mr-1"></i> Back
+            </a>
+            <button type="submit" class="btn btn-primary btn-rounded" id="submitBtn">
+              <i class="fas fa-paper-plane mr-1"></i> Submit Request
+            </button>
             </div>
           </div>
           </form>
+
+          <!-- Hidden template for additional documents -->
+          <template id="documentTemplate">
+          <div class="additional-document mt-3 p-3 border rounded">
+            <div class="d-flex align-items-center mb-2">
+            <label class="font-weight-bold mb-0">
+              <i class="fas fa-file-upload mr-1 text-primary"></i>Supporting Document <span class="text-danger">*</span>
+            </label>
+            <button type="button" class="btn btn-sm btn-danger ml-auto remove-document rounded-circle">
+              <i class="fas fa-times"></i>
+            </button>
+            </div>
+
+            <div class="input-group">
+            <div class="custom-file">
+              <input type="file" class="custom-file-input document-file" name="additional_documents[]"
+              accept=".pdf,.jpg,.jpeg,.png" required>
+              <label class="custom-file-label">Choose file...</label>
+            </div>
+            </div>
+            <small class="form-text text-muted mb-2"><i class="fas fa-info-circle mr-1"></i>Allowed: PDF, JPG, PNG
+            (max 5MB)</small>
+
+            <!-- File preview area -->
+            <div class="file-preview mt-2" style="display: none;">
+            <div class="card border-light shadow-sm">
+              <div class="card-body p-2 text-center preview-content"></div>
+            </div>
+            </div>
+          </div>
+          </template>
         </div>
         </div>
       </div>
@@ -258,29 +167,189 @@
   </div>
 @endsection
 
+@push('style')
+  <!-- Additional CSS -->
+  <style>
+    .bg-gradient-primary {
+    background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+    }
+
+    .btn-rounded {
+    border-radius: 30px;
+    padding-left: 20px;
+    padding-right: 20px;
+    }
+
+    .form-control:focus {
+    border-color: #4e73df;
+    box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+    }
+
+    .custom-file-input:focus~.custom-file-label {
+    border-color: #4e73df;
+    box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+    }
+
+    .card {
+    border-radius: 8px;
+    }
+
+    .card-header {
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    }
+
+    .btn-primary {
+    background-color: #4e73df;
+    border-color: #4e73df;
+    }
+
+    .btn-primary:hover {
+    background-color: #2e59d9;
+    border-color: #2653d4;
+    }
+
+    .shadow-sm {
+    box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .075) !important;
+    }
+
+    #addDocumentBtn {
+    border-radius: 30px;
+    transition: all 0.3s ease;
+    padding: 10px 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    #addDocumentBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, .1);
+    background-color: #4e73df;
+    color: white;
+    }
+
+    .additional-document {
+    border: 1px solid #e3e6f0;
+    border-radius: 8px;
+    padding: 15px;
+    position: relative;
+    background-color: #ffffff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+    transition: all 0.3s ease;
+    }
+
+    .additional-document:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .remove-document {
+    padding: 0.25rem 0.35rem;
+    font-size: 0.8rem;
+    line-height: 1;
+    border-radius: 50%;
+    margin-left: 10px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    }
+
+    .file-preview {
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    }
+
+    /* Styles for embedded PDF preview */
+    .embed-responsive {
+    max-height: 300px;
+    border: 1px solid #e3e6f0;
+    border-radius: 5px;
+    overflow: hidden;
+    }
+    
+    .embed-responsive iframe {
+    background-color: #f8f9fc;
+    }
+
+    #submitBtn {
+    transition: all 0.3s ease;
+    /* Using the same btn-rounded style as the Back button */
+    }
+
+    #submitBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, .1) !important;
+    }
+  </style>
+@endpush
+
 @push('scripts')
   <!-- JS Libraries -->
-  <script src="{{ asset('assets/modules/datatables/datatables.min.js') }}"></script>
   <script src="{{ asset('assets/modules/sweetalert/sweetalert2.all.min.js') }}"></script>
 
   <script>
     $(document).ready(function () {
-    // Character counter for comment
-    $('#comment').on('input', function () {
-      const length = $(this).val().length;
-      $('#charCount').text(length);
+    // Document counter for generating unique IDs
+    let documentCounter = 0;
 
-      if (length < 50) {
-      $('#charCount').removeClass('text-success').addClass('text-danger');
-      } else {
-      $('#charCount').removeClass('text-danger').addClass('text-success');
-      }
+    // Add additional document field
+    $('#addDocumentBtn').on('click', function () {
+      // Clone the template content
+      const template = document.getElementById('documentTemplate');
+      const documentId = 'doc_' + (++documentCounter);
+
+      // Create document element from template
+      const documentElement = template.content.cloneNode(true);
+
+      // Add unique IDs to elements
+      const fileInput = $(documentElement).find('.document-file');
+      fileInput.attr('id', documentId);
+      $(documentElement).find('.custom-file-label').attr('for', documentId);
+
+      // Add the new document to the container with fade-in animation
+      const newDocument = $(documentElement);
+      newDocument.hide();
+      $('#additionalDocuments').append(newDocument);
+      newDocument.slideDown(300);
+
+      // Scroll to the new element
+      $('html, body').animate({
+      scrollTop: $('#additionalDocuments').offset().top + $('#additionalDocuments').height() - 80
+      }, 500);
+
+      // Initialize file input behavior
+      initializeFileInput(documentId);
     });
 
-    // File upload handling for first file
+    // Initialize character counter on page load
+    const updateCharCount = function () {
+      const length = $('#comment').val().length;
+      $('#charCount').text(length);
+
+      // Update validation styling based on character count
+      if (length < 20) {
+        $('#charCount').removeClass('text-success').addClass('text-danger');
+        $('#comment').removeClass('is-valid').addClass('is-invalid');
+      } else {
+        $('#charCount').removeClass('text-danger').addClass('text-success');
+        $('#comment').removeClass('is-invalid').addClass('is-valid');
+      }
+    };
+
+    // Run on page load
+    updateCharCount();
+
+    // Character counter for comment - update on each keystroke
+    $('#comment').on('input keyup keydown keypress change blur focus', function () {
+      updateCharCount();
+    });    // Improved file upload handling for first file
     $('#certificate_file').on('change', function () {
       const file = this.files[0];
       const label = $(this).next('.custom-file-label');
+
+      // Hide preview initially (will show only if valid file is selected)
+      $('#filePreview').hide();
 
       if (file) {
       const fileSize = file.size / 1024 / 1024; // Convert to MB
@@ -291,12 +360,11 @@
         Swal.fire({
         icon: 'error',
         title: 'File Too Large',
-        text: 'File size must be less than 5MB.',
-        confirmButtonColor: '#dc3545'
+        text: 'Please upload a file smaller than 5MB',
+        confirmButtonColor: '#4e73df'
         });
         this.value = '';
-        label.text('Choose first file...');
-        $('#filePreview').hide();
+        label.text('Choose file...');
         return;
       }
 
@@ -305,12 +373,11 @@
         Swal.fire({
         icon: 'error',
         title: 'Invalid File Format',
-        text: 'Please upload PDF, JPG, JPEG, or PNG files only.',
-        confirmButtonColor: '#dc3545'
+        html: '<p>Please upload files in these formats:</p><ul style="text-align: left; display: inline-block;"><li>PDF</li><li>JPG/JPEG</li><li>PNG</li></ul>',
+        confirmButtonColor: '#4e73df'
         });
         this.value = '';
-        label.text('Choose first file...');
-        $('#filePreview').hide();
+        label.text('Choose file...');
         return;
       }
 
@@ -320,151 +387,315 @@
       // Show file preview
       showFilePreview(file, 'previewContent', 'filePreview');
       } else {
-      label.text('Choose first file...');
+      label.text('Choose file...');
       $('#filePreview').hide();
       }
     });
 
-    // File upload handling for second file
-    $('#certificate_file_2').on('change', function () {
-      const file = this.files[0];
-      const label = $(this).next('.custom-file-label');
+    // Event delegation for document removal with animation
+    $(document).on('click', '.remove-document', function () {
+      const documentEl = $(this).closest('.additional-document');
+      documentEl.addClass('border-danger');
 
-      if (file) {
-      const fileSize = file.size / 1024 / 1024; // Convert to MB
-      const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
-
-      // Validate file size
-      if (fileSize > 5) {
-        Swal.fire({
-        icon: 'error',
-        title: 'File Too Large',
-        text: 'File size must be less than 5MB.',
-        confirmButtonColor: '#dc3545'
-        });
-        this.value = '';
-        label.text('Choose second file...');
-        $('#filePreview2').hide();
-        return;
-      }
-
-      // Validate file type
-      if (!allowedTypes.includes(file.type)) {
-        Swal.fire({
-        icon: 'error',
-        title: 'Invalid File Format',
-        text: 'Please upload PDF, JPG, JPEG, or PNG files only.',
-        confirmButtonColor: '#dc3545'
-        });
-        this.value = '';
-        label.text('Choose second file...');
-        $('#filePreview2').hide();
-        return;
-      }
-
-      // Update label with filename
-      label.text(file.name);
-
-      // Show file preview
-      showFilePreview(file, 'previewContent2', 'filePreview2');
-      } else {
-      label.text('Choose second file...');
-      $('#filePreview2').hide();
-      }
+      // Animate removal with fade effect
+      documentEl.animate({ opacity: 0.5 }, 200, function () {
+      documentEl.slideUp(300, function () {
+        documentEl.remove();
+      });
+      });
     });
 
-    // Form submission
+    // Function to initialize file input behavior
+    function initializeFileInput(inputId) {
+      $('#' + inputId).on('change', function () {
+      const file = this.files[0];
+      const label = $(this).next('.custom-file-label');
+      const previewEl = $(this).closest('.additional-document').find('.file-preview');
+      const previewContent = $(this).closest('.additional-document').find('.preview-content');
+
+      // Always hide preview initially
+      previewEl.hide();
+
+      if (file) {
+        const fileSize = file.size / 1024 / 1024; // Convert to MB
+        const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+
+        // Validate file size
+        if (fileSize > 5) {
+        Swal.fire({
+          icon: 'error',
+          title: 'File Too Large',
+          text: 'Please upload a file smaller than 5MB',
+          confirmButtonColor: '#4e73df'
+        });
+        this.value = '';
+        label.text('Choose file...');
+        return;
+        }
+
+        // Validate file type
+        if (!allowedTypes.includes(file.type)) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Invalid File Format',
+          html: '<p>Please upload files in these formats:</p><ul style="text-align: left; display: inline-block;"><li>PDF</li><li>JPG/JPEG</li><li>PNG</li></ul>',
+          confirmButtonColor: '#4e73df'
+        });
+        this.value = '';
+        label.text('Choose file...');
+        return;
+        }
+
+        // Update label with filename
+        label.text(file.name);
+
+        // Show file preview with animation
+        showDynamicFilePreview(file, previewContent, previewEl);
+      } else {
+        label.text('Choose file...');
+        previewEl.hide();
+      }
+      });
+    }
+
+    // Enhanced form submission with animations and better UX
     $('#verificationForm').on('submit', function (e) {
       const comment = $('#comment').val().trim();
-      const file = $('#certificate_file')[0].files[0];
+      const mainFile = $('#certificate_file')[0].files[0];
+      const additionalFiles = $('.document-file').filter(function () {
+      return this.files.length > 0;
+      }).length;
+      const totalFiles = (mainFile ? 1 : 0) + additionalFiles;
 
       // Validate comment length
-      if (comment.length < 50) {
+      if (comment.length < 20) {
       e.preventDefault();
       Swal.fire({
         icon: 'warning',
-        title: 'Comment Too Short',
-        text: 'Please provide at least 50 characters in your comment.',
-        confirmButtonColor: '#ffc107'
+        title: 'Description Too Short',
+        text: 'Please provide at least 20 characters in your request description',
+        confirmButtonColor: '#4e73df',
+        confirmButtonText: 'OK, I\'ll Add More'
       });
       $('#comment').focus();
       return;
       }
 
-      // Validate file upload
-      if (!file) {
+      // Validate file upload - main document
+      if (!mainFile) {
       e.preventDefault();
       Swal.fire({
         icon: 'warning',
-        title: 'File Required',
-        text: 'Please upload a supporting document.',
-        confirmButtonColor: '#ffc107'
+        title: 'Document Required',
+        text: 'Please upload at least one supporting document',
+        confirmButtonColor: '#4e73df'
       });
       $('#certificate_file').focus();
       return;
       }
+      
+      // Validate minimum total documents (at least 2)
+      if (totalFiles < 2) {
+      e.preventDefault();
+      Swal.fire({
+        icon: 'warning',
+        title: 'More Documents Required',
+        text: 'Please upload at least 2 supporting documents for verification',
+        confirmButtonColor: '#4e73df',
+        confirmButtonText: 'I\'ll Add More'
+      });
+      $('#addDocumentBtn').focus();
+      return;
+      }
 
-      // Show loading state
-      $('#submitBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i> Submitting...');
+      // Show number of files in confirmation
+      const fileText = totalFiles > 1 ?
+      `You are submitting ${totalFiles} documents with this request.` :
+      'You are submitting 1 document with this request.';
 
-      // Show confirmation
+      // Show loading state with animation
+      $('#submitBtn').prop('disabled', true)
+      .html('<span class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span> Submitting...')
+      .addClass('disabled');
+
+      // Show confirmation with improved UI and file count
       e.preventDefault();
       Swal.fire({
       title: 'Submit Verification Request?',
-      text: 'Are you sure you want to submit this verification request?',
+      html: `<p>${fileText}</p><p>Your request will be reviewed by our staff.</p><p class="text-muted">You\'ll receive a notification once processed.</p>`,
       icon: 'question',
       showCancelButton: true,
-      confirmButtonColor: '#007bff',
+      confirmButtonColor: '#4e73df',
       cancelButtonColor: '#6c757d',
-      confirmButtonText: 'Yes, Submit',
-      cancelButtonText: 'Cancel'
+      confirmButtonText: '<i class="fas fa-check mr-1"></i> Submit',
+      cancelButtonText: '<i class="fas fa-times mr-1"></i> Cancel',
+      buttonsStyling: true,
+      showClass: {
+        popup: 'animate__animated animate__fadeInDown'
+      },
+      hideClass: {
+        popup: 'animate__animated animate__fadeOutUp'
+      }
       }).then((result) => {
       if (result.isConfirmed) {
         // Actually submit the form
         this.submit();
       } else {
-        // Reset button state
-        $('#submitBtn').prop('disabled', false).html('<i class="fas fa-paper-plane mr-1"></i> Submit Verification Request');
+        // Reset button state with animation
+        $('#submitBtn').prop('disabled', false)
+        .html('<i class="fas fa-paper-plane mr-1"></i> Submit Request')
+        .removeClass('disabled');
       }
       });
     });
-    });
 
-    // File preview function
+    // Initialize document counter on page load
+    function updateDocumentCounter() {
+      const mainFile = $('#certificate_file')[0].files.length > 0 ? 1 : 0;
+      const additionalFiles = $('.document-file').filter(function () {
+        return this.files.length > 0;
+      }).length;
+      
+      const totalFiles = mainFile + additionalFiles;
+      $('#documentCounter').text(totalFiles);
+      
+      // Update styling based on if minimum documents are met
+      if (totalFiles >= 2) {
+        $('#documentCounter').removeClass('text-danger').addClass('text-success');
+      } else {
+        $('#documentCounter').removeClass('text-success').addClass('text-danger');
+      }
+    }
+
+    // Call updateDocumentCounter whenever files change
+    $('#certificate_file').on('change', function() {
+      updateDocumentCounter();
+    });
+    
+    // Event delegation for document file changes
+    $(document).on('change', '.document-file', function() {
+      updateDocumentCounter();
+    });
+    
+    // Update counter on document removal
+    $(document).on('click', '.remove-document', function() {
+      setTimeout(updateDocumentCounter, 500); // Update after animation completes
+    });
+    
+    // Initialize counter on document ready
+    updateDocumentCounter();
+
+    // Enhanced file preview function with better styling and interactive preview
     function showFilePreview(file, previewContentId, previewContainerId) {
     const reader = new FileReader();
     const previewContent = $('#' + previewContentId);
+    const previewContainer = $('#' + previewContainerId);
 
     reader.onload = function (e) {
       let content = '';
 
       if (file.type.startsWith('image/')) {
-      content = `
-      <div class="text-center">
-      <img src="${e.target.result}" class="img-fluid" style="max-height: 200px; border-radius: 5px;">
-      <p class="mt-2 mb-0"><strong>${file.name}</strong></p>
-      <small class="text-muted">${(file.size / 1024 / 1024).toFixed(2)} MB</small>
-      </div>
-      `;
+        content = `
+          <div class="mb-2">
+            <img src="${e.target.result}" class="img-fluid shadow-sm" style="max-height: 180px; border-radius: 5px;">
+          </div>
+          <div>
+            <span class="badge badge-light p-2">
+              <i class="fas fa-image mr-1 text-primary"></i> ${file.name}
+            </span>
+          </div>
+          <div class="mt-2">
+            <a href="${e.target.result}" target="_blank" class="btn btn-sm btn-outline-primary">
+              <i class="fas fa-eye mr-1"></i> View Full Image
+            </a>
+          </div>
+          <small class="text-muted d-block mt-1">${(file.size / 1024 / 1024).toFixed(1)} MB</small>
+          `;
       } else if (file.type === 'application/pdf') {
-      content = `
-      <div class="text-center">
-      <i class="fas fa-file-pdf fa-4x text-danger mb-2"></i>
-      <p class="mb-0"><strong>${file.name}</strong></p>
-      <small class="text-muted">${(file.size / 1024 / 1024).toFixed(2)} MB</small>
-      </div>
-      `;
+        // For PDFs, create an embedded PDF viewer
+        content = `
+          <div class="mb-2">
+            <i class="fas fa-file-pdf fa-3x text-danger mb-2"></i>
+            <div class="embed-responsive embed-responsive-16by9 mt-2">
+              <iframe class="embed-responsive-item" src="${e.target.result}" allowfullscreen></iframe>
+            </div>
+          </div>
+          <div>
+            <span class="badge badge-light p-2">
+              <i class="fas fa-file-pdf mr-1 text-danger"></i> ${file.name}
+            </span>
+          </div>
+          <div class="mt-2">
+            <a href="${e.target.result}" target="_blank" class="btn btn-sm btn-outline-primary">
+              <i class="fas fa-external-link-alt mr-1"></i> Open in New Tab
+            </a>
+          </div>
+          <small class="text-muted d-block mt-1">${(file.size / 1024 / 1024).toFixed(1)} MB</small>
+          `;
       }
 
+      // Set content and make sure preview is visible
       previewContent.html(content);
-      $('#' + previewContainerId).fadeIn();
+      previewContainer.slideDown(300);
     };
 
-    if (file.type.startsWith('image/')) {
-      reader.readAsDataURL(file);
-    } else {
-      reader.readAsDataURL(file);
+    reader.readAsDataURL(file);
     }
+
+    // Function to show dynamic file previews for additional documents
+    function showDynamicFilePreview(file, previewContentEl, previewContainerEl) {
+    const reader = new FileReader();
+
+    reader.onload = function (e) {
+      let content = '';
+
+      if (file.type.startsWith('image/')) {
+        content = `
+          <div class="mb-2">
+            <img src="${e.target.result}" class="img-fluid shadow-sm" style="max-height: 150px; border-radius: 5px;">
+          </div>
+          <div>
+            <span class="badge badge-light p-2">
+              <i class="fas fa-image mr-1 text-primary"></i> ${file.name}
+            </span>
+          </div>
+          <div class="mt-2">
+            <a href="${e.target.result}" target="_blank" class="btn btn-sm btn-outline-primary">
+              <i class="fas fa-eye mr-1"></i> View Full Image
+            </a>
+          </div>
+          <small class="text-muted d-block mt-1">${(file.size / 1024 / 1024).toFixed(1)} MB</small>
+          `;
+      } else if (file.type === 'application/pdf') {
+        // For PDFs, create an embedded PDF viewer
+        content = `
+          <div class="mb-2">
+            <i class="fas fa-file-pdf fa-3x text-danger mb-2"></i>
+            <div class="embed-responsive embed-responsive-16by9 mt-2">
+              <iframe class="embed-responsive-item" src="${e.target.result}" allowfullscreen></iframe>
+            </div>
+          </div>
+          <div>
+            <span class="badge badge-light p-2">
+              <i class="fas fa-file-pdf mr-1 text-danger"></i> ${file.name}
+            </span>
+          </div>
+          <div class="mt-2">
+            <a href="${e.target.result}" target="_blank" class="btn btn-sm btn-outline-primary">
+              <i class="fas fa-external-link-alt mr-1"></i> Open in New Tab
+            </a>
+          </div>
+          <small class="text-muted d-block mt-1">${(file.size / 1024 / 1024).toFixed(1)} MB</small>
+          `;
+      }
+
+      // Set content and ensure it's visible with animation
+      previewContentEl.html(content);
+      previewContainerEl.slideDown(300);
+    };
+
+    reader.readAsDataURL(file);
     }
+    });
   </script>
 @endpush
