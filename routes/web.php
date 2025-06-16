@@ -293,6 +293,16 @@ Route::group(['prefix' => 'users', 'middleware' => ['auth', 'prevent-back-histor
     Route::post('/store', [ManageUsersController::class, 'store'])->name('users.store');
 });
 
+// Admin Verification Requests route
+Route::group(['prefix' => 'admin/verification-requests', 'middleware' => ['auth', 'prevent-back-history']], function () {
+    Route::get('/', [\App\Http\Controllers\VerificationRequestController::class, 'index'])->name('admin.verification.requests.index');
+    Route::get('/data', [\App\Http\Controllers\VerificationRequestController::class, 'getData'])->name('admin.verification.requests.data');
+    Route::get('/{id}', [\App\Http\Controllers\VerificationRequestController::class, 'show'])->name('admin.verification.requests.show');
+    Route::post('/{id}/approve', [\App\Http\Controllers\VerificationRequestController::class, 'approve'])->name('admin.verification.requests.approve');
+    Route::post('/{id}/reject', [\App\Http\Controllers\VerificationRequestController::class, 'reject'])->name('admin.verification.requests.reject');
+    Route::get('/{id}/download', [\App\Http\Controllers\VerificationRequestController::class, 'downloadCertificate'])->name('admin.verification.requests.download');
+});
+
 // Student routes
 Route::group(['prefix' => 'student', 'middleware' => ['auth', 'prevent-back-history']], function () {
     Route::get('/dashboard', [StudentController::class, 'dashboard'])->name('student.dashboard');
@@ -303,6 +313,7 @@ Route::group(['prefix' => 'student', 'middleware' => ['auth', 'prevent-back-hist
 
     // Request routes
     Route::get('/request', [StudentController::class, 'requestIndex'])->name('student.request.index');
+    Route::get('/request/detail/{id}', [StudentController::class, 'getRequestDetail'])->name('student.request.detail');
     Route::get('/verification-request', [StudentController::class, 'showVerificationRequestForm'])->name('student.verification.request.form');
     Route::post('/verification-request', [StudentController::class, 'submitVerificationRequest'])->name('student.verification.request.submit');
 });

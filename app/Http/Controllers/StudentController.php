@@ -332,7 +332,11 @@ class StudentController extends Controller
         ]);
 
         // Update user exam status to 'on_process' after successful registration
-        $user->update(['exam_status' => 'on_process']);
+        $userModel = UserModel::find($user->user_id);
+        if ($userModel) {
+            $userModel->exam_status = 'on_process';
+            $userModel->save();
+        }
 
         // Redirect with success message
         return redirect()->route('student.registration.form')
@@ -426,7 +430,8 @@ class StudentController extends Controller
         $user = Auth::guard('web')->user();
         if (!$user || $user->role !== 'student') {
             abort(403, 'Unauthorized or insufficient permissions.');
-        }        $request->validate([
+        }
+        $request->validate([
             'comment' => 'required|string|max:1000',
             'certificate_file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120', // 5MB max
             'certificate_file_2' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120' // 5MB max, optional
@@ -455,5 +460,42 @@ class StudentController extends Controller
 
         return redirect()->route('student.dashboard')
             ->with('success', 'Verification request has been submitted successfully. Please wait for admin approval.');
+    }
+
+    /**
+     * Get verification request detail for modal display
+     */
+    public function getRequestDetail($id)
+    {
+        $user = Auth::guard('web')->user();
+        if (!$user || $user->role !== 'student') {
+            abort(403, 'Unauthorized or insufficient permissions.');
+        }
+
+        // Get the request only if it belongs to current user
+        $request = VerificationRequestModel::with(['approvedBy'])
+            ->where('request_id', $id)
+            ->where('user_id', $user->user_id) // Ensure user can only see their own requests
+            ->first();
+
+        if (!$request) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Request not found or access denied.'
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'request_id' => $request->request_id,
+                'comment' => $request->comment,
+                'status' => $request->status,
+                'admin_notes' => $request->admin_notes,
+                'approved_by' => $request->approvedBy ? $request->approvedBy->name : null,
+                'created_at' => $request->formatted_created_at,
+                'approved_at' => $request->formatted_approved_at
+            ]
+        ]);
     }
 }

@@ -150,6 +150,7 @@
           <th>Status</th>
           <th>Comment</th>
           <th>Supporting Evidence</th>
+          <th>Action</th>
           </tr>
           </thead>
           <tbody>
@@ -168,14 +169,15 @@
           <span title="{{ $request->comment }}">
           {{ Str::limit($request->comment, 50) }}
           </span>
-          </td>          <td>
+          </td>
+          <td>
           @if($request->certificate_file)
         <a href="{{ asset('storage/' . $request->certificate_file) }}" target="_blank"
         class="btn btn-info btn-sm mb-1">
         <i class="fas fa-eye mr-1"></i>View File 1
         </a>
         @endif
-        
+
           @if($request->certificate_file_2)
         <a href="{{ asset('storage/' . $request->certificate_file_2) }}" target="_blank"
         class="btn btn-info btn-sm mb-1">
@@ -195,7 +197,16 @@
         <span class="text-muted">-</span>
         @endif
           </td>
-
+          <td>
+          @if($request->status === 'approved' || $request->status === 'rejected')
+        <button class="btn btn-info btn-sm" onclick="showRequestDetail({{ $request->request_id }})"
+        title="View Admin Message">
+        <i class="fas fa-info-circle"></i> Detail
+        </button>
+        @else
+        <span class="text-muted">-</span>
+        @endif
+          </td>
         </tr>
         @endforeach
           </tbody>
@@ -222,6 +233,55 @@
     </div>
     </section>
   </div>
+
+  <!-- Modal untuk menampilkan detail pesan admin -->
+  <div class="modal fade" id="requestDetailModal" tabindex="-1" role="dialog" aria-labelledby="requestDetailModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+      <h5 class="modal-title" id="requestDetailModalLabel">Request Detail</h5>
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      </div>
+      <div class="modal-body">
+      <div class="row">
+        <div class="col-md-6">
+        <h6><strong>Request Information:</strong></h6>
+        <p><strong>Request Date:</strong> <span id="detail-request-date"></span></p>
+        <p><strong>Status:</strong> <span id="detail-status"></span></p>
+        </div>
+        <div class="col-md-6">
+        <h6><strong>Processing Information:</strong></h6>
+        <p><strong>Processed Date:</strong> <span id="detail-processed-date"></span></p>
+        <p><strong>Processed By:</strong> <span id="detail-processed-by"></span></p>
+        </div>
+      </div>
+      <hr>
+      <div class="row">
+        <div class="col-12">
+        <h6><strong>Your Comment:</strong></h6>
+        <div class="alert alert-light">
+          <p id="detail-user-comment" class="mb-0"></p>
+        </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12">
+        <h6><strong>Admin Message:</strong></h6>
+        <div class="alert" id="detail-admin-message-container">
+          <p id="detail-admin-message" class="mb-0"></p>
+        </div>
+        </div>
+      </div>
+      </div>
+      <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+    </div>
+  </div>
 @endsection
 
 @push('scripts')
@@ -243,5 +303,54 @@
     });
     @endif
     });
+
+    // Function untuk menampilkan detail request
+    function showRequestDetail(requestId) {
+    $.ajax({
+      url: '/student/request/detail/' + requestId,
+      type: 'GET',
+      success: function (response) {
+      if (response.success) {
+        const data = response.data;
+
+        // Populate modal with data
+        $('#detail-request-date').text(data.created_at || '-');
+        $('#detail-processed-date').text(data.approved_at || '-');
+        $('#detail-processed-by').text(data.approved_by || '-');
+        $('#detail-user-comment').text(data.comment || 'No comment provided');
+
+        // Set status badge
+        let statusClass = 'alert-secondary';
+        if (data.status === 'approved') {
+        statusClass = 'alert-success';
+        $('#detail-status').html('<span class="badge badge-success"><i class="fas fa-check mr-1"></i>Approved</span>');
+        } else if (data.status === 'rejected') {
+        statusClass = 'alert-danger';
+        $('#detail-status').html('<span class="badge badge-danger"><i class="fas fa-times mr-1"></i>Rejected</span>');
+        } else {
+        $('#detail-status').html('<span class="badge badge-warning"><i class="fas fa-clock mr-1"></i>Pending</span>');
+        }
+
+        // Set admin message
+        $('#detail-admin-message-container').removeClass('alert-success alert-danger alert-secondary').addClass(statusClass);
+        if (data.admin_notes && data.admin_notes.trim() !== '') {
+        $('#detail-admin-message').text(data.admin_notes);
+        } else {
+        $('#detail-admin-message').text('No message from admin.');
+        }
+
+        // Show modal
+        $('#requestDetailModal').modal('show');
+      }
+      },
+      error: function (xhr) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error!',
+        text: 'Failed to load request details.',
+      });
+      }
+    });
+    }
   </script>
 @endpush
