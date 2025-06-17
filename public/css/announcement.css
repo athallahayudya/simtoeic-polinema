@@ -15,3 +15,30 @@
     background-color: #6c757d;
     color: white;
 }
+#addDocument {
+    margin-bottom: 20px;
+    background-color: #6c5ce7;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 6px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    display: inline-block;
+}
+#addDocument:hover {
+    background-color: #5b4ed1;
+}
+#removeDocument {
+    background-color: #d63031;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 6px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    display: inline-block;
+}
+#removeDocument:hover {
+    background-color: #b32c2c;
+}
