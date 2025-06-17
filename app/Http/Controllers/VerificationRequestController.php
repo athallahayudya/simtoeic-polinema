@@ -7,6 +7,7 @@ use App\Models\UserModel;
 use App\Models\StudentModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
 use Barryvdh\DomPDF\Facade\Pdf as PDF;
@@ -57,9 +58,10 @@ class VerificationRequestController extends Controller
                         substr($comment, 0, 100) . '...</span>';
                 }
                 return $comment;
-            })            ->addColumn('supporting_evidence', function ($request) {
+            })
+            ->addColumn('supporting_evidence', function ($request) {
                 $files = [];
-                
+
                 // Handle first file
                 if ($request->certificate_file) {
                     $fileUrl = asset('storage/' . $request->certificate_file);
@@ -76,7 +78,7 @@ class VerificationRequestController extends Controller
                                 </a>';
                     }
                 }
-                
+
                 // Handle second file
                 if ($request->certificate_file_2) {
                     $fileUrl2 = asset('storage/' . $request->certificate_file_2);
@@ -93,7 +95,7 @@ class VerificationRequestController extends Controller
                                 </a>';
                     }
                 }
-                
+
                 return !empty($files) ? implode('<br>', $files) : '<span class="text-muted">No files</span>';
             })
             ->addColumn('status_badge', function ($request) {
@@ -119,8 +121,6 @@ class VerificationRequestController extends Controller
                     </button>';
                 }
 
-
-
                 $actions .= '</div>';
                 return $actions;
             })
@@ -136,23 +136,50 @@ class VerificationRequestController extends Controller
      */
     public function show($id)
     {
-        $request = VerificationRequestModel::with(['user.student', 'approvedBy'])
-            ->findOrFail($id);        return response()->json([
-            'success' => true,
-            'data' => [
-                'request_id' => $request->request_id,
-                'student_name' => $request->user->student->name ?? 'N/A',
-                'student_nim' => $request->user->student->nim ?? 'N/A',
-                'comment' => $request->comment,
-                'certificate_file' => $request->certificate_file,
-                'certificate_file_2' => $request->certificate_file_2,
-                'status' => $request->status,
-                'admin_notes' => $request->admin_notes,
-                'approved_by' => $request->approvedBy->name ?? null,
-                'created_at' => $request->formatted_created_at,
-                'approved_at' => $request->formatted_approved_at
-            ]
-        ]);
+        try {
+            $request = VerificationRequestModel::with(['user.student', 'approvedBy'])
+                ->findOrFail($id);
+
+            // Check if user exists
+            if (!$request->user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User information not found for this request.'
+                ], 404);
+            }
+
+            // Get student information safely
+            $student = $request->user->student ?? null;
+            $studentName = $student ? $student->name : 'N/A';
+            $studentNim = $student ? $student->nim : 'N/A';
+
+            // Get approved by information safely
+            $approvedByName = $request->approvedBy ? $request->approvedBy->name : null;
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'request_id' => $request->request_id,
+                    'student_name' => $studentName,
+                    'student_nim' => $studentNim,
+                    'comment' => $request->comment,
+                    'certificate_file' => $request->certificate_file,
+                    'certificate_file_2' => $request->certificate_file_2,
+                    'status' => $request->status,
+                    'admin_notes' => $request->admin_notes,
+                    'approved_by' => $approvedByName,
+                    'created_at' => $request->formatted_created_at,
+                    'approved_at' => $request->formatted_approved_at
+                ]
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error retrieving verification request details: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while retrieving the request details.'
+            ], 500);
+        }
     }
 
     /**
@@ -183,7 +210,7 @@ class VerificationRequestController extends Controller
             }
 
             // Generate PDF certificate
-            \Log::info('Starting PDF generation for request ID: ' . $id);
+            Log::info('Starting PDF generation for request ID: ' . $id);
             $pdfPath = $this->generateCertificate($verificationRequest);
 
             if (!$pdfPath) {
@@ -193,7 +220,7 @@ class VerificationRequestController extends Controller
                 ]);
             }
 
-            \Log::info('PDF generated successfully: ' . $pdfPath);
+            Log::info('PDF generated successfully: ' . $pdfPath);
 
             $verificationRequest->update([
                 'status' => 'approved',
@@ -208,8 +235,8 @@ class VerificationRequestController extends Controller
                 'message' => 'Request has been approved and verification letter has been generated.'
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error approving verification request: ' . $e->getMessage());
-            \Log::error('Stack trace: ' . $e->getTraceAsString());
+            Log::error('Error approving verification request: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
 
             return response()->json([
                 'success' => false,
@@ -223,30 +250,48 @@ class VerificationRequestController extends Controller
      */
     public function reject(Request $request, $id)
     {
-        $request->validate([
-            'admin_notes' => 'required|string|max:500'
-        ]);
+        try {
+            $request->validate([
+                'admin_notes' => 'required|string|max:500'
+            ]);
 
-        $verificationRequest = VerificationRequestModel::findOrFail($id);
+            $verificationRequest = VerificationRequestModel::findOrFail($id);
 
-        if ($verificationRequest->status !== 'pending') {
+            if ($verificationRequest->status !== 'pending') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Request has already been processed.'
+                ]);
+            }
+
+            // Check if user exists
+            if (!$verificationRequest->user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User information not found for this request.'
+                ]);
+            }
+
+            $verificationRequest->update([
+                'status' => 'rejected',
+                'admin_notes' => $request->admin_notes,
+                'approved_by' => Auth::id(),
+                'approved_at' => now()
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Request has been rejected successfully.'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error rejecting verification request: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
+
             return response()->json([
                 'success' => false,
-                'message' => 'Request has already been processed.'
-            ]);
+                'message' => 'An error occurred while processing the request: ' . $e->getMessage()
+            ], 500);
         }
-
-        $verificationRequest->update([
-            'status' => 'rejected',
-            'admin_notes' => $request->admin_notes,
-            'approved_by' => Auth::id(),
-            'approved_at' => now()
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Request has been rejected.'
-        ]);
     }
 
     /**
@@ -254,22 +299,36 @@ class VerificationRequestController extends Controller
      */
     public function downloadCertificate($id)
     {
-        $verificationRequest = VerificationRequestModel::findOrFail($id);
+        try {
+            $verificationRequest = VerificationRequestModel::findOrFail($id);
 
-        if ($verificationRequest->status !== 'approved' || !$verificationRequest->generated_certificate_path) {
-            abort(404, 'Certificate not found or not approved yet.');
+            if ($verificationRequest->status !== 'approved' || !$verificationRequest->generated_certificate_path) {
+                abort(404, 'Certificate not found or not approved yet.');
+            }
+
+            $filePath = storage_path('app/public/' . $verificationRequest->generated_certificate_path);
+
+            if (!file_exists($filePath)) {
+                Log::error('Certificate file not found at path: ' . $filePath);
+                abort(404, 'Certificate file not found.');
+            }
+
+            // Check if user and student relationship exists
+            if (!$verificationRequest->user || !$verificationRequest->user->student) {
+                Log::error('User or student relationship missing for request ID: ' . $id);
+                abort(404, 'Student information not found for this certificate.');
+            }
+
+            $student = $verificationRequest->user->student;
+            $fileName = 'Verification_Letter_' . ($student->nim ?? 'Unknown') . '_' . date('Y-m-d') . '.pdf';
+
+            Log::info('Downloading certificate for student: ' . $student->name . ' (Request ID: ' . $id . ')');
+
+            return response()->download($filePath, $fileName);
+        } catch (\Exception $e) {
+            Log::error('Error downloading certificate: ' . $e->getMessage());
+            abort(500, 'An error occurred while downloading the certificate.');
         }
-
-        $filePath = storage_path('app/public/' . $verificationRequest->generated_certificate_path);
-
-        if (!file_exists($filePath)) {
-            abort(404, 'Certificate file not found.');
-        }
-
-        $student = $verificationRequest->user->student;
-        $fileName = 'Verification_Letter_' . ($student->nim ?? 'Unknown') . '.pdf';
-
-        return response()->download($filePath, $fileName);
     }
 
     /**
@@ -277,24 +336,30 @@ class VerificationRequestController extends Controller
      */
     private function generateCertificate($verificationRequest)
     {
+        // Verify user and student relationship exists
+        if (!$verificationRequest->user || !$verificationRequest->user->student) {
+            Log::error('Unable to generate certificate: User or student relationship missing for request ID: ' . $verificationRequest->request_id);
+            throw new \Exception('Student information not found');
+        }
+
         $student = $verificationRequest->user->student;
-        \Log::info('Generating certificate for student: ' . $student->name);
+        Log::info('Generating certificate for student: ' . $student->name);
 
         try {
             // Create new PDF instance
-            \Log::info('Creating FPDI instance');
+            Log::info('Creating FPDI instance');
             $pdf = new Fpdi();
             $pdf->AddPage();
 
             // Import the existing PDF template
             $templatePath = public_path('surat-keterangan-ujian.pdf');
-            \Log::info('Template path: ' . $templatePath);
+            Log::info('Template path: ' . $templatePath);
 
             if (!file_exists($templatePath)) {
                 throw new \Exception('Template PDF not found at: ' . $templatePath);
             }
 
-            \Log::info('Template file exists, importing...');
+            Log::info('Template file exists, importing...');
 
             $pageCount = $pdf->setSourceFile($templatePath);
             $templateId = $pdf->importPage(1);
@@ -372,9 +437,8 @@ class VerificationRequestController extends Controller
 
             return $filePath;
         } catch (\Exception $e) {
-            // Log error and fallback to simple PDF generation
-            \Log::error('FPDI PDF generation failed: ' . $e->getMessage());
-            \Log::info('Falling back to simple PDF generation');
+            Log::error('FPDI PDF generation failed: ' . $e->getMessage());
+            Log::info('Falling back to simple PDF generation');
 
             // Fallback: create simple PDF without template
             return $this->generateSimpleCertificate($verificationRequest);
@@ -387,6 +451,12 @@ class VerificationRequestController extends Controller
     private function generateSimpleCertificate($verificationRequest)
     {
         try {
+            // Verify user and student relationship exists
+            if (!$verificationRequest->user || !$verificationRequest->user->student) {
+                Log::error('Unable to generate simple certificate: User or student relationship missing for request ID: ' . $verificationRequest->request_id);
+                return null;
+            }
+
             $student = $verificationRequest->user->student;
 
             // Prepare data for PDF
@@ -397,9 +467,15 @@ class VerificationRequestController extends Controller
                 'student_study_program' => $student->study_program ?? 'N/A',
                 'request_date' => $verificationRequest->created_at->format('d F Y'),
                 'approval_date' => now()->format('d F Y'),
-                'admin_name' => Auth::user()->name,
+                'admin_name' => Auth::user()->name ?? 'Admin',
                 'barcode_data' => 'VERIFY-' . $verificationRequest->request_id . '-' . time()
             ];
+
+            // Check if the verification letter view exists
+            if (!view()->exists('pdf.verification-letter')) {
+                Log::error('PDF template view "pdf.verification-letter" not found');
+                return null;
+            }
 
             // Generate PDF using the template
             $pdf = PDF::loadView('pdf.verification-letter', $data);
@@ -409,17 +485,23 @@ class VerificationRequestController extends Controller
             $filePath = 'verification_letters/' . $fileName;
 
             // Ensure directory exists
-            $fullPath = storage_path('app/public/' . dirname($filePath));
-            if (!file_exists($fullPath)) {
-                mkdir($fullPath, 0755, true);
+            $storagePath = storage_path('app/public/verification_letters');
+            if (!file_exists($storagePath)) {
+                mkdir($storagePath, 0755, true);
             }
 
             Storage::disk('public')->put($filePath, $pdf->output());
 
+            // Verify the file was saved successfully
+            if (!Storage::disk('public')->exists($filePath)) {
+                Log::error('Failed to save PDF file to storage');
+                return null;
+            }
+
             return $filePath;
         } catch (\Exception $e) {
-            \Log::error('Fallback PDF generation failed: ' . $e->getMessage());
-            \Log::error('Stack trace: ' . $e->getTraceAsString());
+            Log::error('Fallback PDF generation failed: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
             return null;
         }
     }
