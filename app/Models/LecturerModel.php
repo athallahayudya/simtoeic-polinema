@@ -47,9 +47,19 @@ class LecturerModel extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
+    protected $attributes = [
+        'nidn' => '-',
+        'home_address' => '',
+        'current_address' => '',
+    ];
 
     /**
-     * Get the user that owns the lecturer.
+     * Get the user that owns the lecturer profile.
      */
     public function user()
     {

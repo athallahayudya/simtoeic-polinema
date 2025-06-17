@@ -119,13 +119,28 @@ class LecturerController extends Controller
             'user'
         ));
     }
-
     /**
      * Display lecturer profile
      */
     public function profile()
     {
+        $user = Auth::guard('web')->user();
         $lecturer = LecturerModel::where('user_id', auth()->id())->first();
+
+        // If lecturer record doesn't exist but user is a lecturer, create a new lecturer record
+        if (!$lecturer && $user && $user->role === 'lecturer') {
+            try {
+                $lecturer = new LecturerModel();
+                $lecturer->user_id = $user->user_id;
+                $lecturer->name = $user->name ?? '';
+                $lecturer->nidn = '-'; // Providing a dash as default value for nidn
+                $lecturer->home_address = ''; // Adding default for home_address
+                $lecturer->current_address = ''; // Adding default for current_address
+                $lecturer->save();
+            } catch (\Exception $e) {                // Log the error if saving failed
+                \Illuminate\Support\Facades\Log::error('Failed to create lecturer record: ' . $e->getMessage());
+            }
+        }
 
         return view('users-lecturer.lecturer-profile', [
             'type_menu' => 'profile',
@@ -138,9 +153,17 @@ class LecturerController extends Controller
         $user = Auth::guard('web')->user();
         if (!$user || $user->role !== 'lecturer') {
             abort(403, 'Unauthorized or insufficient permissions.');
+        }        // Find or create lecturer record
+        $lecturer = LecturerModel::where('user_id', $user->user_id)->first();
+        if (!$lecturer) {
+            $lecturer = new LecturerModel();
+            $lecturer->user_id = $user->user_id;
+            // Set default values if necessary
+            $lecturer->name = $user->name ?? '';
+            $lecturer->nidn = '-'; // Providing a dash as default value for nidn
+            $lecturer->home_address = ''; // Adding default for home_address
+            $lecturer->current_address = ''; // Adding default for current_address
         }
-
-        $lecturer = LecturerModel::where('user_id', $user->user_id)->firstOrFail();
 
         $request->validate([
             'name' => 'required|string|max:255',

@@ -88,7 +88,7 @@
                     </div>
                 @endif
 
-                <h2 class="section-title">Hi, {{ $lecturer->name ?? 'Lecturer' }}!</h2>
+                <h2 class="section-title">Hi, {{ isset($lecturer) && $lecturer->name ? $lecturer->name : 'Lecturer' }}!</h2>
                 <p class="section-lead">
                     Change information about yourself on this page.
                 </p>
@@ -98,24 +98,24 @@
                         <div class="card profile-widget">
                             <div class="profile-widget-header">
                                 <img alt="profile photo"
-                                    src="{{ $lecturer->photo ? asset($lecturer->photo) : asset('img/avatar/avatar-1.png') }}"
+                                    src="{{ isset($lecturer) && $lecturer->photo ? asset($lecturer->photo) : asset('img/avatar/avatar-1.png') }}"
                                     class="rounded-circle profile-widget-picture">
                             </div>
 
                             <div class="profile-widget-items">
                                 <div class="profile-widget-item">
                                     <div class="profile-widget-item-label">NIDN</div>
-                                    <div class="profile-widget-item-value">{{ $lecturer->nidn ?? 'N/A' }}</div>
+                                    <div class="profile-widget-item-value">
+                                        {{ isset($lecturer) && $lecturer->nidn ? $lecturer->nidn : 'N/A' }}</div>
                                 </div>
                             </div>
-
                             <div class="card-footer text-center">
                                 <div class="font-weight-bold mb-2">Documents</div>
                                 <div class="row justify-content-center">
                                     <div class="col-6">
-                                        <a href="{{ $lecturer->ktp_scan ? asset($lecturer->ktp_scan) : '#' }}"
-                                            class="btn btn-outline-primary btn-block {{ !$lecturer->ktp_scan ? 'disabled' : '' }}"
-                                            {{ $lecturer->ktp_scan ? 'target="_blank"' : '' }}>
+                                        <a href="{{ isset($lecturer) && $lecturer->ktp_scan ? asset($lecturer->ktp_scan) : '#' }}"
+                                            class="btn btn-outline-primary btn-block {{ !isset($lecturer) || !$lecturer->ktp_scan ? 'disabled' : '' }}"
+                                            {{ isset($lecturer) && $lecturer->ktp_scan ? 'target="_blank"' : '' }}>
                                             <i class="fas fa-id-card mr-1"></i> KTP
                                         </a>
                                     </div>
@@ -138,14 +138,16 @@
                                             <div class="form-group">
                                                 <label>Lecturer ID</label>
                                                 <input type="text" class="form-control readonly-field"
-                                                    value="{{ $lecturer->lecturer_id ?? '-' }}" readonly>
+                                                    value="{{ isset($lecturer) && $lecturer->lecturer_id ? $lecturer->lecturer_id : '-' }}"
+                                                    readonly>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label>NIDN</label>
                                                 <input type="text" class="form-control readonly-field"
-                                                    value="{{ $lecturer->nidn ?? '' }}" readonly>
+                                                    value="{{ isset($lecturer) && $lecturer->nidn ? $lecturer->nidn : '' }}"
+                                                    readonly>
                                             </div>
                                         </div>
                                     </div>
@@ -154,8 +156,10 @@
                                             <div class="form-group">
                                                 <label>Full Name</label>
                                                 <input type="text" name="name" class="form-control readonly-field"
-                                                    value="{{ $lecturer->name ?? '' }}" readonly>
-                                                <input type="hidden" name="name" value="{{ $lecturer->name ?? '' }}">
+                                                    value="{{ isset($lecturer) && $lecturer->name ? $lecturer->name : auth()->user()->name ?? '' }}"
+                                                    readonly>
+                                                <input type="hidden" name="name"
+                                                    value="{{ isset($lecturer) && $lecturer->name ? $lecturer->name : auth()->user()->name ?? '' }}">
                                                 @error('name')
                                                     <div class="text-danger">{{ $message }}</div>
                                                 @enderror
@@ -163,9 +167,9 @@
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label>Phone Number</label>
-                                                <input type="tel" name="phone_number" class="form-control"
-                                                    value="{{ $lecturer->user->phone_number ?? '' }}"
+                                                <label>Phone Number</label> <input type="tel" name="phone_number"
+                                                    class="form-control"
+                                                    value="{{ (isset($lecturer) && $lecturer && isset($lecturer->user)) ? $lecturer->user->phone_number ?? '' : auth()->user()->phone_number ?? '' }}"
                                                     placeholder="Please enter your active phone number" required>
                                                 @error('phone_number')
                                                     <div class="text-danger">{{ $message }}</div>
@@ -176,10 +180,10 @@
 
                                     <div class="row">
                                         <div class="col-md-12">
-                                            <div class="form-group">
-                                                <label>Telegram Chat ID <span class="text-muted">(Optional)</span></label>
-                                                <input type="text" name="telegram_chat_id" class="form-control"
-                                                    value="{{ $lecturer->user->telegram_chat_id ?? '' }}"
+                                            <div class="form-group"> <label>Telegram Chat ID <span
+                                                        class="text-muted">(Optional)</span></label> <input type="text"
+                                                    name="telegram_chat_id" class="form-control"
+                                                    value="{{ (isset($lecturer) && $lecturer && isset($lecturer->user)) ? $lecturer->user->telegram_chat_id ?? '' : auth()->user()->telegram_chat_id ?? '' }}"
                                                     placeholder="Enter your Telegram Chat ID (numbers only)">
                                                 @error('telegram_chat_id')
                                                     <div class="text-danger">{{ $message }}</div>
@@ -203,7 +207,7 @@
                                             <div class="form-group">
                                                 <label>Home Address</label>
                                                 <textarea name="home_address" class="form-control"
-                                                    required>{{ $lecturer->home_address ?? '' }}</textarea>
+                                                    required>{{ isset($lecturer) ? $lecturer->home_address ?? '' : '' }}</textarea>
                                                 @error('home_address')
                                                     <div class="text-danger">{{ $message }}</div>
                                                 @enderror
@@ -213,7 +217,7 @@
                                             <div class="form-group">
                                                 <label>Current Address</label>
                                                 <textarea name="current_address" class="form-control"
-                                                    required>{{ $lecturer->current_address ?? '' }}</textarea>
+                                                    required>{{ isset($lecturer) ? $lecturer->current_address ?? '' : '' }}</textarea>
                                                 @error('current_address')
                                                     <div class="text-danger">{{ $message }}</div>
                                                 @enderror
