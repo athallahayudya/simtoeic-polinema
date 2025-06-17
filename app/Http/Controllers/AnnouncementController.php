@@ -156,6 +156,8 @@ class AnnouncementController extends Controller
     {
         Log::info('Upload request received', [
             'title' => $request->title,
+            'description' => $request->description,
+            'announcement_status' => $request->announcement_status,
             'has_announcement_file' => $request->hasFile('announcement_file'),
             'has_photo' => $request->hasFile('photo'),
             'announcement_file_size' => $request->hasFile('announcement_file') ? $request->file('announcement_file')->getSize() : 0,
@@ -167,6 +169,7 @@ class AnnouncementController extends Controller
             'announcement_file' => 'nullable|file|mimes:pdf|max:10240',
             'photo' => 'nullable|file|mimes:jpg,jpeg,png|max:10240',
             'description' => 'nullable|string',
+            'announcement_status' => 'required|in:draft,published',
             'visible_to' => 'nullable|array',
             'visible_to.*' => 'in:student,staff,alumni,lecturer'
         ]);
@@ -202,7 +205,7 @@ class AnnouncementController extends Controller
             $announcement->announcement_file = $announcementFileUrl;
             $announcement->photo = $photoUrl;
             $announcement->announcement_date = now();
-            $announcement->announcement_status = 'published';
+            $announcement->announcement_status = $request->announcement_status;
             $announcement->visible_to = $visibleTo;
             $announcement->created_by = auth()->id();
             $announcement->save();
