@@ -27,7 +27,8 @@
       <div class="col-lg-8 col-md-10 mx-auto">
         <div class="card shadow-sm">
         <div class="card-header bg-gradient-primary py-3">
-          <h4 class="mb-0 text-white"><i class="fas fa-certificate mr-2 text-white"></i>New Verification Request</h4>
+          <h4 class="mb-0 text-white"><i class="fas fa-certificate mr-2 text-white"></i>New Verification Request
+          </h4>
         </div>
         <div class="card-body p-4">
           @if(session('success'))
@@ -106,13 +107,13 @@
             <div id="additionalDocuments" class="mt-3">
             <!-- Additional document fields will be added here dynamically -->
             </div>
-
             <div class="d-flex justify-content-center mt-3">
-            <button type="button" id="addDocumentBtn" class="btn btn-outline-primary px-4">
-              <i class="fas fa-plus-circle mr-1"></i> Add Another Document <span class="text-danger">*</span>
+            <button type="button" id="addDocumentBtn" class="btn btn-outline-primary btn-rounded">
+              <i class="fas fa-plus-circle mr-1"></i> Add Another Document
             </button>
             </div>
-            <small class="text-center d-block mt-2 text-muted"><i class="fas fa-info-circle mr-1"></i>At least 2 documents are required for verification</small>
+            <small class="text-center d-block mt-2 text-muted"><i class="fas fa-info-circle mr-1"></i>One document
+            is sufficient, additional documents are optional</small>
           </div>
 
           <!-- Submit Button -->
@@ -133,7 +134,7 @@
           <div class="additional-document mt-3 p-3 border rounded">
             <div class="d-flex align-items-center mb-2">
             <label class="font-weight-bold mb-0">
-              <i class="fas fa-file-upload mr-1 text-primary"></i>Supporting Document <span class="text-danger">*</span>
+              <i class="fas fa-file-upload mr-1 text-primary"></i>Supporting Document (Optional)
             </label>
             <button type="button" class="btn btn-sm btn-danger ml-auto remove-document rounded-circle">
               <i class="fas fa-times"></i>
@@ -143,7 +144,7 @@
             <div class="input-group">
             <div class="custom-file">
               <input type="file" class="custom-file-input document-file" name="additional_documents[]"
-              accept=".pdf,.jpg,.jpeg,.png" required>
+              accept=".pdf,.jpg,.jpeg,.png">
               <label class="custom-file-label">Choose file...</label>
             </div>
             </div>
@@ -214,9 +215,7 @@
     }
 
     #addDocumentBtn {
-    border-radius: 30px;
     transition: all 0.3s ease;
-    padding: 10px 20px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
     }
 
@@ -267,7 +266,7 @@
     border-radius: 5px;
     overflow: hidden;
     }
-    
+
     .embed-responsive iframe {
     background-color: #f8f9fc;
     }
@@ -329,11 +328,11 @@
 
       // Update validation styling based on character count
       if (length < 20) {
-        $('#charCount').removeClass('text-success').addClass('text-danger');
-        $('#comment').removeClass('is-valid').addClass('is-invalid');
+      $('#charCount').removeClass('text-success').addClass('text-danger');
+      $('#comment').removeClass('is-valid').addClass('is-invalid');
       } else {
-        $('#charCount').removeClass('text-danger').addClass('text-success');
-        $('#comment').removeClass('is-invalid').addClass('is-valid');
+      $('#charCount').removeClass('text-danger').addClass('text-success');
+      $('#comment').removeClass('is-invalid').addClass('is-valid');
       }
     };
 
@@ -479,9 +478,7 @@
       });
       $('#comment').focus();
       return;
-      }
-
-      // Validate file upload - main document
+      }      // Validate file upload - main document (only requirement)
       if (!mainFile) {
       e.preventDefault();
       Swal.fire({
@@ -491,20 +488,6 @@
         confirmButtonColor: '#4e73df'
       });
       $('#certificate_file').focus();
-      return;
-      }
-      
-      // Validate minimum total documents (at least 2)
-      if (totalFiles < 2) {
-      e.preventDefault();
-      Swal.fire({
-        icon: 'warning',
-        title: 'More Documents Required',
-        text: 'Please upload at least 2 supporting documents for verification',
-        confirmButtonColor: '#4e73df',
-        confirmButtonText: 'I\'ll Add More'
-      });
-      $('#addDocumentBtn').focus();
       return;
       }
 
@@ -547,154 +530,151 @@
         .removeClass('disabled');
       }
       });
-    });
-
-    // Initialize document counter on page load
+    });    // Initialize document counter on page load (optional counter for information only)
     function updateDocumentCounter() {
       const mainFile = $('#certificate_file')[0].files.length > 0 ? 1 : 0;
       const additionalFiles = $('.document-file').filter(function () {
-        return this.files.length > 0;
+      return this.files.length > 0;
       }).length;
-      
+
       const totalFiles = mainFile + additionalFiles;
+
+      // Update document counter if element exists (optional display feature)
+      if ($('#documentCounter').length) {
       $('#documentCounter').text(totalFiles);
-      
-      // Update styling based on if minimum documents are met
-      if (totalFiles >= 2) {
-        $('#documentCounter').removeClass('text-danger').addClass('text-success');
-      } else {
-        $('#documentCounter').removeClass('text-success').addClass('text-danger');
+      // Always show green since 1 document is sufficient
+      $('#documentCounter').removeClass('text-danger').addClass('text-success');
       }
     }
 
     // Call updateDocumentCounter whenever files change
-    $('#certificate_file').on('change', function() {
+    $('#certificate_file').on('change', function () {
       updateDocumentCounter();
     });
-    
+
     // Event delegation for document file changes
-    $(document).on('change', '.document-file', function() {
+    $(document).on('change', '.document-file', function () {
       updateDocumentCounter();
     });
-    
+
     // Update counter on document removal
-    $(document).on('click', '.remove-document', function() {
+    $(document).on('click', '.remove-document', function () {
       setTimeout(updateDocumentCounter, 500); // Update after animation completes
     });
-    
+
     // Initialize counter on document ready
     updateDocumentCounter();
 
     // Enhanced file preview function with better styling and interactive preview
     function showFilePreview(file, previewContentId, previewContainerId) {
-    const reader = new FileReader();
-    const previewContent = $('#' + previewContentId);
-    const previewContainer = $('#' + previewContainerId);
+      const reader = new FileReader();
+      const previewContent = $('#' + previewContentId);
+      const previewContainer = $('#' + previewContainerId);
 
-    reader.onload = function (e) {
+      reader.onload = function (e) {
       let content = '';
 
       if (file.type.startsWith('image/')) {
         content = `
-          <div class="mb-2">
-            <img src="${e.target.result}" class="img-fluid shadow-sm" style="max-height: 180px; border-radius: 5px;">
-          </div>
-          <div>
-            <span class="badge badge-light p-2">
-              <i class="fas fa-image mr-1 text-primary"></i> ${file.name}
-            </span>
-          </div>
-          <div class="mt-2">
-            <a href="${e.target.result}" target="_blank" class="btn btn-sm btn-outline-primary">
-              <i class="fas fa-eye mr-1"></i> View Full Image
-            </a>
-          </div>
-          <small class="text-muted d-block mt-1">${(file.size / 1024 / 1024).toFixed(1)} MB</small>
-          `;
+        <div class="mb-2">
+        <img src="${e.target.result}" class="img-fluid shadow-sm" style="max-height: 180px; border-radius: 5px;">
+        </div>
+        <div>
+        <span class="badge badge-light p-2">
+          <i class="fas fa-image mr-1 text-primary"></i> ${file.name}
+        </span>
+        </div>
+        <div class="mt-2">
+        <a href="${e.target.result}" target="_blank" class="btn btn-sm btn-outline-primary">
+          <i class="fas fa-eye mr-1"></i> View Full Image
+        </a>
+        </div>
+        <small class="text-muted d-block mt-1">${(file.size / 1024 / 1024).toFixed(1)} MB</small>
+        `;
       } else if (file.type === 'application/pdf') {
         // For PDFs, create an embedded PDF viewer
         content = `
-          <div class="mb-2">
-            <i class="fas fa-file-pdf fa-3x text-danger mb-2"></i>
-            <div class="embed-responsive embed-responsive-16by9 mt-2">
-              <iframe class="embed-responsive-item" src="${e.target.result}" allowfullscreen></iframe>
-            </div>
-          </div>
-          <div>
-            <span class="badge badge-light p-2">
-              <i class="fas fa-file-pdf mr-1 text-danger"></i> ${file.name}
-            </span>
-          </div>
-          <div class="mt-2">
-            <a href="${e.target.result}" target="_blank" class="btn btn-sm btn-outline-primary">
-              <i class="fas fa-external-link-alt mr-1"></i> Open in New Tab
-            </a>
-          </div>
-          <small class="text-muted d-block mt-1">${(file.size / 1024 / 1024).toFixed(1)} MB</small>
-          `;
+        <div class="mb-2">
+        <i class="fas fa-file-pdf fa-3x text-danger mb-2"></i>
+        <div class="embed-responsive embed-responsive-16by9 mt-2">
+          <iframe class="embed-responsive-item" src="${e.target.result}" allowfullscreen></iframe>
+        </div>
+        </div>
+        <div>
+        <span class="badge badge-light p-2">
+          <i class="fas fa-file-pdf mr-1 text-danger"></i> ${file.name}
+        </span>
+        </div>
+        <div class="mt-2">
+        <a href="${e.target.result}" target="_blank" class="btn btn-sm btn-outline-primary">
+          <i class="fas fa-external-link-alt mr-1"></i> Open in New Tab
+        </a>
+        </div>
+        <small class="text-muted d-block mt-1">${(file.size / 1024 / 1024).toFixed(1)} MB</small>
+        `;
       }
 
       // Set content and make sure preview is visible
       previewContent.html(content);
       previewContainer.slideDown(300);
-    };
+      };
 
-    reader.readAsDataURL(file);
+      reader.readAsDataURL(file);
     }
 
     // Function to show dynamic file previews for additional documents
     function showDynamicFilePreview(file, previewContentEl, previewContainerEl) {
-    const reader = new FileReader();
+      const reader = new FileReader();
 
-    reader.onload = function (e) {
+      reader.onload = function (e) {
       let content = '';
 
       if (file.type.startsWith('image/')) {
         content = `
-          <div class="mb-2">
-            <img src="${e.target.result}" class="img-fluid shadow-sm" style="max-height: 150px; border-radius: 5px;">
-          </div>
-          <div>
-            <span class="badge badge-light p-2">
-              <i class="fas fa-image mr-1 text-primary"></i> ${file.name}
-            </span>
-          </div>
-          <div class="mt-2">
-            <a href="${e.target.result}" target="_blank" class="btn btn-sm btn-outline-primary">
-              <i class="fas fa-eye mr-1"></i> View Full Image
-            </a>
-          </div>
-          <small class="text-muted d-block mt-1">${(file.size / 1024 / 1024).toFixed(1)} MB</small>
-          `;
+        <div class="mb-2">
+        <img src="${e.target.result}" class="img-fluid shadow-sm" style="max-height: 150px; border-radius: 5px;">
+        </div>
+        <div>
+        <span class="badge badge-light p-2">
+          <i class="fas fa-image mr-1 text-primary"></i> ${file.name}
+        </span>
+        </div>
+        <div class="mt-2">
+        <a href="${e.target.result}" target="_blank" class="btn btn-sm btn-outline-primary">
+          <i class="fas fa-eye mr-1"></i> View Full Image
+        </a>
+        </div>
+        <small class="text-muted d-block mt-1">${(file.size / 1024 / 1024).toFixed(1)} MB</small>
+        `;
       } else if (file.type === 'application/pdf') {
         // For PDFs, create an embedded PDF viewer
         content = `
-          <div class="mb-2">
-            <i class="fas fa-file-pdf fa-3x text-danger mb-2"></i>
-            <div class="embed-responsive embed-responsive-16by9 mt-2">
-              <iframe class="embed-responsive-item" src="${e.target.result}" allowfullscreen></iframe>
-            </div>
-          </div>
-          <div>
-            <span class="badge badge-light p-2">
-              <i class="fas fa-file-pdf mr-1 text-danger"></i> ${file.name}
-            </span>
-          </div>
-          <div class="mt-2">
-            <a href="${e.target.result}" target="_blank" class="btn btn-sm btn-outline-primary">
-              <i class="fas fa-external-link-alt mr-1"></i> Open in New Tab
-            </a>
-          </div>
-          <small class="text-muted d-block mt-1">${(file.size / 1024 / 1024).toFixed(1)} MB</small>
-          `;
+        <div class="mb-2">
+        <i class="fas fa-file-pdf fa-3x text-danger mb-2"></i>
+        <div class="embed-responsive embed-responsive-16by9 mt-2">
+          <iframe class="embed-responsive-item" src="${e.target.result}" allowfullscreen></iframe>
+        </div>
+        </div>
+        <div>
+        <span class="badge badge-light p-2">
+          <i class="fas fa-file-pdf mr-1 text-danger"></i> ${file.name}
+        </span>
+        </div>
+        <div class="mt-2">
+        <a href="${e.target.result}" target="_blank" class="btn btn-sm btn-outline-primary">
+          <i class="fas fa-external-link-alt mr-1"></i> Open in New Tab
+        </a>
+        </div>
+        <small class="text-muted d-block mt-1">${(file.size / 1024 / 1024).toFixed(1)} MB</small>
+        `;
       }
 
       // Set content and ensure it's visible with animation
       previewContentEl.html(content);
       previewContainerEl.slideDown(300);
-    };
+      };
 
-    reader.readAsDataURL(file);
+      reader.readAsDataURL(file);
     }
     });
   </script>

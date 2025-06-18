@@ -433,20 +433,21 @@ class StudentController extends Controller
         }
         $request->validate([
             'comment' => 'required|string|max:1000',
-            'certificate_file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120', // 5MB max
-            'certificate_file_2' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120' // 5MB max, optional
-        ]);
-
-        // Store the uploaded certificates
+            'certificate_file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120', // 5MB max - only 1 document required
+            'additional_documents.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120' // Additional documents optional
+        ]);        // Store the uploaded certificates
         $certificateFile = $request->file('certificate_file');
         $fileName = time() . '_' . $user->user_id . '_' . $certificateFile->getClientOriginalName();
         $filePath = $certificateFile->storeAs('verification_requests', $fileName, 'public');
 
-        $filePath2 = null;
-        if ($request->hasFile('certificate_file_2')) {
-            $certificateFile2 = $request->file('certificate_file_2');
-            $fileName2 = time() . '_2_' . $user->user_id . '_' . $certificateFile2->getClientOriginalName();
-            $filePath2 = $certificateFile2->storeAs('verification_requests', $fileName2, 'public');
+        // Handle additional documents if any
+        $additionalFiles = [];
+        if ($request->hasFile('additional_documents')) {
+            foreach ($request->file('additional_documents') as $index => $file) {
+                $additionalFileName = time() . '_' . ($index + 2) . '_' . $user->user_id . '_' . $file->getClientOriginalName();
+                $additionalFilePath = $file->storeAs('verification_requests', $additionalFileName, 'public');
+                $additionalFiles[] = $additionalFilePath;
+            }
         }
 
         // Create the request
@@ -454,9 +455,10 @@ class StudentController extends Controller
             'user_id' => $user->user_id,
             'comment' => $request->comment,
             'certificate_file' => $filePath,
-            'certificate_file_2' => $filePath2,
+            'certificate_file_2' => !empty($additionalFiles) ? $additionalFiles[0] : null, // Store first additional file in old field for compatibility
             'status' => 'pending'
-        ]);        return redirect()->route('student.request.index')
+        ]);
+        return redirect()->route('student.request.index')
             ->with('success', 'Verification request has been submitted successfully. Please wait for admin approval.');
     }
 
