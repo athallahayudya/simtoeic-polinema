@@ -134,15 +134,15 @@ class ExamResultModel extends Model
     // Get exam type display name
     public function getExamTypeDisplayAttribute()
     {
-        return $this->exam_type === 'gratis' ? 'Gratis' : 'Mandiri';
+        return $this->exam_type === 'gratis' ? 'Unpaid' : 'Paid';
     }
 
     // Get exam type badge
     public function getExamTypeBadgeAttribute()
     {
         return $this->exam_type === 'gratis'
-            ? '<span class="badge badge-success">Gratis</span>'
-            : '<span class="badge badge-primary">Mandiri</span>';
+            ? '<span class="badge badge-success">Unpaid</span>'
+            : '<span class="badge badge-primary">Paid</span>';
     }
 
     // Scopes for exam types
