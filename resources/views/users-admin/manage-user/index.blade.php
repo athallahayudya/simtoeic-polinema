@@ -771,26 +771,71 @@
                             });
                         }
                     },
+                    error: function (xhr) {
+                        if (xhr.status === 422) {
+                            const response = xhr.responseJSON;
+                            if (response.message === 'User already exist') {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'User Already Exist',
+                                    text: 'User already exist',
+                                    confirmButtonText: 'OK'
+                                });
+                            } else if (response.msgField) {
+                                // Handle field-specific errors
+                                let errorMessages = [];
+                                Object.keys(response.msgField).forEach(field => {
+                                    response.msgField[field].forEach(error => {
+                                        errorMessages.push(error);
+                                    });
+                                });
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Validation Error',
+                                    html: errorMessages.join('<br>'),
+                                    confirmButtonText: 'OK'
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: response.message || 'An error occurred',
+                                    confirmButtonText: 'OK'
+                                });
+                            }
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'An unexpected error occurred. Please try again.',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    }
                 });
             });
-
-            @if (session('success'))
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Success!',
-                    text: '{{ session('success') }}',
-                    confirmButtonText: 'OK'
-                });
-            @endif
-
-            @if (session('error'))
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error!',
-                    text: '{{ session('error') }}',
-                    confirmButtonText: 'OK'
-                });
-            @endif
         });
     </script>
 @endpush
+
+@if (session('success'))
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: "{{ session('success') }}",
+            confirmButtonText: 'OK'
+        });
+    </script>
+@endif
+
+@if (session('error'))
+    <script>
+        Swal.fire({
+            icon: 'error',
+            title: 'Error!',
+            text: "{{ session('error') }}",
+            confirmButtonText: 'OK'
+        });
+    </script>
+@endif

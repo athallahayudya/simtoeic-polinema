@@ -387,6 +387,18 @@ class ManageUsersController extends Controller
 
     public function store(Request $request)
     {
+        // Check if identity number already exists before validation
+        $existingUser = UserModel::where('identity_number', $request->identity_number)->first();
+        if ($existingUser) {
+            return response()->json([
+                'status' => false,
+                'message' => 'User already exist',
+                'msgField' => [
+                    'identity_number' => ['User already exist']
+                ]
+            ], 422);
+        }
+
         $rules = [
             'name' => 'required|min:3',
             'identity_number' => 'required|unique:users,identity_number|min:5',
@@ -471,6 +483,19 @@ class ManageUsersController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error('Create user error: ' . $e->getMessage());
+            
+            // Check if it's a duplicate key error for identity_number
+            if (strpos($e->getMessage(), 'Duplicate entry') !== false && 
+                strpos($e->getMessage(), 'users_identity_number_unique') !== false) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'User already exist',
+                    'msgField' => [
+                        'identity_number' => ['User already exist']
+                    ]
+                ], 422);
+            }
+            
             return response()->json([
                 'status' => false,
                 'message' => 'Failed to create user. Please try again.',
