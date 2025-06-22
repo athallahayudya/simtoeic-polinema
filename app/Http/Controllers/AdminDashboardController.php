@@ -39,10 +39,8 @@ class AdminDashboardController extends Controller
         $recentExamResults = ExamResultModel::with(['user.student', 'user.staff', 'user.lecturer', 'user.alumni'])
             ->orderBy('created_at', 'desc')
             ->limit(10)
-            ->get();
-
-        // Enhanced Score statistics with detailed calculations
-        $allScores = ExamResultModel::pluck('score')->filter()->values();
+            ->get();        // Enhanced Score statistics with detailed calculations
+        $allScores = ExamResultModel::pluck('total_score')->filter()->where('>', 0)->values();
         $averageScore = $allScores->avg();
         $highestScore = $allScores->max();
         $lowestScore = $allScores->min();
@@ -108,15 +106,13 @@ class AdminDashboardController extends Controller
                 (object)['grade' => 'Advanced (785-944)', 'count' => 0],
                 (object)['grade' => 'Proficient (945-990)', 'count' => 0],
             ]);
-        }
-
-        // Additional score statistics for enhanced display
-        $totalParticipants = ExamResultModel::count();
-        $passRate = $totalParticipants > 0 ? ExamResultModel::where('score', '>=', 550)->count() / $totalParticipants * 100 : 0;
-        $excellentRate = $totalParticipants > 0 ? ExamResultModel::where('score', '>=', 785)->count() / $totalParticipants * 100 : 0;
+        }        // Additional score statistics for enhanced display
+        $totalParticipants = ExamResultModel::where('total_score', '>', 0)->count();
+        $passRate = $totalParticipants > 0 ? ExamResultModel::where('total_score', '>=', 500)->count() / $totalParticipants * 100 : 0;
+        $excellentRate = $totalParticipants > 0 ? ExamResultModel::where('total_score', '>=', 785)->count() / $totalParticipants * 100 : 0;
 
         // Get all exam results for detailed chart
-        $allExamResults = ExamResultModel::select('score')->get();
+        $allExamResults = ExamResultModel::select('total_score as score')->where('total_score', '>', 0)->get();
 
         // Exam Score Distribution by Major using ORM
         $majorScoreDistribution = $this->getMajorScoreDistribution();
@@ -203,12 +199,11 @@ class AdminDashboardController extends Controller
             'Akuntansi',
             'Administrasi Niaga',
             'Teknologi Informasi'
-        ];
-
-        // Get all exam results with student data using ORM relationships
+        ];        // Get all exam results with student data using ORM relationships
         $examResults = ExamResultModel::with(['user.student'])
             ->whereHas('user.student')
-            ->whereNotNull('score')
+            ->whereNotNull('total_score')
+            ->where('total_score', '>', 0)
             ->get();
 
         // Process data for each major
@@ -220,11 +215,9 @@ class AdminDashboardController extends Controller
                 return $result->user &&
                     $result->user->student &&
                     $result->user->student->major === $major;
-            });
-
-            // Calculate statistics
+            });            // Calculate statistics
             $totalParticipants = $majorResults->count();
-            $scores = $majorResults->pluck('score');
+            $scores = $majorResults->pluck('total_score');
 
             $averageScore = $totalParticipants > 0 ? round($scores->avg(), 1) : 0;
             $minScore = $totalParticipants > 0 ? $scores->min() : 0;
@@ -272,10 +265,9 @@ class AdminDashboardController extends Controller
 
     /**
      * Get score distribution using ORM
-     */
-    private function getScoreDistribution()
+     */    private function getScoreDistribution()
     {
-        $examResults = ExamResultModel::whereNotNull('score')->get();
+        $examResults = ExamResultModel::whereNotNull('total_score')->where('total_score', '>', 0)->get();
 
         $distribution = collect([
             (object)['grade' => 'Beginner (10-224)', 'count' => 0],
@@ -286,7 +278,7 @@ class AdminDashboardController extends Controller
         ]);
 
         foreach ($examResults as $result) {
-            $score = $result->score;
+            $score = $result->total_score;
 
             if ($score >= 945) {
                 $distribution[4]->count++;
@@ -326,12 +318,10 @@ class AdminDashboardController extends Controller
                 if ($student->user && $student->user->examResults) {
                     $examResults = $examResults->merge($student->user->examResults);
                 }
-            }
-
-            $examResultsWithScore = $examResults->whereNotNull('score');
+            }            $examResultsWithScore = $examResults->whereNotNull('total_score')->where('total_score', '>', 0);
             $examTaken = $examResultsWithScore->count();
-            $avgScore = $examTaken > 0 ? round($examResultsWithScore->avg('score'), 1) : 0;
-            $passedCount = $examResultsWithScore->where('score', '>=', 550)->count();
+            $avgScore = $examTaken > 0 ? round($examResultsWithScore->avg('total_score'), 1) : 0;
+            $passedCount = $examResultsWithScore->where('total_score', '>=', 500)->count();
 
             $campusStats->push((object)[
                 'campus' => $campus,
