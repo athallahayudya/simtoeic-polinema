@@ -298,7 +298,7 @@
                                     <input type="file" class="custom-file-input" id="announcement_file" name="announcement_file" accept=".pdf">
                                     <label class="custom-file-label" for="announcement_file">Choose PDF file...</label>
                                 </div>
-                                <small class="form-text text-muted">Maximum file size: 10MB. Only PDF files are allowed.</small>
+                                <small class="form-text text-muted">Maximum file size: 20MB. Only PDF files are allowed.</small>
                             </div>
 
                             <div class="form-group">
@@ -307,7 +307,7 @@
                                     <input type="file" class="custom-file-input" id="photo" name="photo" accept=".jpg,.jpeg,.png">
                                     <label class="custom-file-label" for="photo">Choose image...</label>
                                 </div>
-                                <small class="form-text text-muted">Maximum file size: 10MB. Allowed image types: JPG, JPEG, PNG.</small>
+                                <small class="form-text text-muted">Maximum file size: 20MB. Allowed image types: JPG, JPEG, PNG.</small>
                             </div>
                             <button type="button" class="btn btn-danger mt-2" id="removeDocument">Remove</button>
                         </div>
@@ -338,11 +338,11 @@
 
                     if (file) {
                         var fileSize = file.size;
-                        var maxSize = 10 * 1024 * 1024; // 10MB
+                        var maxSize = 20 * 1024 * 1024; // 20MB
                         var validTypes = id.includes('announcement_file') ? ['application/pdf'] : ['image/jpeg', 'image/jpg', 'image/png'];
 
                         if (fileSize > maxSize) {
-                            fileLabel.text('File too large (max 10MB)').addClass('text-danger');
+                            fileLabel.text('File too large (max 20MB)').addClass('text-danger');
                             $(this).val(''); // Clear the input
                         } else if (!validTypes.includes(file.type)) {
                             fileLabel.text('Invalid file type').addClass('text-danger');

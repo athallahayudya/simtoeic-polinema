@@ -14,7 +14,9 @@ return new class extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->enum('certificate_status', ['taken', 'not_taken'])->default('not_taken')->after('exam_status');
+            if (!Schema::hasColumn('users', 'certificate_status')) {
+                $table->enum('certificate_status', ['taken', 'not_taken'])->default('not_taken')->after('exam_status');
+            }
         });
     }
 
@@ -26,7 +28,9 @@ return new class extends Migration
     public function down()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('certificate_status');
+            if (Schema::hasColumn('users', 'certificate_status')) {
+                $table->dropColumn('certificate_status');
+            }
         });
     }
 };

@@ -166,12 +166,17 @@ class AnnouncementController extends Controller
 
         $request->validate([
             'title' => 'required|string|max:255',
-            'announcement_file' => 'nullable|file|mimes:pdf|max:10240',
-            'photo' => 'nullable|file|mimes:jpg,jpeg,png|max:10240',
+            'announcement_file' => 'nullable|file|mimes:pdf|max:20480', // Increased to 20MB
+            'photo' => 'nullable|file|mimes:jpg,jpeg,png|max:20480', // Increased to 20MB
             'description' => 'nullable|string',
             'announcement_status' => 'required|in:draft,published',
             'visible_to' => 'nullable|array',
             'visible_to.*' => 'in:student,staff,alumni,lecturer'
+        ], [
+            'announcement_file.max' => 'The announcement file may not be greater than 20MB.',
+            'photo.max' => 'The photo may not be greater than 20MB.',
+            'announcement_file.mimes' => 'The announcement file must be a PDF file.',
+            'photo.mimes' => 'The photo must be a JPG, JPEG, or PNG file.'
         ]);
 
         try {
@@ -210,8 +215,18 @@ class AnnouncementController extends Controller
             $announcement->created_by = auth()->id();
             $announcement->save();
 
-            // Send Telegram notifications
-            $this->sendTelegramNotifications($announcement);
+            // Send Telegram notifications only if announcement is published
+            if ($request->announcement_status === 'published') {
+                try {
+                    $this->sendTelegramNotifications($announcement);
+                } catch (\Exception $telegramError) {
+                    Log::error('Telegram notification failed but announcement was saved: ' . $telegramError->getMessage(), [
+                        'announcement_id' => $announcement->announcement_id,
+                        'trace' => $telegramError->getTraceAsString()
+                    ]);
+                    // Don't fail the entire upload if Telegram fails
+                }
+            }
 
             return response()->json([
                 'status' => true,
@@ -239,8 +254,15 @@ class AnnouncementController extends Controller
     private function sendTelegramNotifications(AnnouncementModel $announcement)
     {
         try {
+            // Check if Telegram bot token is configured
+            if (empty(config('services.telegram.bot_token'))) {
+                Log::warning('Telegram bot token not configured, skipping notifications');
+                return;
+            }
+
             // Get users based on announcement visibility
-            $query = UserModel::whereNotNull('telegram_chat_id');
+            $query = UserModel::whereNotNull('telegram_chat_id')
+                             ->where('telegram_chat_id', '!=', '');
 
             // Filter by roles if specific roles are set
             if (!empty($announcement->visible_to)) {
@@ -251,7 +273,18 @@ class AnnouncementController extends Controller
 
             if ($users->count() > 0) {
                 // Send notification to each user
-                Notification::send($users, new AnnouncementNotification($announcement));
+                foreach ($users as $user) {
+                    try {
+                        $user->notify(new AnnouncementNotification($announcement));
+                    } catch (\Exception $userError) {
+                        Log::error('Failed to send notification to user: ' . $userError->getMessage(), [
+                            'user_id' => $user->user_id,
+                            'chat_id' => $user->telegram_chat_id,
+                            'announcement_id' => $announcement->announcement_id
+                        ]);
+                        // Continue with other users even if one fails
+                    }
+                }
 
                 Log::info('Telegram notifications sent for announcement', [
                     'announcement_id' => $announcement->announcement_id,
@@ -270,6 +303,7 @@ class AnnouncementController extends Controller
                 'announcement_id' => $announcement->announcement_id,
                 'trace' => $e->getTraceAsString()
             ]);
+            // Don't throw the exception, just log it
         }
     }
 }

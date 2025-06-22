@@ -73,23 +73,6 @@ class AdminProfileController extends Controller
 
         // Handle photo upload
         if ($request->hasFile('photo')) {
-            // Check if admin already has a custom photo (one-time upload rule)
-            $hasCustomPhoto = $admin->photo && !str_contains($admin->photo, 'img/avatar/');
-
-            if ($hasCustomPhoto) {
-                return redirect()->route('admin.profile')->with('error', 'You can only upload a profile photo once. Your current photo is already set.');
-            }
-
-            $file = $request->file('photo');
-
-            // Debug: Log file information
-            Log::info('Admin photo upload attempt', [
-                'file_name' => $file->getClientOriginalName(),
-                'file_size' => $file->getSize(),
-                'file_mime' => $file->getMimeType(),
-                'admin_id' => $admin->admin_id
-            ]);
-
             // Delete old photo if it exists and it's not the default photo
             if ($admin->photo && !str_contains($admin->photo, 'img/avatar/')) {
                 $oldPhotoPath = str_replace('storage/', '', $admin->photo);
@@ -100,28 +83,14 @@ class AdminProfileController extends Controller
             }
 
             // Store new photo
-            try {
-                // Create directory if it doesn't exist
-                $uploadPath = 'admin/photos';
-                if (!Storage::disk('public')->exists($uploadPath)) {
-                    Storage::disk('public')->makeDirectory($uploadPath);
-                }
+            $file = $request->file('photo');
+            $path = $file->store('admin/photos', 'public');
+            $admin->photo = 'storage/' . $path; // Prepend storage/ for easy asset() linking
 
-                $path = $file->store($uploadPath, 'public');
-                $admin->photo = $path; // Remove 'storage/' prefix for now
-
-                Log::info('Admin photo uploaded successfully', [
-                    'path' => $path,
-                    'full_path' => $admin->photo,
-                    'admin_id' => $admin->admin_id
-                ]);
-
-                // Sync file to public/storage
-                $this->syncStorageFile($path);
-            } catch (\Exception $e) {
-                Log::error('Failed to upload admin photo: ' . $e->getMessage());
-                return redirect()->route('admin.profile')->with('error', 'Failed to upload photo: ' . $e->getMessage());
-            }
+            Log::info('Admin photo uploaded successfully', [
+                'path' => $path,
+                'admin_id' => $admin->admin_id
+            ]);
         }
 
         $admin->save();

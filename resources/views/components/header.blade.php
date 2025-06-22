@@ -56,7 +56,9 @@
                 <div class="d-none d-lg-inline-block ml-2">
                     Hi,
                     @if (Auth::check())
-                        @if (Auth::user()->role === 'student' && Auth::user()->student)
+                        @if (Auth::user()->role === 'admin' && Auth::user()->admin)
+                            {{ Auth::user()->admin->name }}
+                        @elseif (Auth::user()->role === 'student' && Auth::user()->student)
                             {{ Auth::user()->student->name }}
                         @elseif(Auth::user()->role === 'lecturer' && Auth::user()->lecturer)
                             {{ Auth::user()->lecturer->name }}
