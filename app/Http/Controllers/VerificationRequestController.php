@@ -329,10 +329,8 @@ class VerificationRequestController extends Controller
             Log::error('Error downloading certificate: ' . $e->getMessage());
             abort(500, 'An error occurred while downloading the certificate.');
         }
-    }
-
-    /**
-     * Generate PDF certificate using existing template
+    }    /**
+     * Generate PDF certificate using blank template (no positioning/filling)
      */
     private function generateCertificate($verificationRequest)
     {
@@ -343,15 +341,10 @@ class VerificationRequestController extends Controller
         }
 
         $student = $verificationRequest->user->student;
-        Log::info('Generating certificate for student: ' . $student->name);
+        Log::info('Generating blank certificate template for student: ' . $student->name);
 
         try {
-            // Create new PDF instance
-            Log::info('Creating FPDI instance');
-            $pdf = new Fpdi();
-            $pdf->AddPage();
-
-            // Import the existing PDF template
+            // Simply copy the blank template to the storage location
             $templatePath = public_path('surat-keterangan-ujian.pdf');
             Log::info('Template path: ' . $templatePath);
 
@@ -359,70 +352,9 @@ class VerificationRequestController extends Controller
                 throw new \Exception('Template PDF not found at: ' . $templatePath);
             }
 
-            Log::info('Template file exists, importing...');
+            Log::info('Template file exists, copying blank template...');
 
-            $pageCount = $pdf->setSourceFile($templatePath);
-            $templateId = $pdf->importPage(1);
-            $pdf->useTemplate($templateId, 0, 0, 210); // A4 width = 210mm
-
-            // Set font for text overlay (use helvetica which is built-in)
-            $pdf->SetFont('helvetica', '', 10);
-            $pdf->SetTextColor(0, 0, 0);
-
-            // Fill in the form fields with exact coordinates based on template
-            $pdf->SetFont('helvetica', '', 9);
-            $pdf->SetTextColor(0, 0, 0);
-
-            // Coordinates based on careful analysis of the template:
-
-            // Header name field (Yang bertanda tangan di bawah ini)
-            $pdf->SetXY(50, 80);
-            $pdf->Cell(0, 4, $student->name ?? 'N/A', 0, 0, 'L');
-
-            // Field 1: Nama
-            $pdf->SetXY(50, 95);
-            $pdf->Cell(0, 4, $student->name ?? 'N/A', 0, 0, 'L');
-
-            // Field 2: NIP (use as NIM)
-            $pdf->SetXY(50, 102);
-            $pdf->Cell(0, 4, $student->nim ?? 'N/A', 0, 0, 'L');
-
-            // Field 3: Pangkat, golongan, ruang (use as study program)
-            $pdf->SetXY(120, 109);
-            $pdf->Cell(0, 4, $student->study_program ?? 'N/A', 0, 0, 'L');
-
-            // Field 4: Jabatan (use as major)
-            $pdf->SetXY(70, 116);
-            $pdf->Cell(0, 4, $student->major ?? 'N/A', 0, 0, 'L');
-
-            // Add approval date in the signature area (bottom right)
-            $pdf->SetXY(140, 200);
-            $pdf->Cell(0, 5, 'Malang, ' . now()->format('d F Y'), 0, 0, 'L');
-
-            // Add admin name in signature area (bottom right)
-            $pdf->SetXY(140, 240);
-            $pdf->Cell(0, 5, Auth::user()->name, 0, 0, 'L');
-
-            // Generate QR Code
-            $qrData = 'VERIFY-' . $verificationRequest->request_id . '-' . time();
-            $qrCode = new QrCode($qrData);
-            $qrCode->setSize(60);
-            $writer = new PngWriter();
-            $qrResult = $writer->write($qrCode);
-
-            // Save QR code temporarily
-            $qrTempPath = storage_path('app/temp_qr_' . time() . '.png');
-            file_put_contents($qrTempPath, $qrResult->getString());
-
-            // Add QR code to PDF (adjust position as needed)
-            $pdf->Image($qrTempPath, 160, 250, 20, 20); // Adjust position and size
-
-            // Clean up temporary QR file
-            if (file_exists($qrTempPath)) {
-                unlink($qrTempPath);
-            }
-
-            // Save the final PDF
+            // Save the blank template as the certificate
             $fileName = 'verification_' . $verificationRequest->request_id . '_' . time() . '.pdf';
             $filePath = 'verification_letters/' . $fileName;
             $fullPath = storage_path('app/public/' . $filePath);
@@ -433,17 +365,18 @@ class VerificationRequestController extends Controller
                 mkdir($directory, 0755, true);
             }
 
-            $pdf->Output($fullPath, 'F');
+            // Copy the blank template
+            copy($templatePath, $fullPath);
 
+            Log::info('Blank certificate template generated successfully');
             return $filePath;
         } catch (\Exception $e) {
-            Log::error('FPDI PDF generation failed: ' . $e->getMessage());
+            Log::error('Template copy failed: ' . $e->getMessage());
             Log::info('Falling back to simple PDF generation');
 
             // Fallback: create simple PDF without template
             return $this->generateSimpleCertificate($verificationRequest);
-        }
-    }
+        }    }
 
     /**
      * Fallback method to generate simple certificate

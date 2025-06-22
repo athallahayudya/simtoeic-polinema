@@ -25,12 +25,9 @@
       <!-- Verification Request Form -->
       <div class="row">
       <div class="col-lg-8 col-md-10 mx-auto">
-        <div class="card shadow-sm">
-        <div class="card-header bg-gradient-primary py-3">
-          <h4 class="mb-0 text-white"><i class="fas fa-certificate mr-2 text-white"></i>New Verification Request
-          </h4>
-        </div>
-        <div class="card-body p-4">
+        <div class="card shadow-sm">        <div class="card-header bg-gradient-primary py-3">
+          <h4 class="mb-0 text-white"><i class="fas fa-certificate mr-2 text-white"></i>New Verification Request</h4>
+        </div>        <div class="card-body p-4">
           @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
         <i class="fas fa-check-circle mr-2"></i>{{ session('success') }}

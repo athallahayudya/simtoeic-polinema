@@ -310,9 +310,7 @@ Route::group(['prefix' => 'student', 'middleware' => ['auth', 'prevent-back-hist
     Route::post('/profile/update', [StudentController::class, 'updateProfile'])->name('student.profile.update');
     Route::get('/registration', [StudentController::class, 'showRegistrationForm'])->name('student.registration.form');
     Route::post('/register-exam', [StudentController::class, 'registerExam'])->name('student.register.exam');
-    Route::post('/certificate/update/{status}', [StudentController::class, 'updateCertificateStatus'])->name('student.certificate.update');
-
-    // Request routes
+    Route::post('/certificate/update/{status}', [StudentController::class, 'updateCertificateStatus'])->name('student.certificate.update');    // Request routes
     Route::get('/request', [StudentController::class, 'requestIndex'])->name('student.request.index');
     Route::get('/request/detail/{id}', [StudentController::class, 'getRequestDetail'])->name('student.request.detail');
     Route::get('/verification-request', [StudentController::class, 'showVerificationRequestForm'])->name('student.verification.request.form');
@@ -325,7 +323,7 @@ Route::group(['prefix' => 'staff', 'middleware' => ['auth', 'prevent-back-histor
     Route::get('/profile', [StaffController::class, 'profile'])->name('staff.profile');
     Route::post('/profile/update', [StaffController::class, 'updateProfile'])->name('staff.profile.update');
     Route::get('/registration', [StaffController::class, 'showRegistrationForm'])->name('staff.registration.form');
-       Route::post('/certificate/update/{status}', [StaffController::class, 'updateCertificateStatus'])->name('staff.certificate.update');
+    Route::post('/certificate/update/{status}', [StaffController::class, 'updateCertificateStatus'])->name('staff.certificate.update');
 });
 
 // Alumni routes
@@ -334,7 +332,7 @@ Route::group(['prefix' => 'alumni', 'middleware' => ['auth', 'prevent-back-histo
     Route::get('/profile', [AlumniController::class, 'profile'])->name('alumni.profile');
     Route::post('/profile/update', [AlumniController::class, 'updateProfile'])->name('alumni.profile.update');
     Route::get('/registration', [AlumniController::class, 'showRegistrationForm'])->name('alumni.registration.form');
-       Route::post('/certificate/update/{status}', [AlumniController::class, 'updateCertificateStatus'])->name('alumni.certificate.update');
+    Route::post('/certificate/update/{status}', [AlumniController::class, 'updateCertificateStatus'])->name('alumni.certificate.update');
 });
 
 // Lecturer routes
@@ -343,23 +341,13 @@ Route::group(['prefix' => 'lecturer', 'middleware' => ['auth', 'prevent-back-his
     Route::get('/profile', [LecturerController::class, 'profile'])->name('lecturer.profile');
     Route::post('/profile/update', [LecturerController::class, 'updateProfile'])->name('lecturer.profile.update');
     Route::get('/registration', [LecturerController::class, 'showRegistrationForm'])->name('lecturer.registration.form');
-       Route::post('/certificate/update/{status}', [LecturerController::class, 'updateCertificateStatus'])->name('lecturer.certificate.update');
+    Route::post('/certificate/update/{status}', [LecturerController::class, 'updateCertificateStatus'])->name('lecturer.certificate.update');
 });
 
 // admin routes
 Route::middleware(['auth'])->group(function () {
     Route::get('/admin/profile', [AdminProfileController::class, 'show'])->name('admin.profile');
     Route::post('/admin/profile/update', [AdminProfileController::class, 'update'])->name('admin.profile.update');
-});
-
-// Admin Verification Requests route
-Route::group(['prefix' => 'admin/verification-requests', 'middleware' => ['auth', 'prevent-back-history']], function () {
-    Route::get('/', [App\Http\Controllers\VerificationRequestController::class, 'index'])->name('admin.verification.requests.index');
-    Route::get('/data', [App\Http\Controllers\VerificationRequestController::class, 'getData'])->name('admin.verification.requests.data');
-    Route::get('/{id}', [App\Http\Controllers\VerificationRequestController::class, 'show'])->name('admin.verification.requests.show');
-    Route::post('/{id}/approve', [App\Http\Controllers\VerificationRequestController::class, 'approve'])->name('admin.verification.requests.approve');
-    Route::post('/{id}/reject', [App\Http\Controllers\VerificationRequestController::class, 'reject'])->name('admin.verification.requests.reject');
-    Route::get('/{id}/download', [App\Http\Controllers\VerificationRequestController::class, 'downloadCertificate'])->name('admin.verification.download');
 });
 
 
