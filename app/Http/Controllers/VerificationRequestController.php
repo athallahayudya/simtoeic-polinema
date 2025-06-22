@@ -329,7 +329,8 @@ class VerificationRequestController extends Controller
             Log::error('Error downloading certificate: ' . $e->getMessage());
             abort(500, 'An error occurred while downloading the certificate.');
         }
-    }    /**
+    }
+    /**
      * Generate PDF certificate using blank template (no positioning/filling)
      */
     private function generateCertificate($verificationRequest)
@@ -376,7 +377,8 @@ class VerificationRequestController extends Controller
 
             // Fallback: create simple PDF without template
             return $this->generateSimpleCertificate($verificationRequest);
-        }    }
+        }
+    }
 
     /**
      * Fallback method to generate simple certificate
