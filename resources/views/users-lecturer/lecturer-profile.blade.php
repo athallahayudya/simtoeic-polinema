@@ -136,24 +136,6 @@
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label>Lecturer ID</label>
-                                                <input type="text" class="form-control readonly-field"
-                                                    value="{{ isset($lecturer) && $lecturer->lecturer_id ? $lecturer->lecturer_id : '-' }}"
-                                                    readonly>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label>NIDN</label>
-                                                <input type="text" class="form-control readonly-field"
-                                                    value="{{ isset($lecturer) && $lecturer->nidn ? $lecturer->nidn : '' }}"
-                                                    readonly>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
                                                 <label>Full Name</label>
                                                 <input type="text" name="name" class="form-control readonly-field"
                                                     value="{{ isset($lecturer) && $lecturer->name ? $lecturer->name : auth()->user()->name ?? '' }}"
@@ -165,6 +147,17 @@
                                                 @enderror
                                             </div>
                                         </div>
+
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>NIDN</label>
+                                                <input type="text" class="form-control readonly-field"
+                                                    value="{{ isset($lecturer) && $lecturer->nidn ? $lecturer->nidn : '' }}"
+                                                    readonly>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label>Phone Number</label> <input type="tel" name="phone_number"

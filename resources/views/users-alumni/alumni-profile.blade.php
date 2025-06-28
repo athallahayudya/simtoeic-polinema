@@ -136,22 +136,6 @@
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label>Alumni ID</label>
-                                                <input type="text" class="form-control readonly-field"
-                                                    value="{{ $alumni->alumni_id ?? '-' }}" readonly>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label>NIK</label>
-                                                <input type="text" class="form-control readonly-field"
-                                                    value="{{ $alumni->nik ?? '' }}" readonly>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
                                                 <label>Full Name</label>
                                                 <input type="text" name="name" class="form-control readonly-field"
                                                     value="{{ $alumni->name ?? '' }}" readonly>
@@ -161,6 +145,16 @@
                                                 @enderror
                                             </div>
                                         </div>
+                                        
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>NIK</label>
+                                                <input type="text" class="form-control readonly-field"
+                                                    value="{{ $alumni->nik ?? '' }}" readonly>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label>Phone Number</label>

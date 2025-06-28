@@ -151,11 +151,16 @@
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label>Student ID</label>
-                                                <input type="text" class="form-control readonly-field"
-                                                    value="{{ $student->student_id ?? '-' }}" readonly>
+                                                <label>Full Name</label>
+                                                <input type="text" name="name" class="form-control readonly-field"
+                                                    value="{{ $student->name ?? '' }}" readonly>
+                                                <input type="hidden" name="name" value="{{ $student->name ?? '' }}">
+                                                @error('name')
+                                                    <div class="text-danger">{{ $message }}</div>
+                                                @enderror
                                             </div>
                                         </div>
+
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label>NIM</label>
@@ -166,17 +171,6 @@
                                     </div>
 
                                     <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label>Full Name</label>
-                                                <input type="text" name="name" class="form-control readonly-field"
-                                                    value="{{ $student->name ?? '' }}" readonly>
-                                                <input type="hidden" name="name" value="{{ $student->name ?? '' }}">
-                                                @error('name')
-                                                    <div class="text-danger">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label>Phone Number</label>

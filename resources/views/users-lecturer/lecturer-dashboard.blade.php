@@ -171,7 +171,7 @@
                                             </div>
                                         @endif
                                         @if ($announcements && strpos($announcements->content, 'Have you obtained the certificate?') !== false)
-                                            @if (Auth::user()->exam_status === 'success')
+                                            @if (Auth::user()->exam_status === 'success' || Auth::user()->exam_status === 'fail')
                                                 <div class="d-flex justify-content-end mt-2">
                                                     @if ($user->certificate_status === 'not_taken')
                                                         <form
@@ -187,8 +187,7 @@
                                                 </div>
                                             @else
                                                 <div class="alert alert-info mt-2" role="alert">
-                                                    Button to confirm certificate collection is only available after passing
-                                                    the exam.
+                                                    Button to confirm certificate collection is only available after taking the exam.
                                                 </div>
                                             @endif
                                         @endif
