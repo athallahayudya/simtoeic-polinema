@@ -188,14 +188,14 @@ class AlumniController extends Controller
             $alumni->ktp_scan = 'storage/' . $ktpPath;
         }
 
-        // Handle KTM/ID card scan upload
-        if ($request->hasFile('ktm_scan')) {
-            if ($alumni->ktm_scan && Storage::disk('public')->exists(str_replace('storage/', '', $alumni->ktm_scan))) {
-                Storage::disk('public')->delete(str_replace('storage/', '', $alumni->ktm_scan));
-            }
-            $ktmPath = $request->file('ktm_scan')->store('alumni/id_card', 'public');
-            $alumni->ktm_scan = 'storage/' . $ktmPath;
-        }
+        // // Handle KTM/ID card scan upload
+        // if ($request->hasFile('ktm_scan')) {
+        //     if ($alumni->ktm_scan && Storage::disk('public')->exists(str_replace('storage/', '', $alumni->ktm_scan))) {
+        //         Storage::disk('public')->delete(str_replace('storage/', '', $alumni->ktm_scan));
+        //     }
+        //     $ktmPath = $request->file('ktm_scan')->store('alumni/id_card', 'public');
+        //     $alumni->ktm_scan = 'storage/' . $ktmPath;
+        // }
 
         // Simpan perubahan data alumni
         $alumni->save();
